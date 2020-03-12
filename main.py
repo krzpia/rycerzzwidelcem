@@ -534,6 +534,13 @@ class Game:
                         self.player.active_spell = self.player.selected_spell
                         self.player.update_stats()
                 if event.key == pygame.K_e:
+                    ####### ROZMAWIAJ Z NPC
+                    npcs_to_talk = pygame.sprite.spritecollide(self.player,self.act_lvl.npcs,False,collide_double_hit_rect)
+                    for npc in npcs_to_talk:
+                        print ("TALK")
+                        self.paused = True
+                        self.dialog_in_progress = True
+                        self.dialog_box.start_conversation(npc)
                     ######## PODNIES PRZEDMIOT
                     items_to_pick = pygame.sprite.spritecollide(self.player, self.act_lvl.items_to_pick, False,
                                                                 collide_double_hit_rect)
@@ -585,6 +592,7 @@ class Game:
                             self.ph_treasure_inv = False
                             self.ph_spell_book = False
                             self.treasure_inv = False
+                            self.dialog_in_progress = False
                             self.player.update_stats()
                         else:
                             self.paused = True
@@ -692,6 +700,9 @@ class Game:
                                 # 5. CZAR DEFENSYWNY
                             if self.cast_button.check_if_clicked(mouse_pos):
                                 self.player.active_spell.cast(self.player)
+                        # 5. PRZYCISKI DIALOG BOX
+                        if self.dialog_in_progress:
+                            self.dialog_box.check_buttons(mouse_pos)
 
     def update(self):
         mouse_pos = pygame.mouse.get_pos()
@@ -722,9 +733,9 @@ class Game:
                 self.cast_button.deactivate()
         else:
             self.cast_button.deactivate()
-        #### ACTIVATE DIALOG BUTTONS ####
-        #
-        #
+        #### DIALOG BUTTONS ####
+        if self.dialog_in_progress:
+            self.dialog_box.update(mouse_pos)
         #### ACTIVATE INV_USE_BUTTON ####
         if self.item_picked:
             if self.item_picked.type == "potion" or self.item_picked.type == "book":
@@ -1162,7 +1173,7 @@ class Game:
                 self.cast_button.show_button(self.screen)
             # DIALOG BOX
             elif self.dialog_in_progress:
-                self.active_dialog.show(self.screen)
+                self.dialog_box.show(self.screen)
         #### RYSUJEMY TEKST ROBOCZY
         self.write(str(self.clock.get_fps()), (0, 0))
         #### SREDNIA FPS

@@ -518,17 +518,65 @@ class DialogBox:
     def __init__(self, game):
         self.game = game
         self.pos = (50, 120)
-        self.image = dialogbox_img
-        self.ok_button = RadioButton(button_d_img,button_a_img,178,290)
-        self.write("TEST")
+        self.image = dialogbox_img.copy()
+        self.ok_button = RadioButton(rad_ok_img,rad_ok_h_img,178,290)
+        self.act_line = False
+        self.last_line = False
+        self.npc = False
+        self.step = 0
+        #self.write("TEST", 0)
 
-    def write(self, txt):
-        ln_counter = 0
-        self.game.s_write(txt,self.image, (10, 40 + ln_counter * 20), (WHITE))
+    def find_act_line(self):
+        for line in self.npc.dialogs.lines:
+            if line.nr == self.step:
+                if line.active:
+                    self.act_line = line
+                    return 1
+        print ("CANNOT FIND A LINE")
+
+    def start_conversation(self,npc):
+        self.step = 0
+        self.clear()
+        self.npc = npc
+        self.find_act_line()
+        self.write_line()
+
+    def write_line(self):
+        if self.act_line.speaker == "n":
+            self.image.blit(pygame.transform.scale(self.npc.image,(48,48)), (210, 18))
+            self.game.s_write(self.npc.name,self.image,(80,35),(WHITE))
+        elif self.act_line.speaker == "p":
+            self.image.blit(pygame.transform.scale(self.game.player.image, (48, 48)), (210, 18))
+            self.game.s_write(self.game.player.name, self.image, (80, 35), (WHITE))
+        self.write(self.act_line.txt,0)
+
+    def next(self):
+        self.step += 1
+        self.last_line = self.act_line
+        self.clear()
+        self.find_act_line()
+        self.write_line()
+        if self.last_line:
+            print ("LAST LINE: " + self.last_line.txt)
+        print ("ACT LINE: " + self.act_line.txt )
+
+    def write(self, txt, ln):
+        self.game.s_write(txt,self.image, (35, 100 + ln * 20), (WHITE))
+
+    def clear(self):
+        self.image = dialogbox_img.copy()
 
     def show(self, screen):
         self.ok_button.show_button(self.image)
         screen.blit(self.image, self.pos)
+
+    def update(self, mouse_pos):
+        mouse_x = mouse_pos[0]
+        mouse_y = mouse_pos[1]
+        mouse_x -= self.pos[0]
+        mouse_y -= self.pos[1]
+        self.mouse_pos = (mouse_x, mouse_y)
+        self.ok_button.check_if_highlight(self.mouse_pos)
 
     def check_buttons(self, mouse_pos):
         mouse_x = mouse_pos[0]
@@ -537,7 +585,44 @@ class DialogBox:
         mouse_y -= self.pos[1]
         self.mouse_pos = (mouse_x, mouse_y)
         if self.ok_button.active:
-            self.ok_button.check_if_clicked(self.mouse_pos)
+            if self.ok_button.check_if_clicked(self.mouse_pos):
+                if self.act_line.type == "b":
+                    self.game.dialog_in_progress = False
+                    self.game.paused = False
+                else:
+                    self.next()
+
+class NpcDialogData:
+    def __init__(self, game):
+        self.game = game
+        self.lines = []
+        self.quests = False
+
+    def add_line(self, type, speaker, active, goto, statchange, txt):
+        nr = len(self.lines)
+        self.lines.append(DialLine(nr,type, speaker,active,goto,statchange, txt))
+
+    def print_lines(self):
+        for line in self.lines:
+            print(str(line.nr) + line.txt)
+
+    def get_line_txt(self, nr):
+        return self.lines[nr].txt
+
+    def get_line(self, nr):
+        return self.lines[nr]
+
+class DialLine:
+    def __init__(self, nr, type, speaker, active, goto, statchange, txt):
+        self.nr = nr
+        self.type = type
+        self.speaker = speaker
+        self.active = active
+        self.goto = goto
+        self.statchange = statchange
+        self.txt = txt
+
+
 
 
 

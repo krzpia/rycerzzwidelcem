@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="50" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="14" nextobjectid="284">
+<map version="1.2" tiledversion="1.3.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="50" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="14" nextobjectid="285">
  <tileset firstgid="1" source="terrain_tile_set.tsx"/>
  <tileset firstgid="1025" source="build atlas.tsx"/>
  <tileset firstgid="2049" source="full tileset.tsx"/>
@@ -344,6 +344,53 @@
    </properties>
   </object>
  </objectgroup>
+ <objectgroup id="12" name="teleport">
+  <object id="261" name="teleport" x="868" y="438" width="24" height="30">
+   <properties>
+    <property name="destination" value="level02"/>
+    <property name="pos_x" type="int" value="43"/>
+    <property name="pos_y" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="264" name="arrow" x="1469" y="366">
+   <properties>
+    <property name="number" type="int" value="1"/>
+   </properties>
+  </object>
+  <object id="265" name="arrow" x="1557" y="374">
+   <properties>
+    <property name="number" type="int" value="2"/>
+   </properties>
+  </object>
+  <object id="266" name="arrow" x="1454" y="145">
+   <properties>
+    <property name="number" type="int" value="1"/>
+   </properties>
+  </object>
+  <object id="267" name="arrow" x="1565" y="924">
+   <properties>
+    <property name="number" type="int" value="1"/>
+   </properties>
+  </object>
+  <object id="268" name="arrow" x="1430" y="921">
+   <properties>
+    <property name="number" type="int" value="3"/>
+   </properties>
+  </object>
+  <object id="269" name="arrow" x="33" y="529">
+   <properties>
+    <property name="number" type="int" value="1"/>
+   </properties>
+  </object>
+  <object id="272" name="pintrap" x="63" y="545" width="32" height="32"/>
+  <object id="273" name="pintrap" x="640" y="353" width="32" height="32"/>
+  <object id="274" name="pintrap" x="608" y="416" width="32" height="32"/>
+  <object id="275" name="pintrap" x="640" y="480" width="32" height="32"/>
+  <object id="284" name="pintrap" x="66" y="416" width="32" height="32"/>
+ </objectgroup>
+ <objectgroup id="13" name="npcs">
+  <object id="283" name="Gold Crusader" type="npc" gid="6420" x="90" y="53" width="32" height="32"/>
+ </objectgroup>
  <objectgroup id="8" name="items">
   <object id="192" name="gold" x="192" y="624">
    <properties>
@@ -443,51 +490,5 @@
     <property name="treasure_value" type="int" value="26"/>
    </properties>
   </object>
- </objectgroup>
- <objectgroup id="12" name="teleport">
-  <object id="261" name="teleport" x="868" y="438" width="24" height="30">
-   <properties>
-    <property name="destination" value="level02"/>
-    <property name="pos_x" type="int" value="43"/>
-    <property name="pos_y" type="int" value="3"/>
-   </properties>
-  </object>
-  <object id="264" name="arrow" x="1469" y="366">
-   <properties>
-    <property name="number" type="int" value="1"/>
-   </properties>
-  </object>
-  <object id="265" name="arrow" x="1557" y="374">
-   <properties>
-    <property name="number" type="int" value="2"/>
-   </properties>
-  </object>
-  <object id="266" name="arrow" x="1454" y="145">
-   <properties>
-    <property name="number" type="int" value="1"/>
-   </properties>
-  </object>
-  <object id="267" name="arrow" x="1565" y="924">
-   <properties>
-    <property name="number" type="int" value="1"/>
-   </properties>
-  </object>
-  <object id="268" name="arrow" x="1430" y="921">
-   <properties>
-    <property name="number" type="int" value="3"/>
-   </properties>
-  </object>
-  <object id="269" name="arrow" x="33" y="529">
-   <properties>
-    <property name="number" type="int" value="1"/>
-   </properties>
-  </object>
-  <object id="272" name="pintrap" x="65" y="416" width="32" height="32"/>
-  <object id="273" name="pintrap" x="640" y="353" width="32" height="32"/>
-  <object id="274" name="pintrap" x="608" y="416" width="32" height="32"/>
-  <object id="275" name="pintrap" x="640" y="480" width="32" height="32"/>
- </objectgroup>
- <objectgroup id="13" name="npcs">
-  <object id="283" name="Gold Crusader" type="npc" gid="6420" x="90" y="53" width="32" height="32"/>
  </objectgroup>
 </map>

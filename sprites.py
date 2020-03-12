@@ -1397,6 +1397,24 @@ class Player(pygame.sprite.Sprite):
                 self.damaged = False
 
 
+class Npc(pygame.sprite.Sprite):
+    def __init__(self, game, name, start_x, start_y, image):
+        self._layer = MOB_LAYER
+        self.groups = game.act_lvl.all_sprites, game.act_lvl.npcs
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.name = name
+        self.image = image
+        self.start_x = start_x
+        self.start_y = start_y
+        self.visible = True
+        self.rect = self.image.get_rect()
+        self.rect.x = self.start_x
+        self.rect.y = self.start_y
+        self.hit_rect = pygame.Rect(0, 0, TILE_SIZE - 5, TILE_SIZE - 5)
+        self.hit_rect.center = self.rect.center
+        self.dialogs = NpcDialogData(self.game)
+
 class Mob(pygame.sprite.Sprite):
     ### KLASA PRZECIWNIKA, STOI W SPAWNLOC,
     ### Movement1:

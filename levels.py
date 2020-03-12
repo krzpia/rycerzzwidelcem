@@ -4,12 +4,14 @@ from sprites import *
 from data import *
 from items import ItemGenerator
 from enemies import EnemyGenerator
+from npcs import NpcGenerator
 
 class LevelGen:
     def __init__(self, game):
         self.game = game
         self.gen = ItemGenerator(self.game,tileset_image,full_tileset_image)
         self.enemy_gen = EnemyGenerator(self.game,tileset_image,full_tileset_image)
+        self.npcs_gen = NpcGenerator(self.game,tileset_image,full_tileset_image)
 
     def load(self,name):
         if name == "level01":
@@ -36,7 +38,7 @@ class LevelGen:
         ## NIEWIDZIALNE POLE ZABIERAJACE HP
         self.game.level_02.lavas = pygame.sprite.LayeredUpdates()
         ## NPCS
-        self.game.level_01.npcs = pygame.sprite.LayeredUpdates()
+        self.game.level_02.npcs = pygame.sprite.LayeredUpdates()
         ## PRZECIWNICY
         self.game.level_02.mobs = pygame.sprite.LayeredUpdates()
         ## STRZALY PRZECIWNIKOW
@@ -119,7 +121,7 @@ class LevelGen:
                                           tile_object.r_hr)
             ### NPCS
             if tile_object.type == "npc":
-                pass
+                self.npcs_gen.generate(tile_object.name,tile_object.x,tile_object.y,tile_object.image)
             ### MAP ELEMENTS
             if tile_object.name == "wall":
                 Obstacle(self.game,tile_object.x,tile_object.y,tile_object.width,tile_object.height)

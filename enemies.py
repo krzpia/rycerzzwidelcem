@@ -7,8 +7,6 @@ class EnemyGenerator:
         self.game = game
         self.tileset = tileset1
         self.f_set = tileset2
-        self.enemies = []
-        self.enemies_s = []
 
     def generate(self, name, x, y):
         if name == "Rat":
