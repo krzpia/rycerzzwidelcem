@@ -1,6 +1,6 @@
 import unittest
 
-from dialog import Dialog
+from dialogs.dialog import Dialog
 
 
 class TestDialog(unittest.TestCase):
