@@ -64,7 +64,7 @@ class Game:
         ######## ZMIENNE DO DEBUOWANIA #######
         self.unlock_updates = False
         self.fpss = []
-        self.events_manager = EventsManager()
+        self.events_manager = EventManager()
 
     def get_tile(self, tileset, x, y):
         surface = pygame.Surface((32, 32)).convert_alpha()

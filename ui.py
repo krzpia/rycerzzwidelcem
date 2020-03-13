@@ -1,5 +1,8 @@
+import typing
+
 from data import *
 import spells
+from dialogs.line import Line
 
 pygame.init()
 
@@ -620,41 +623,25 @@ class DialogBox:
         self.last_line = False
         self.npc = False
         self.step = 0
+        self.lines: typing.Optional[typing.Generator[Line, None, None]] = None
         #self.write("TEST", 0)
-
-    def find_act_line(self):
-        for line in self.npc.dialogs.lines:
-            if line.nr == self.step:
-                if line.active:
-                    self.act_line = line
-                    return 1
-        print ("CANNOT FIND A LINE")
 
     def start_conversation(self,npc):
         self.step = 0
-        self.clear()
         self.npc = npc
-        self.find_act_line()
-        self.write_line()
+        self.lines = self.npc.dialog.lines()
+        self.write_line(self.lines)
 
-    def write_line(self):
-        if self.act_line.speaker == "n":
-            self.image.blit(pygame.transform.scale(self.npc.image,(48,48)), (210, 18))
-            self.game.s_write(self.npc.name,self.image,(80,35),(WHITE))
-        elif self.act_line.speaker == "p":
-            self.image.blit(pygame.transform.scale(self.game.player.image, (48, 48)), (210, 18))
-            self.game.s_write(self.game.player.name, self.image, (80, 35), (WHITE))
-        self.write(self.act_line.txt,0)
-
-    def next(self):
-        self.step += 1
-        self.last_line = self.act_line
+    def write_line(self, lines: typing.Generator[Line, None, None]) -> None:
         self.clear()
-        self.find_act_line()
-        self.write_line()
-        if self.last_line:
-            print ("LAST LINE: " + self.last_line.txt)
-        print ("ACT LINE: " + self.act_line.txt )
+        line = next(lines)
+        if line.belongs_to_npc():
+            self.image.blit(pygame.transform.scale(self.npc.image, (48, 48)), (210, 18))
+            self.game.s_write(self.npc.name, self.image, (80, 35), WHITE)
+        else:
+            self.image.blit(pygame.transform.scale(self.game.player.image, (48, 48)), (210, 18))
+            self.game.s_write(self.game.player.name, self.image, (80, 35), WHITE)
+        self.write(line.text, 0)
 
     def write(self, txt, ln):
         self.game.s_write(txt,self.image, (35, 100 + ln * 20), (WHITE))
@@ -682,11 +669,11 @@ class DialogBox:
         self.mouse_pos = (mouse_x, mouse_y)
         if self.ok_button.active:
             if self.ok_button.check_if_clicked(self.mouse_pos):
-                if self.act_line.type == "b":
+                try:
+                    self.write_line(self.lines)
+                except StopIteration:
                     self.game.dialog_in_progress = False
                     self.game.paused = False
-                else:
-                    self.next()
 
 
 class Quest:

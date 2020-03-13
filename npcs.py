@@ -1,4 +1,6 @@
 import sprites
+from events.event import Event
+
 
 class NpcGenerator:
     def __init__(self, game,tileset1, tileset2):
@@ -9,13 +11,28 @@ class NpcGenerator:
     def generate(self, name, x, y, image):
         if name == "Gold Crusader":
             gold_crusader = sprites.Npc(self.game,name,x,y,image)
-            gold_crusader.dialogs.add_line("w", "n", True, False, False, ("Welcome " + self.game.player.name))
-            gold_crusader.dialogs.add_line("w", "p", True, False, False, "Welcome!")
-            gold_crusader.dialogs.add_line("b", "n", True, False, False, ("Farewell " + self.game.player.name))
-            gold_crusader.dialogs.print_lines()
-            #gold_crusader.dialogs.add_n_txt('welcome', "Welcome " + self.game.player.name)
-            #gold_crusader.dialogs.add_n_txt('goodbye', "Farewell " + self.game.player.name)
-            #gold_crusader.dialogs.initial_construct()
+            self.game.events_manager.subscribe(gold_crusader.dialog.handle)
+            gold_crusader.dialog.add_npc_line(
+                f"Welcome {self.game.player.name}! I'm the Gold Crusader!",
+            )
+            gold_crusader.dialog.add_player_line(
+                f'Welcome o Gold Crusader!',
+            )
+            gold_crusader.dialog.add_npc_line(
+                f"What do you seek {self.game.player.name}?",
+            )
+            gold_crusader.dialog.add_player_line(f'I seek a Holy Grail!')
+            gold_crusader.dialog.add_npc_line(
+                f"You are too weak {self.game.player.name}!"
+                "Come back to me when you kill a rat.",
+            )
+            gold_crusader.dialog.set_next_stage(
+                fired_by=Event('Rat has been killed.')
+            )
+            gold_crusader.dialog.add_npc_line(
+                f"So you have killed a Rat - {self.game.player.name}."
+                " I'm impressed!",
+            )
             # Thread welcome:
             # NPC: <Witaj Kris>
             # PL: <Witaj>
@@ -26,7 +43,4 @@ class NpcGenerator:
             # PL: print answers <1/ Tak, 2/Smak, 3/Owak
             # NPC: print comment on answer(answer)
             # NEXT THREAD:
-            #
-            #
-            #
             return gold_crusader
