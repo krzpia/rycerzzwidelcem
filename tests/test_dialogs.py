@@ -16,3 +16,10 @@ class TestDialog(unittest.TestCase):
         dialog = Dialog()
         dialog.add_player_line("I'm the player.")
         assert dialog.lines == [PlayerLine("I'm the player.")]
+
+    def test_dialog_are_added_to_initial_stage(self) -> None:
+        dialog = Dialog()
+        dialog.add_player_line("I'm the player.")
+        self.assertEqual(
+            dialog.lines_for_stage(0), [PlayerLine("I'm the player.")]
+        )
