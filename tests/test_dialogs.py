@@ -82,4 +82,12 @@ class TestDialog(unittest.TestCase):
         lines = dialog.lines()
         self.assertEqual(next(lines), PlayerLine("I'm the player."))
 
-    def test_
+    def test_triggering_events_has_to_happen_in_order(self) -> None:
+        dialog = Dialog()
+        dialog.add_player_line("I'm the player.")
+        dialog.set_next_stage(fired_by=Event('Rat killed'))
+        dialog.add_npc_line("I'm Npc. You have killed a rat")
+        dialog.set_next_stage(fired_by=Event('Item found'))
+        dialog.handle(event=Event('Item found'))
+        lines = dialog.lines()
+        self.assertEqual(next(lines), PlayerLine("I'm the player."))

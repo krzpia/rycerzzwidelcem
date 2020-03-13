@@ -28,7 +28,7 @@ class Dialog:
     def set_next_stage(self, fired_by: Event) -> None:
         self.setup_stage += 1
         self.lines_by_stage[self.setup_stage] = []
-        self.triggers.append(fired_by)
+        self.triggers.insert(0, fired_by)
 
     def lines(self) -> typing.Generator[Line, None, None]:
         for line in self.lines_by_stage[self.stage]:
