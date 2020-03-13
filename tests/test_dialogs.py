@@ -48,7 +48,7 @@ class TestDialog(unittest.TestCase):
             [NpcLine("Wow you have killed a Huuuge rat")]
         )
 
-    def test_dialog_line_method_returnes_lines_for_initial_stage(self) -> None:
+    def test_presents_lines_for_initial_stage(self) -> None:
         dialog = Dialog()
         dialog.add_player_line("I'm the player.")
         dialog.set_next_stage(fired_by=Event('Rat killed'))
