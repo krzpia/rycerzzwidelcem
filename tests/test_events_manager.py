@@ -1,9 +1,8 @@
 import unittest
 
-import typing
 from events.event import Event
+from events.events_manager import Subscriber
 
-Subscriber = typing.Callable[['Event'], None]
 
 class EventManager:
 
