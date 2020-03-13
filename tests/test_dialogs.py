@@ -72,3 +72,14 @@ class TestDialog(unittest.TestCase):
         self.assertEqual(next(lines), PlayerLine("Yes I did!"))
         with self.assertRaises(StopIteration):
             next(lines)
+
+    def test_only_specified_events_trigger_stage_change(self) -> None:
+        dialog = Dialog()
+        dialog.add_player_line("I'm the player.")
+        dialog.set_next_stage(fired_by=Event('Rat killed'))
+        dialog.add_npc_line("I'm Npc. You have killed a rat")
+        dialog.handle(event=Event('Item found'))
+        lines = dialog.lines()
+        self.assertEqual(next(lines), PlayerLine("I'm the player."))
+
+    def test_
