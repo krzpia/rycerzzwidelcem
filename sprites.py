@@ -8,6 +8,7 @@ import pytweening as pytw
 from os import path
 from data import *
 from itertools import chain
+from events.event import Event
 
 pygame.init()
 
