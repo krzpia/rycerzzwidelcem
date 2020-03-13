@@ -28,5 +28,6 @@ class Dialog:
         self.setup_stage += 1
         self.lines_by_stage[self.setup_stage] = []
 
-    def line(self) -> typing.Generator[Line, None, None]:
-        yield from self.lines_by_stage[self.stage]
+    def lines(self) -> typing.Generator[Line, None, None]:
+        for line in self.lines_by_stage[self.stage]:
+            yield line

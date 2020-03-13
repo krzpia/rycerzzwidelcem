@@ -11,12 +11,12 @@ class TestDialog(unittest.TestCase):
     def test_dialog_can_have_npc_lines(self) -> None:
         dialog = Dialog()
         dialog.add_npc_line("I'm Npc. What's your name?")
-        assert next(dialog.line()) == NpcLine("I'm Npc. What's your name?")
+        assert next(dialog.lines()) == NpcLine("I'm Npc. What's your name?")
 
     def test_dialog_can_have_player_lines(self) -> None:
         dialog = Dialog()
         dialog.add_player_line("I'm the player.")
-        assert next(dialog.line()) == PlayerLine("I'm the player.")
+        assert next(dialog.lines()) == PlayerLine("I'm the player.")
 
     def test_dialog_are_added_to_initial_stage(self) -> None:
         dialog = Dialog()
@@ -54,4 +54,7 @@ class TestDialog(unittest.TestCase):
         dialog.set_next_stage(fired_by=Event('Rat killed'))
         dialog.add_npc_line("I'm Npc. You have killed a rat")
         dialog.add_player_line("Yes I did!")
-        self.assertEqual(next(dialog.line()), PlayerLine("I'm the player."))
+        lines = dialog.lines()
+        self.assertEqual(next(lines), PlayerLine("I'm the player."))
+        with self.assertRaises(StopIteration):
+            next(lines)
