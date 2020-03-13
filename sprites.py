@@ -1699,6 +1699,7 @@ class Mob(pygame.sprite.Sprite):
                 self.last_damage = now
                 self.damaged = True
             if self.hp <= 0:
+                self.game.events_manager.emit(Event(id=f'{self.name} has been killed.'))
                 self.kill()
         ### OBRAZENIA OD STRZAL INNYCH POTWOROW:
         hits = pygame.sprite.spritecollide(self,self.game.act_lvl.mob_arrows, False)
