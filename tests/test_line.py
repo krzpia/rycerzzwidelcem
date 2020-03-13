@@ -11,3 +11,9 @@ class TestLine(unittest.TestCase):
 
     def test_player_line_knows_its_owner(self) -> None:
         self.assertFalse(PlayerLine("I'm Player!").belongs_to_npc())
+
+    def test_line_equal_if_text_and_type_equal(self) -> None:
+        self.assertEqual(NpcLine('text'), NpcLine('text'))
+
+    def test_line_different_if_text_equal_but_types_differ(self) -> None:
+        self.assertNotEqual(NpcLine('text'), PlayerLine('text'))
