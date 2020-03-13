@@ -18,26 +18,39 @@ class EventManager:
     def subscribe(self, callback: Subscriber) -> None:
         self.subscribers.append(callback)
 
+    def history(self) -> typing.List['Event']:
+        return self.events[::-1]
 
 class Event:
 
+    def __init__(self, id: str) -> None:
+        self.id = id
+
     def __eq__(self, other: 'Event') -> bool:
-        return True
+        return self.id == other.id
 
 
 class TestEventManager(unittest.TestCase):
 
     def test_manager_can_emit_event(self) -> None:
         manager = EventManager()
-        manager.emit(Event())
-        assert manager.events == [Event()]
+        manager.emit(Event('Rat killed'))
+        assert manager.events == [Event('Rat killed')]
 
     def test_manager_publishes_events_to_subscribers(self) -> None:
         subscriber = SpySubscriber()
         manager = EventManager()
         manager.subscribe(subscriber.receive)
-        manager.emit(Event())
-        assert subscriber.events == [Event()]
+        manager.emit(Event('Rat killed'))
+        assert subscriber.events == [Event('Rat killed')]
+
+    def test_returns_story_of_events_from_a_newest_to_the_last(self) -> None:
+        manager = EventManager()
+        manager.emit(Event('Rat killed'))
+        manager.emit(Event('Quest completed'))
+        assert (
+            manager.history() == [Event('Quest completed'), Event('Rat killed')]
+        )
 
 
 class SpySubscriber:
