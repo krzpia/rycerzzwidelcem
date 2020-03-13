@@ -8,6 +8,7 @@ import pytweening as pytw
 from os import path
 from data import *
 from itertools import chain
+from events.event import Event
 
 pygame.init()
 
@@ -306,7 +307,7 @@ class Arrow_to_take(pygame.sprite.Sprite):
         self.number = number
         if 0 < self.number <= 1:
             self.image = arrow_icon
-        elif 1 < self.number <= 9:
+        else:
             self.image = arrows_icon
         self.rect = self.image.get_rect()
         self.hit_rect = pygame.Rect(0, 0, TILE_SIZE - 5, TILE_SIZE - 5)
@@ -1698,9 +1699,8 @@ class Mob(pygame.sprite.Sprite):
                 self.damage_alpha = chain(DAMAGE_ALPHA_LIST * 2)
                 self.last_damage = now
                 self.damaged = True
-            if self.hp <= 0:
-                self.game.events_manager.emit(Event(id=f'{self.name} has been killed.'))
-                self.kill()
+            #if self.hp <= 0:
+            #    self.kill()
         ### OBRAZENIA OD STRZAL INNYCH POTWOROW:
         hits = pygame.sprite.spritecollide(self,self.game.act_lvl.mob_arrows, False)
         for hit in hits:
@@ -1711,8 +1711,8 @@ class Mob(pygame.sprite.Sprite):
                 self.damage_alpha = chain(DAMAGE_ALPHA_LIST * 2)
                 self.damaged = True
                 hit.kill()
-                if self.hp <= 0:
-                    self.kill()
+                #if self.hp <= 0:
+                #    self.kill()
         ### KOLIZJE Z MUREM
         self.hit_rect.centerx = self.pos.x
         collide_wall(self,self.game.act_lvl.walls,"x")
@@ -1725,7 +1725,9 @@ class Mob(pygame.sprite.Sprite):
         if self.hp <=0:
             self.game.player.xp += self.xp
             Flesh(self.game,self.pos)
+            ### METODY DO KOLEKCJI INFORMACJI, jedna MOJA, druga COPALCO
             self.game.player.score_killed_enemies.append(self)
+            self.game.events_manager.emit(Event(id=f'{self.name} has been killed.'))
             self.kill()
             pygame.mixer.Sound.play(win_snd)
             if self.game.player.check_next_level():
