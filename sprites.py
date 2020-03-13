@@ -859,8 +859,23 @@ class Player(pygame.sprite.Sprite):
         if self.char_class.spells:
             for spell in self.char_class.spells:
                 self.spell_book.add_spell_by_name(spell)
+            self.spell_book.add_spell_by_name("Fireball")
+            self.spell_book.add_spell_by_name("Tricebolt")
+            self.spell_book.add_spell_by_name("Iron Skin")
+            self.spell_book.add_spell_by_name("Cure")
+            self.spell_book.add_spell_by_name("Freeze")
+            self.spell_book.add_spell_by_name("Invisibility")
+            self.spell_book.add_spell_by_name("Icebolt")
+            self.spell_book.add_spell_by_name("Haste")
+            self.spell_book.add_spell_by_name("Poison Cloud")
+            self.spell_book.add_spell_by_name("Stone Skin")
+
+
         self.active_spell = False
         self.selected_spell = False
+        self.active_quests = []
+        self.completed_quests = []
+        self.failed_quests = []
         self.armor_slot = Slot(slot_a_img)
         self.armor_slot.define_type("armor")
         self.weapon_slot = Slot(slot_w_img)
@@ -1408,12 +1423,20 @@ class Npc(pygame.sprite.Sprite):
         self.start_x = start_x
         self.start_y = start_y
         self.visible = True
+        self.encountered = False
+        self.friendly = 100
+        self.quests = []
         self.rect = self.image.get_rect()
         self.rect.x = self.start_x
         self.rect.y = self.start_y
         self.hit_rect = pygame.Rect(0, 0, TILE_SIZE - 5, TILE_SIZE - 5)
         self.hit_rect.center = self.rect.center
         self.dialogs = NpcDialogData(self.game)
+
+    def put_quest(self, quest):
+        self.quests.append(quest)
+
+
 
 class Mob(pygame.sprite.Sprite):
     ### KLASA PRZECIWNIKA, STOI W SPAWNLOC,

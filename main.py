@@ -129,8 +129,9 @@ class Game:
                                           INV_POS[0] + 140, INV_POS[1] + 80)
         self.inv_open_door_button = RadioButton(rad_open_img, rad_open_h_img,
                                                 INV_POS[0] + 120, INV_POS[1] + 20)
-        self.pause_button = RadioButton(rad_pause_img, rad_pause_h_img, 780, 690)
+        self.pause_button = RadioButton(rad_pause_img, rad_pause_h_img, INV_POS[0]+200, 690)
         self.spell_book_button = RadioButton(sbb_img, sbb_h_img, INV_POS[0], 680)
+        self.quest_book_button = RadioButton(qbb_img,qbb_h_img,INV_POS[0]+100, 680)
         self.cast_button = RadioButton(rad_cast_img, rad_cast_h_img, MAP_WIDTH / 2 - 72, MAP_HEIGHT - 96)
         #### AD BUTTONS
         self.str_ad_button = RadioButton(rad_but_img, rad_but_h_img,
@@ -149,7 +150,8 @@ class Game:
         self.all_buttons = [self.inv_use_button, self.inv_open_door_button,
                             self.str_ad_button, self.sta_ad_button, self.int_ad_button,
                             self.wis_ad_button, self.spe_ad_button, self.ste_ad_button,
-                            self.spell_book_button, self.pause_button, self.cast_button]
+                            self.spell_book_button, self.pause_button, self.cast_button,
+                            self.quest_book_button]
         self.att_buttons = [self.str_ad_button, self.sta_ad_button, self.int_ad_button,
                             self.wis_ad_button, self.spe_ad_button, self.ste_ad_button]
         ####### START LEVEL
@@ -686,6 +688,7 @@ class Game:
                                     self.player.update_stats()
                         # 4. ZAZNACZ lub ODZNACZ CZAR:
                         if self.ph_spell_book:
+                            self.player.spell_book.check_page_buttons(mouse_pos)
                             ## Zaznaczm tylko gdy NIE naciskam guziku cast i spellbook (zeby nie odhaczac bez sensu
                             if not self.spell_book_button.check_if_clicked(
                                     mouse_pos) and not self.cast_button.check_if_clicked_even_inactive(mouse_pos):
@@ -718,6 +721,9 @@ class Game:
         #### HIGHLIGHT BUTTONS #####
         for button in self.all_buttons:
             button.check_if_highlight(mouse_pos)
+        #### HIGLIGHT NEXT PAGE BUTTONS ON SPELL BOOK ###
+        if self.ph_spell_book:
+            self.player.spell_book.update_buttons(mouse_pos)
         ### ACTIVATE ADD BUTTONS ####
         if self.player.attribute_points > 0:
             for button in self.att_buttons:
@@ -1157,6 +1163,7 @@ class Game:
         self.draw_info()
         self.pause_button.show_button(self.screen)
         self.spell_book_button.show_button(self.screen)
+        self.quest_book_button.show_button(self.screen)
         if self.paused:
             self.screen.blit(dim_screen, (MAP_TOPLEFT))
             #### STANY SPECJALNE

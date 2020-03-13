@@ -50,6 +50,11 @@ rad_ok_h_img = pygame.image.load(path.join(img_folder, 'button_ok_red_a.png')).c
 rad_ok_img = pygame.image.load(path.join(img_folder, 'button_ok_red_d.png')).convert_alpha()
 sbb_img = pygame.image.load(path.join(img_folder, 'button_spell_d.png')).convert_alpha()
 sbb_h_img = pygame.image.load(path.join(img_folder, 'button_spell_a.png')).convert_alpha()
+qbb_img = pygame.image.load(path.join(img_folder, 'button_quest_d.png')).convert_alpha()
+qbb_h_img = pygame.image.load(path.join(img_folder, 'button_quest_a.png')).convert_alpha()
+empty_image = pygame.image.load(path.join(img_folder, 'empty_image.png')).convert_alpha()
+next_page_img = pygame.image.load(path.join(img_folder, 'next_page_img.png')).convert_alpha()
+prev_page_img = pygame.image.load(path.join(img_folder, 'prev_page_img.png')).convert_alpha()
 rad_cast_img = pygame.image.load(path.join(img_folder, 'button_cast_d.png')).convert_alpha()
 rad_cast_h_img = pygame.image.load(path.join(img_folder, 'button_cast_a.png')).convert_alpha()
 ### TILESET #####

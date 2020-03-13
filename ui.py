@@ -284,14 +284,72 @@ class Button:
         self.active = False
 
 
+class EButton:
+    def __init__(self, img, x, y):
+        self.img = pygame.Surface((74, 74), pygame.HWSURFACE | pygame.SRCALPHA)
+        self.h_img = img
+        self.rect = self.img.get_rect()
+        self.active = True
+        self.highlighted = False
+        self.x = x
+        self.y = y
+        self.rect.x = x
+        self.rect.y = y
+        self.width = self.img.get_width()
+        self.height = self.img.get_height()
+
+    def show_button(self,surface):
+        self.img.fill((0,0,0,0))
+        if self.highlighted:
+            self.img.blit(self.h_img,(0,0))
+        surface.blit(self.img,(self.rect.x, self.rect.y))
+
+    def check_if_highlight(self, pos_hl):
+        if self.active:
+            if self.rect.x + self.width > pos_hl[0] > self.rect.x and\
+                    (self.rect.y + self.height > pos_hl[1] > self.rect.y):
+                self.highlighted = True
+                return True
+            else:
+                self.highlighted = False
+                return False
+        else:
+            self.highlighted = False
+            return False
+
+    def check_if_clicked(self,pos_cl):
+        self.pos_cl = pos_cl
+        if self.active:
+            if self.rect.x + self.width > self.pos_cl[0] > self.rect.x and\
+                    (self.rect.y + self.height > self.pos_cl[1] > self.rect.y):
+                pygame.mixer.Sound.play(click_snd)
+                return True
+
+    def check_if_clicked_even_inactive(self,pos_cl):
+        self.pos_cl = pos_cl
+        if self.rect.x + self.width > self.pos_cl[0] > self.rect.x and\
+                (self.rect.y + self.height > self.pos_cl[1] > self.rect.y):
+            pygame.mixer.Sound.play(click_snd)
+            return True
+
+    def activate(self):
+        self.active = True
+
+    def deactivate(self):
+        self.active = False
+
 class SpellBook:
     def __init__(self, game):
         self.game = game
+        self.pages = 5
         self.spells = []
         self.image = pygame.Surface((MAP_WIDTH, 466), pygame.HWSURFACE | pygame.SRCALPHA)
         self.image.blit(spellbook_bcg_img, (0, 0))
         self.pos = (5,100)
         self.spellgenerator = spells.SpellGenerator()
+        self.act_page = 0
+        self.next_page_button = EButton(next_page_img,549,377)
+        self.prev_page_button = EButton(prev_page_img,18,376)
 
     def add_spell(self, spell):
         if len(self.spells)<11:
@@ -308,13 +366,49 @@ class SpellBook:
             if i.name == spell.name:
                 return True
 
+    def update_buttons(self, mouse_pos):
+        mouse_x = mouse_pos[0]
+        mouse_y = mouse_pos[1]
+        mouse_x -= self.pos[0]
+        mouse_y -= self.pos[1]
+        self.mouse_pos = (mouse_x, mouse_y)
+        # print ("mod_mouse a (%d, %d)" % self.mouse_pos)
+        self.next_page_button.check_if_highlight(self.mouse_pos)
+        self.prev_page_button.check_if_highlight(self.mouse_pos)
+
+    def check_page_buttons(self, mouse_pos):
+        mouse_x = mouse_pos[0]
+        mouse_y = mouse_pos[1]
+        mouse_x -= self.pos[0]
+        mouse_y -= self.pos[1]
+        self.mouse_pos = (mouse_x, mouse_y)
+        if self.next_page_button.check_if_clicked(self.mouse_pos):
+            if self.act_page < self.pages:
+                self.act_page += 1
+        if self.prev_page_button.check_if_clicked(self.mouse_pos):
+            if self.act_page > 0:
+                self.act_page -= 1
+
     def show(self, screen, pos = (5,100)):
         self.image.blit(spellbook_bcg_img, (0, 0))
+        self.next_page_button.show_button(self.image)
+        self.prev_page_button.show_button(self.image)
         self.pos = pos
-        counter = 0
         x_pos = 40
-        # na razie tylko 1 strona
-        for i in self.spells:
+        ## TWORZE DWUWYMIAROWA TABLICE CZAROW DO ICH WYSWIETLANIA
+        pages = [[] * self.pages for i in range(9)]
+        page_counter = 0
+        spell_counter = 0
+        for spell in self.spells:
+            spell.active = False
+            pages[page_counter].append(spell)
+            spell_counter += 1
+            if spell_counter > 9:
+                page_counter +=1
+        #print ("pages[1][0]" + pages[1][0].name)
+        counter = 0
+        for i in pages[self.act_page]:
+            i.active = True
             i.show_spell(self.image, x_pos, 40 + counter * i.width)
             if i == self.game.player.selected_spell:
                 pygame.draw.rect(self.image,(0,180,0),(x_pos,40+counter*i.width,i.width,i.height),2)
@@ -359,9 +453,11 @@ class SpellBook:
                     self.game.s_write("Freeze time: " + str(i.freeze_effect + self.game.player.intellect) + "s", self.image,
                                       (x_pos + 180, 55 + counter * i.width), (BLACK))
             counter += 1
-            if counter >= 6:
+            if counter >= 5:
                 x_pos = 330
                 counter = 0
+        self.game.s_write((str(self.act_page + 1)),self.image,(160,428),(BLACK))
+        self.game.s_write((str(self.act_page + 1)), self.image, (480, 428), (BLACK))
         screen.blit(self.image,(pos))
 
     def check_spell(self, mouse_pos):
@@ -591,6 +687,84 @@ class DialogBox:
                     self.game.paused = False
                 else:
                     self.next()
+
+
+class Quest:
+    def __init__(self, game, name, level_req, mobs_to_kill,
+                 items_to_collect,
+                 tiles_to_explore,
+                 npcs_to_encounter,
+                 reward_xp, reward_gold):
+        self.game = game
+        self.name = name
+        self.level_req = level_req
+        self.goal = QuestGoal()
+        for i in mobs_to_kill:
+            self.goal.add_mob_to_kill(i)
+        for i in items_to_collect:
+            self.goal.add_item_to_collect(i)
+        for i in tiles_to_explore:
+            self.goal.add_tile_to_explore(i)
+        for i in npcs_to_encounter:
+            self.goal.add_npc_to_encounter(i)
+        self.reward_xp = reward_xp
+        self.reward_gold = reward_gold
+        self.completed = False
+        self.in_progress = False
+        self.visible = False
+        self.start_time = 0
+
+    def check_if_completed(self):
+        print ("Sprawdzam czy wykonałeś quest")
+        if self.goal.mobs_to_kill:
+            for i in self.goal.mobs_to_kill:
+                for ii in self.game.player.defeated_enemies:
+                    if i == ii.name:
+                        self.completed = True
+                        print ("QUEST WYKONANO")
+                        return True
+        if self.goal.npcs_to_encounter:
+            for i in self.goal.npcs_to_encounter:
+                for ii in self.game.player.encountered_npcs:
+                    if i == ii.name:
+                        self.completed = True
+                        print ("ODNALEZIONY NPC, QUEST WYKONANO")
+                        return True
+
+    def collect_reward(self):
+        if self.completed:
+            self.game.player.active_quests.remove(self)
+            self.game.player.gold += self.reward_gold
+            self.game.player.xp += self.reward_xp
+            pygame.mixer.Sound.play(coin_snd)
+            self.game.player.completed_quests.append(self)
+            print("NAGRODA ODEBRANA i QUEST ZAPISANY JAKO WYKONANY")
+
+    def get_quest(self):
+        if self not in self.game.player.active_quests:
+            self.in_progress = True
+            self.game.player.active_quests.append(self)
+            self.start_time = (int(self.game.player.score_time_played * 1000))
+
+class QuestGoal:
+    def __init__(self):
+        self.mobs_to_kill = []
+        self.items_to_collect = []
+        self.tiles_to_explore = []
+        self.npcs_to_encounter = []
+
+    def add_mob_to_kill(self,mob):
+        self.mobs_to_kill.append(mob)
+
+    def add_item_to_collect(self,item):
+        self.items_to_collect.append(item)
+
+    def add_tile_to_explore(self,tile_pos):
+        self.tiles_to_explore.append(tile_pos)
+
+    def add_npc_to_encounter(self,npc):
+        self.npcs_to_encounter.append(npc)
+
 
 class NpcDialogData:
     def __init__(self, game):
