@@ -58,3 +58,17 @@ class TestDialog(unittest.TestCase):
         self.assertEqual(next(lines), PlayerLine("I'm the player."))
         with self.assertRaises(StopIteration):
             next(lines)
+
+    def test_presents_line_for_next_stage_if_specific_event_happened(
+            self) -> None:
+        dialog = Dialog()
+        dialog.add_player_line("I'm the player.")
+        dialog.set_next_stage(fired_by=Event('Rat killed'))
+        dialog.add_npc_line("I'm Npc. You have killed a rat")
+        dialog.add_player_line("Yes I did!")
+        dialog.handle(event=Event('Rat killed'))
+        lines = dialog.lines()
+        self.assertEqual(next(lines), NpcLine("I'm Npc. You have killed a rat"))
+        self.assertEqual(next(lines), PlayerLine("Yes I did!"))
+        with self.assertRaises(StopIteration):
+            next(lines)

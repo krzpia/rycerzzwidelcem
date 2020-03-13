@@ -31,3 +31,6 @@ class Dialog:
     def lines(self) -> typing.Generator[Line, None, None]:
         for line in self.lines_by_stage[self.stage]:
             yield line
+
+    def handle(self, event: Event) -> None:
+        self.stage += 1
