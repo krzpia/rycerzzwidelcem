@@ -6,7 +6,6 @@ import tilemap
 from os import path
 from data import *
 import levels
-from events.event import Event
 from events.events_manager import EventManager
 
 
@@ -65,7 +64,7 @@ class Game:
         ######## ZMIENNE DO DEBUOWANIA #######
         self.unlock_updates = False
         self.fpss = []
-        self.events_manager = EventManager()
+        self.events_manager = EventsManager()
 
     def get_tile(self, tileset, x, y):
         surface = pygame.Surface((32, 32)).convert_alpha()
