@@ -15,3 +15,9 @@ class NpcLine(Line):
 
     def belongs_to_npc(self) -> bool:
         return True
+
+
+class PlayerLine(Line):
+
+    def belongs_to_npc(self) -> bool:
+        return False
