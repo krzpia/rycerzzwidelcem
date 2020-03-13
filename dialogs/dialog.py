@@ -9,6 +9,7 @@ from events.event import Event
 class Dialog:
 
     def __init__(self) -> None:
+        self.stage = 0
         self.setup_stage = 0
         self.lines: typing.List[Line] = []
         self.lines_by_stage: typing.Dict[int, typing.List[Line]] = {
@@ -29,3 +30,6 @@ class Dialog:
     def set_next_stage(self, fired_by: Event) -> None:
         self.setup_stage += 1
         self.lines_by_stage[self.setup_stage] = []
+
+    def line(self) -> typing.Generator[Line, None, None]:
+        yield from self.lines_by_stage[self.stage]
