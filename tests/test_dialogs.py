@@ -7,4 +7,5 @@ class TestDialog(unittest.TestCase):
 
     def test_dialog_can_have_npc_lines(self) -> None:
         dialog = Dialog()
-        dialog.add_npc_line()
+        dialog.add_npc_line("I'm Npc. What's your name?")
+        assert dialog.lines == ["I'm Npc. What's your name?"]

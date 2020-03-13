@@ -1,4 +1,7 @@
 class Dialog:
 
-    def add_npc_line(self) -> None:
-        pass
+    def __init__(self) -> None:
+        self.lines = []
+
+    def add_npc_line(self, text: str) -> None:
+        self.lines.append(text)
