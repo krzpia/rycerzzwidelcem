@@ -10,7 +10,7 @@ class Line(abc.ABC):
     def belongs_to_npc(self) -> bool:
         pass
 
-    def __eq__(self, other: 'Line') -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return NotImplemented
         return self.text == other.text

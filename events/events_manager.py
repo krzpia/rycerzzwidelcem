@@ -1,5 +1,6 @@
 import typing
 
+from .event import Event
 
 Subscriber = typing.Callable[['Event'], None]
 
@@ -8,7 +9,7 @@ class EventManager:
 
     def __init__(self) -> None:
         self.subscribers: typing.List[Subscriber] = []
-        self.events = []
+        self.events: typing.List[Event] = []
 
     def emit(self, event: 'Event') -> None:
         self.events.append(event)
