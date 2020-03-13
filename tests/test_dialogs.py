@@ -3,6 +3,7 @@ import unittest
 from dialogs.dialog import Dialog
 from dialogs.line import NpcLine
 from dialogs.line import PlayerLine
+from events.event import Event
 
 
 class TestDialog(unittest.TestCase):
@@ -23,3 +24,27 @@ class TestDialog(unittest.TestCase):
         self.assertEqual(
             dialog.lines_for_stage(0), [PlayerLine("I'm the player.")]
         )
+
+    def test_dialogs_are_added_to_previously_defined_stage(self) -> None:
+        dialog = Dialog()
+        dialog.add_player_line("I'm the player.")
+        dialog.set_next_stage(fired_by=Event('Rat killed'))
+        dialog.add_npc_line("I'm Npc. You have killed a rat")
+        dialog.add_player_line("Yes I did!")
+        dialog.set_next_stage(fired_by=Event('Huge Rat killed'))
+        dialog.add_npc_line("Wow you have killed a Huuuge rat")
+        self.assertEqual(
+            dialog.lines_for_stage(0), [PlayerLine("I'm the player.")]
+        )
+        self.assertEqual(
+            dialog.lines_for_stage(1),
+            [
+                NpcLine("I'm Npc. You have killed a rat"),
+                PlayerLine("Yes I did!"),
+            ]
+        )
+        self.assertEqual(
+            dialog.lines_for_stage(2),
+            [NpcLine("Wow you have killed a Huuuge rat")]
+        )
+

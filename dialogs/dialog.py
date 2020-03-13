@@ -3,6 +3,7 @@ import typing
 from dialogs.line import Line
 from dialogs.line import NpcLine
 from dialogs.line import PlayerLine
+from events.event import Event
 
 
 class Dialog:
@@ -24,3 +25,7 @@ class Dialog:
 
     def lines_for_stage(self, stage: int) -> typing.List[Line]:
         return self.lines_by_stage[stage]
+
+    def set_next_stage(self, fired_by: Event) -> None:
+        self.setup_stage += 1
+        self.lines_by_stage[self.setup_stage] = []
