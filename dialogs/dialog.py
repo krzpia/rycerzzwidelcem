@@ -1,4 +1,5 @@
 from dialogs.line import NpcLine
+from dialogs.line import PlayerLine
 
 
 class Dialog:
@@ -10,4 +11,4 @@ class Dialog:
         self.lines.append(NpcLine(text))
 
     def add_player_line(self, text: str) -> None:
-        self.lines.append(text)
+        self.lines.append(PlayerLine(text))

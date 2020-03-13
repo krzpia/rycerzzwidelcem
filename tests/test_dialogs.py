@@ -2,6 +2,7 @@ import unittest
 
 from dialogs.dialog import Dialog
 from dialogs.line import NpcLine
+from dialogs.line import PlayerLine
 
 
 class TestDialog(unittest.TestCase):
@@ -14,4 +15,4 @@ class TestDialog(unittest.TestCase):
     def test_dialog_can_have_player_lines(self) -> None:
         dialog = Dialog()
         dialog.add_player_line("I'm the player.")
-        assert dialog.lines == ["I'm the player."]
+        assert dialog.lines == [PlayerLine("I'm the player.")]
