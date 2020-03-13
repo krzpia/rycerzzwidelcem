@@ -17,3 +17,6 @@ class TestLine(unittest.TestCase):
 
     def test_line_different_if_text_equal_but_types_differ(self) -> None:
         self.assertNotEqual(NpcLine('text'), PlayerLine('text'))
+
+    def test_line_string_representation(self) -> None:
+        self.assertEqual(repr(NpcLine("I'm Npc!")), 'NpcLine(text="I\'m Npc!")')
