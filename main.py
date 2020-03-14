@@ -64,7 +64,7 @@ class Game:
         ######## ZMIENNE DO DEBUOWANIA #######
         self.unlock_updates = False
         self.fpss = []
-        self.events_manager = EventsManager()
+        self.events_manager = EventManager()
 
     def get_tile(self, tileset, x, y):
         surface = pygame.Surface((32, 32)).convert_alpha()
@@ -451,6 +451,7 @@ class Game:
         self.treasure_inv = False
         self.ph_spell_book = False
         self.ph_shop = False
+        self.ph_quest_book = False
         self.dialog_in_progress = False
         ##### FLAGI DO OBSLUGI INVENTARZA #######
         self.item_picked = False
@@ -508,6 +509,13 @@ class Game:
             self.player.base_stealth += 1
             self.player.attribute_points -= 1
             self.player.update_stats()
+
+    def back_to_game_and_unpause(self):
+        self.ph_spell_book = False
+        self.ph_quest_book = False
+        self.ph_treasure_inv = False
+        self.paused = False
+        self.player.update_stats()
 
     def events(self):
         events = pygame.event.get()
@@ -591,15 +599,20 @@ class Game:
                     ### PAUZA
                     if self.pause_button.check_if_clicked(mouse_pos):
                         if self.paused:
-                            self.paused = False
-                            ##### ZAMYKAM STANY SPECJALNE
-                            self.ph_treasure_inv = False
-                            self.ph_spell_book = False
-                            self.treasure_inv = False
-                            self.dialog_in_progress = False
-                            self.player.update_stats()
+                            self.back_to_game_and_unpause()
                         else:
                             self.paused = True
+                    ### PRZYCISK QUEST BOOK
+                    if self.quest_book_button.check_if_highlight(mouse_pos):
+                        if not self.ph_quest_book:
+                            if not self.paused:
+                                self.paused = True
+                                self.ph_quest_book = True
+                            else:
+                                self.ph_quest_book = True
+                                self.ph_spell_book = False
+                        else:
+                            self.back_to_game_and_unpause()
                     ### PRZYCISK SPELL BOOK
                     if self.spell_book_button.check_if_clicked(mouse_pos):
                         if not self.ph_spell_book:
@@ -608,11 +621,9 @@ class Game:
                                 self.ph_spell_book = True
                             else:
                                 self.ph_spell_book = True
+                                self.ph_quest_book = False
                         else:
-                            self.ph_spell_book = False
-                            self.ph_treasure_inv = False
-                            self.paused = False
-                            self.player.update_stats()
+                            self.back_to_game_and_unpause()
                     ### ADD ATRIBUTES
                     self.ad_buttons_check(mouse_pos)
                     ### PICK UP AND DROP ITEMS on INV
@@ -708,6 +719,9 @@ class Game:
                         # 5. PRZYCISKI DIALOG BOX
                         if self.dialog_in_progress:
                             self.dialog_box.check_buttons(mouse_pos)
+                        # 6. PRZYCISKI QUEST BOOK
+                        if self.ph_quest_book:
+                            self.player.quest_book.check_page_buttons(mouse_pos)
 
     def update(self):
         mouse_pos = pygame.mouse.get_pos()
@@ -726,6 +740,8 @@ class Game:
         #### HIGLIGHT NEXT PAGE BUTTONS ON SPELL BOOK ###
         if self.ph_spell_book:
             self.player.spell_book.update_buttons(mouse_pos)
+        if self.ph_quest_book:
+            self.player.quest_book.update_buttons(mouse_pos)
         ### ACTIVATE ADD BUTTONS ####
         if self.player.attribute_points > 0:
             for button in self.att_buttons:
@@ -1180,6 +1196,9 @@ class Game:
             elif self.ph_spell_book:
                 self.player.spell_book.show(self.screen)
                 self.cast_button.show_button(self.screen)
+            ### QUEST BOOK
+            elif self.ph_quest_book:
+                self.player.quest_book.show(self.screen)
             # DIALOG BOX
             elif self.dialog_in_progress:
                 self.dialog_box.show(self.screen)

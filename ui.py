@@ -338,6 +338,85 @@ class EButton:
     def deactivate(self):
         self.active = False
 
+
+class QuestBook:
+    def __init__(self, game):
+        self.game = game
+        self.pages = 5
+        self.quests = []
+        self.image = pygame.Surface((MAP_WIDTH, 466), pygame.HWSURFACE | pygame.SRCALPHA)
+        self.image.blit(spellbook_bcg_img, (0, 0))
+        self.pos = (5,100)
+        self.act_page = 0
+        self.next_page_button = EButton(next_page_img,549,377)
+        self.prev_page_button = EButton(prev_page_img,18,376)
+
+    def add_quest(self, quest):
+        if len(self.quests)<11:
+            self.quests.append(quest)
+        else:
+            print ("za dużo czarów")
+            ### TO DO Usuwanie czarów
+
+    def check_duplicate(self, quest):
+        for i in self.quests:
+            if i.name == quest.name:
+                return True
+
+    def update_buttons(self, mouse_pos):
+        mouse_x = mouse_pos[0]
+        mouse_y = mouse_pos[1]
+        mouse_x -= self.pos[0]
+        mouse_y -= self.pos[1]
+        self.mouse_pos = (mouse_x, mouse_y)
+        # print ("mod_mouse a (%d, %d)" % self.mouse_pos)
+        self.next_page_button.check_if_highlight(self.mouse_pos)
+        self.prev_page_button.check_if_highlight(self.mouse_pos)
+
+    def check_page_buttons(self, mouse_pos):
+        mouse_x = mouse_pos[0]
+        mouse_y = mouse_pos[1]
+        mouse_x -= self.pos[0]
+        mouse_y -= self.pos[1]
+        self.mouse_pos = (mouse_x, mouse_y)
+        if self.next_page_button.check_if_clicked(self.mouse_pos):
+            if self.act_page < self.pages:
+                self.act_page += 1
+        if self.prev_page_button.check_if_clicked(self.mouse_pos):
+            if self.act_page > 0:
+                self.act_page -= 1
+
+    def show(self, screen, pos = (5,100)):
+        self.image.blit(spellbook_bcg_img, (0, 0))
+        self.next_page_button.show_button(self.image)
+        self.prev_page_button.show_button(self.image)
+        self.pos = pos
+        x_pos = 40
+        ## TWORZE DWUWYMIAROWA TABLICE CZAROW DO ICH WYSWIETLANIA
+        pages = [[] * self.pages for i in range(9)]
+        page_counter = 0
+        quest_counter = 0
+        for quest in self.quests:
+            quest.active = False
+            pages[page_counter].append(quest)
+            quest_counter += 1
+            if quest_counter > 9:
+                page_counter +=1
+        counter = 0
+        for i in pages[self.act_page]:
+            i.active = True
+            self.game.s_write(i.name, self.image, (x_pos + 80, 40 + counter * i.width),(BLACK))
+            self.game.s_write("Goal: ", (x_pos + 80, 70 + counter * i.width),(BLACK))
+            self.game.s_write("Reward: ", self.image,(x_pos + 180, 70 + counter * i.width),(BLACK))
+            counter += 1
+            if counter >= 5:
+                x_pos = 330
+                counter = 0
+        self.game.s_write((str(self.act_page + 1)),self.image,(160,428),(BLACK))
+        self.game.s_write((str(self.act_page + 1)), self.image, (480, 428), (BLACK))
+        screen.blit(self.image,(pos))
+
+
 class SpellBook:
     def __init__(self, game):
         self.game = game
@@ -352,7 +431,7 @@ class SpellBook:
         self.prev_page_button = EButton(prev_page_img,18,376)
 
     def add_spell(self, spell):
-        if len(self.spells)<11:
+        if len(self.spells) < 50:
             self.spells.append(spell)
         else:
             print ("za dużo czarów")
@@ -745,6 +824,8 @@ class Quest:
             self.in_progress = True
             self.game.player.active_quests.append(self)
             self.start_time = (int(self.game.player.score_time_played * 1000))
+
+
 
 class QuestGoal:
     def __init__(self):

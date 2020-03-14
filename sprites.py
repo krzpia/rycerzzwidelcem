@@ -856,6 +856,7 @@ class Player(pygame.sprite.Sprite):
                                            15, False, 1, 500, "small",
                                            0, 0, 0, 0, 0, 0, 2, 45, 42, 87))
         self.active_effects_lib = ActiveEffectsLibrary(self.game)
+        self.quest_book = QuestBook(self.game)
         self.spell_book = SpellBook(self.game)
         if self.char_class.spells:
             for spell in self.char_class.spells:
@@ -870,8 +871,6 @@ class Player(pygame.sprite.Sprite):
             self.spell_book.add_spell_by_name("Haste")
             self.spell_book.add_spell_by_name("Poison Cloud")
             self.spell_book.add_spell_by_name("Stone Skin")
-
-
         self.active_spell = False
         self.selected_spell = False
         self.active_quests = []
