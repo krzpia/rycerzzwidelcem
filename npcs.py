@@ -24,7 +24,7 @@ class NpcGenerator:
             gold_crusader.dialog_data.load_text(False, 5, 3, "I`m know...",
                                                 compl_event=False, goto=False)
             gold_crusader.dialog_data.load_text(True, 10,0,"So, you have killed a Rat? Impressive",
-                                                'Rat has been killed', False)
+                                                'Rat has been killed.', False)
             gold_crusader.dialog_data.load_text(True, 99, 0, "Goodbye, " + self.game.player.name,
                                                 compl_event=False,goto=False)
             gold_crusader.dialog_data.load_text(False, 99, 1, "Goodbye, " + name,

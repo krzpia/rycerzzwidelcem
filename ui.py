@@ -703,37 +703,44 @@ class Dialog:
 
     def find_next_step(self, act_branch, act_step):
         ##### SORTUJE PO nr GALĘzi
+        ##### TWORZE LOKALNA LISTE GALEZI ROZMOW, ODBLOKOWANYCH
         branch_nrs = []
         for text in self.conversation:
             if text.compl_event:
                 for game_event in self.game.events_manager.history():
                     if game_event.id == text.compl_event:
-                        print ("EVENT COMPLETED, UNBLOCK DIALOG BRANCH!")
+                        #print ("EVENT COMPLETED, UNBLOCK DIALOG BRANCH!")
                         branch_nrs.append(text.branch)
             else:
                 branch_nrs.append(text.branch)
+        ###### SORTUJE (na wszelki wypadek) ##
         branch_nrs.sort()
         last_branch = branch_nrs[-1]
         branch_nrs = list(dict.fromkeys(branch_nrs))
+        ###### TWORZE ITERACJE
         branch_iter = iter(branch_nrs)
         cont_act_branch = True
+        ### JEZELI NIE JEST OSTATNI to przegladam kolejne itaracje galezi (branch) dialogu
         if not act_branch == last_branch:
             while cont_act_branch:
                 a = next(branch_iter)
                 if a == act_branch:
                     next_branch = next(branch_iter)
                     cont_act_branch = False
-            #####
+            ##### GDY JEST TA SAMA GALAZ DODAJE +1 do DIALOG.STEP
             for text in self.conversation:
                 if text.branch == act_branch and text.step == (act_step + 1):
                     return text
+            ##### GDY NIE MA WIECEJ KROKOW w DANEJ GALEZI ZERUJE STEP i ZMIENIAM NA KOLEJNA GALAZ
             for text in self.conversation:
                 if text.branch == next_branch and text.step == 0:
                     return text
+        ##### JEZELI OSTATNIA GALAZ DIALOGU:
         else:
             for text in self.conversation:
                 if text.branch == act_branch and text.step == (act_step + 1):
                     return text
+        ####### JEZELI NIE MA JUZ WIECEJ GALEZI ANI KROKÓW to koniec
         return False
 
 class Text:
