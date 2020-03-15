@@ -1,5 +1,5 @@
 import typing
-
+from events.event import Event
 from data import *
 import spells
 from dialogs.line import Line
@@ -794,6 +794,7 @@ class Quest:
                 for ii in self.game.player.encountered_npcs:
                     if i == ii.name:
                         self.completed = True
+                        self.game.events_manager.emit(Event(id=f' quest {self.name} has been completed.'))
                         print ("ODNALEZIONY NPC, QUEST WYKONANO")
                         return True
 
@@ -803,12 +804,15 @@ class Quest:
             self.game.player.gold += self.reward_gold
             self.game.player.xp += self.reward_xp
             pygame.mixer.Sound.play(coin_snd)
+            #### SEND INFO
+            self.game.events_manager.emit(Event(id=f' quest {self.name} reward has been collected.'))
             self.game.player.completed_quests.append(self)
             print("NAGRODA ODEBRANA i QUEST ZAPISANY JAKO WYKONANY")
 
     def get_quest(self):
         if self not in self.game.player.active_quests:
             self.in_progress = True
+            self.game.events_manager.emit(Event(id=f' got quest {self.name}'))
             self.game.player.active_quests.append(self)
             self.start_time = (int(self.game.player.score_time_played * 1000))
 
@@ -853,6 +857,7 @@ class NpcDialogData:
 
     def get_line(self, nr):
         return self.lines[nr]
+
 
 class DialLine:
     def __init__(self, nr, type, speaker, active, goto, statchange, txt):

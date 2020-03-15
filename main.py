@@ -536,6 +536,9 @@ class Game:
                         self.treasure_inv = False
                     else:
                         self.paused = True
+                if event.key == pygame.K_F2:
+                    for game_event in self.events_manager.history():
+                        print(game_event)
                 if event.key == pygame.K_F1:
                     self.draw_debug = not self.draw_debug
                 if event.key == pygame.K_c:

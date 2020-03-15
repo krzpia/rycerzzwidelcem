@@ -1319,6 +1319,7 @@ class Player(pygame.sprite.Sprite):
             self.level += 1
             self.attribute_points += 1
             self.xp_step = 10 * self.level + ((self.level - 1) * self.level)
+            self.game.events_manager.emit(Event(id=f'level {self.level} achieved'))
         if self.attribute_points > 0:
             return self.attribute_points
         else:
@@ -1438,6 +1439,9 @@ class Npc(pygame.sprite.Sprite):
     def put_quest(self, quest):
         self.quests.append(quest)
 
+    def encounter(self):
+        self.game.events_manager.emit(Event(id=f'{self.name} has been encountered.'))
+        self.encountered = True
 
 
 class Mob(pygame.sprite.Sprite):

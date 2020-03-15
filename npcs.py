@@ -33,14 +33,5 @@ class NpcGenerator:
                 f"So you have killed a Rat - {self.game.player.name}."
                 " I'm impressed!",
             )
-            # Thread welcome:
-            # NPC: <Witaj Kris>
-            # PL: <Witaj>
-            # NEXT Thread:
-            # if thread.type == "question"
-            # if thread.avaible and if not thread.closed:
-            # NPC: print question <Jak mogę Ci pomóc
-            # PL: print answers <1/ Tak, 2/Smak, 3/Owak
-            # NPC: print comment on answer(answer)
-            # NEXT THREAD:
+
             return gold_crusader
