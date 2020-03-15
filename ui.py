@@ -695,22 +695,35 @@ class Dialog:
     def __init__(self, game):
         self.game = game
         self.conversation = []
+        self.events_that_has_to_happen = []
 
     def load_text(self,ifnpc,branch,step,text,compl_event,goto):
         self.conversation.append(Text(ifnpc,branch,step,text,compl_event,goto))
+        self.event_that_has_to_happen.append(compl_event)
+        if compl_event:
+            self.game.events_manager.subscribe_by_id(compl_event, self.store_event)
         if self.conversation[-1].branch == 0 and self.conversation[-1].step == 0:
             self.conversation[-1].welcome = True
+
+    def store_event(self, event):
+        try:
+            self.events_ids.remove(event.id)
+        except ValueError:
+            pass
 
     def find_next_step(self, act_branch, act_step):
         ##### SORTUJE PO nr GALĘzi
         ##### TWORZE LOKALNA LISTE GALEZI ROZMOW, ODBLOKOWANYCH
         branch_nrs = []
         for text in self.conversation:
-            if text.compl_event:
-                for game_event in self.game.events_manager.history():
-                    if game_event.id == text.compl_event:
-                        #print ("EVENT COMPLETED, UNBLOCK DIALOG BRANCH!")
-                        branch_nrs.append(text.branch)
+            # if text.compl_event:
+            #     for game_event in self.game.events_manager.history():
+            #         if game_event.id == text.compl_event:
+            #             #print ("EVENT COMPLETED, UNBLOCK DIALOG BRANCH!")
+            #             branch_nrs.append(text.branch)
+            if text.compl_event not in self.events_that_has_to_happen:
+                    print("EVENT COMPLETED, UNBLOCK DIALOG BRANCH!")
+                    branch_nrs.append(text.branch)
             else:
                 branch_nrs.append(text.branch)
         ###### SORTUJE (na wszelki wypadek) ##
