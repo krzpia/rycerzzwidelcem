@@ -1,6 +1,4 @@
 import pygame
-
-from dialogs.dialog import Dialog
 from settings import *
 vec = pygame.math.Vector2
 from ui import *
@@ -1434,7 +1432,7 @@ class Npc(pygame.sprite.Sprite):
         self.rect.y = self.start_y
         self.hit_rect = pygame.Rect(0, 0, TILE_SIZE - 5, TILE_SIZE - 5)
         self.hit_rect.center = self.rect.center
-        self.dialog = Dialog()
+        self.dialog_data = Dialog(self.game)
 
     def put_quest(self, quest):
         self.quests.append(quest)

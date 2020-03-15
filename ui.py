@@ -2,7 +2,6 @@ import typing
 from events.event import Event
 from data import *
 import spells
-from dialogs.line import Line
 
 pygame.init()
 
@@ -692,35 +691,112 @@ class ActiveEffectsLibrary:
                 self.active_effects.remove(act_effect)
 
 
+class Dialog:
+    def __init__(self, game):
+        self.game = game
+        self.conversation = []
+
+    def load_text(self,ifnpc,branch,step,text,compl_event,goto):
+        self.conversation.append(Text(ifnpc,branch,step,text,compl_event,goto))
+        if self.conversation[-1].branch == 0 and self.conversation[-1].step == 0:
+            self.conversation[-1].welcome = True
+
+    def find_next_step(self, act_branch, act_step):
+        ##### SORTUJE PO nr GALĘzi
+        branch_nrs = []
+        for text in self.conversation:
+            if text.compl_event:
+                for game_event in self.game.events_manager.history():
+                    if game_event.id == text.compl_event:
+                        print ("EVENT COMPLETED, UNBLOCK DIALOG BRANCH!")
+                        branch_nrs.append(text.branch)
+            else:
+                branch_nrs.append(text.branch)
+        branch_nrs.sort()
+        last_branch = branch_nrs[-1]
+        branch_nrs = list(dict.fromkeys(branch_nrs))
+        branch_iter = iter(branch_nrs)
+        cont_act_branch = True
+        if not act_branch == last_branch:
+            while cont_act_branch:
+                a = next(branch_iter)
+                if a == act_branch:
+                    next_branch = next(branch_iter)
+                    cont_act_branch = False
+            #####
+            for text in self.conversation:
+                if text.branch == act_branch and text.step == (act_step + 1):
+                    return text
+            for text in self.conversation:
+                if text.branch == next_branch and text.step == 0:
+                    return text
+        else:
+            for text in self.conversation:
+                if text.branch == act_branch and text.step == (act_step + 1):
+                    return text
+        return False
+
+class Text:
+    def __init__(self, ifnpc, branch, step, text, compl_event, goto):
+        ### ZAWIERAC BEDZIE CALA WYPOWIEDZ
+        ### PODZIELIMY NA linijki tekstu
+        self.ifnpc = ifnpc
+        self.branch = branch
+        self.step = step
+        self.text = text
+        self.goto = goto
+        self.compl_event = compl_event
+        self.welcome = False
+        self.last = False
+        #self.goto = (branch, step)
+
 class DialogBox:
     def __init__(self, game):
         self.game = game
         self.pos = (50, 120)
         self.image = dialogbox_img.copy()
         self.ok_button = RadioButton(rad_ok_img,rad_ok_h_img,178,290)
-        self.act_line = False
-        self.last_line = False
         self.npc = False
-        self.step = 0
-        self.lines: typing.Optional[typing.Generator[Line, None, None]] = None
+        self.actual_text = False
         #self.write("TEST", 0)
 
     def start_conversation(self,npc):
-        self.step = 0
         self.npc = npc
-        self.lines = self.npc.dialog.lines()
-        self.write_line(self.lines)
+        self.dialog_data = self.npc.dialog_data
+        for text in self.dialog_data.conversation:
+            if text.welcome == True:
+                self.actual_text = text
+        self.write_actual_text()
 
-    def write_line(self, lines: typing.Generator[Line, None, None]) -> None:
-        self.clear()
-        line = next(lines)
-        if line.belongs_to_npc():
-            self.image.blit(pygame.transform.scale(self.npc.image, (48, 48)), (210, 18))
-            self.game.s_write(self.npc.name, self.image, (80, 35), WHITE)
+    def write_actual_text(self):
+        if self.actual_text.ifnpc:
+            speaker = self.npc
         else:
-            self.image.blit(pygame.transform.scale(self.game.player.image, (48, 48)), (210, 18))
-            self.game.s_write(self.game.player.name, self.image, (80, 35), WHITE)
-        self.write(line.text, 0)
+            speaker = self.game.player
+        self.write_line(speaker, self.actual_text.text)
+        #except:
+        #   print ("ERROR DONT HAVE ACTUAL TEXT TO BLIT")
+
+    def next_d_step(self):
+        if self.actual_text.goto:
+            for text in self.dialog_data.conversation:
+                if text.branch == self.actual_text.goto[0] and text.step == self.actual_text.goto[1]:
+                    self.actual_text = text
+                    print("FOUND NEXT STEP BY GOTO METHOD")
+        else:
+            self.actual_text = self.dialog_data.find_next_step(self.actual_text.branch,self.actual_text.step)
+        if self.actual_text:
+            self.write_actual_text()
+        else:
+            self.clear()
+            self.game.dialog_in_progress = False
+            self.game.paused = False
+
+    def write_line(self, speaker, text) -> None:
+        self.clear()
+        self.image.blit(pygame.transform.scale(speaker.image, (48, 48)), (210, 18))
+        self.game.s_write(speaker.name, self.image, (80, 35), WHITE)
+        self.write(text, 0)
 
     def write(self, txt, ln):
         self.game.s_write(txt,self.image, (35, 100 + ln * 20), (WHITE))
@@ -748,11 +824,7 @@ class DialogBox:
         self.mouse_pos = (mouse_x, mouse_y)
         if self.ok_button.active:
             if self.ok_button.check_if_clicked(self.mouse_pos):
-                try:
-                    self.write_line(self.lines)
-                except StopIteration:
-                    self.game.dialog_in_progress = False
-                    self.game.paused = False
+                self.next_d_step()
 
 
 class Quest:
@@ -838,36 +910,7 @@ class QuestGoal:
         self.npcs_to_encounter.append(npc)
 
 
-class NpcDialogData:
-    def __init__(self, game):
-        self.game = game
-        self.lines = []
-        self.quests = False
 
-    def add_line(self, type, speaker, active, goto, statchange, txt):
-        nr = len(self.lines)
-        self.lines.append(DialLine(nr,type, speaker,active,goto,statchange, txt))
-
-    def print_lines(self):
-        for line in self.lines:
-            print(str(line.nr) + line.txt)
-
-    def get_line_txt(self, nr):
-        return self.lines[nr].txt
-
-    def get_line(self, nr):
-        return self.lines[nr]
-
-
-class DialLine:
-    def __init__(self, nr, type, speaker, active, goto, statchange, txt):
-        self.nr = nr
-        self.type = type
-        self.speaker = speaker
-        self.active = active
-        self.goto = goto
-        self.statchange = statchange
-        self.txt = txt
 
 
 
