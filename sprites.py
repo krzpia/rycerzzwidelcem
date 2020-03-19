@@ -1432,7 +1432,7 @@ class Npc(pygame.sprite.Sprite):
         self.rect.y = self.start_y
         self.hit_rect = pygame.Rect(0, 0, TILE_SIZE - 5, TILE_SIZE - 5)
         self.hit_rect.center = self.rect.center
-        self.dialog_data = Dialog(self.game)
+        self.dialog_data = Dialog(self.game, self)
 
     def put_quest(self, quest):
         self.quests.append(quest)

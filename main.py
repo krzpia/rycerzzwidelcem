@@ -550,12 +550,13 @@ class Game:
                         self.player.update_stats()
                 if event.key == pygame.K_e:
                     ####### ROZMAWIAJ Z NPC
-                    npcs_to_talk = pygame.sprite.spritecollide(self.player,self.act_lvl.npcs,False,collide_double_hit_rect)
-                    for npc in npcs_to_talk:
-                        print ("TALK")
-                        self.paused = True
-                        self.dialog_in_progress = True
-                        self.dialog_box.start_conversation(npc)
+                    if not self.dialog_in_progress:
+                        npcs_to_talk = pygame.sprite.spritecollide(self.player,self.act_lvl.npcs,False,collide_double_hit_rect)
+                        for npc in npcs_to_talk:
+                            print ("TALK")
+                            self.paused = True
+                            self.dialog_in_progress = True
+                            self.dialog_box.start_conversation(npc)
                     ######## PODNIES PRZEDMIOT
                     items_to_pick = pygame.sprite.spritecollide(self.player, self.act_lvl.items_to_pick, False,
                                                                 collide_double_hit_rect)
@@ -600,33 +601,36 @@ class Game:
                 if event.button == 1:
                     mouse_pos = pygame.mouse.get_pos()
                     ### PAUZA
-                    if self.pause_button.check_if_clicked(mouse_pos):
-                        if self.paused:
-                            self.back_to_game_and_unpause()
-                        else:
-                            self.paused = True
+                    if not self.dialog_in_progress:
+                        if self.pause_button.check_if_clicked(mouse_pos):
+                            if self.paused:
+                                self.back_to_game_and_unpause()
+                            else:
+                                self.paused = True
                     ### PRZYCISK QUEST BOOK
-                    if self.quest_book_button.check_if_highlight(mouse_pos):
-                        if not self.ph_quest_book:
-                            if not self.paused:
-                                self.paused = True
-                                self.ph_quest_book = True
+                    if not self.dialog_in_progress:
+                        if self.quest_book_button.check_if_highlight(mouse_pos):
+                            if not self.ph_quest_book:
+                                if not self.paused:
+                                    self.paused = True
+                                    self.ph_quest_book = True
+                                else:
+                                    self.ph_quest_book = True
+                                    self.ph_spell_book = False
                             else:
-                                self.ph_quest_book = True
-                                self.ph_spell_book = False
-                        else:
-                            self.back_to_game_and_unpause()
+                                self.back_to_game_and_unpause()
                     ### PRZYCISK SPELL BOOK
-                    if self.spell_book_button.check_if_clicked(mouse_pos):
-                        if not self.ph_spell_book:
-                            if not self.paused:
-                                self.paused = True
-                                self.ph_spell_book = True
+                    if not self.dialog_in_progress:
+                        if self.spell_book_button.check_if_clicked(mouse_pos):
+                            if not self.ph_spell_book:
+                                if not self.paused:
+                                    self.paused = True
+                                    self.ph_spell_book = True
+                                else:
+                                    self.ph_spell_book = True
+                                    self.ph_quest_book = False
                             else:
-                                self.ph_spell_book = True
-                                self.ph_quest_book = False
-                        else:
-                            self.back_to_game_and_unpause()
+                                self.back_to_game_and_unpause()
                     ### ADD ATRIBUTES
                     self.ad_buttons_check(mouse_pos)
                     ### PICK UP AND DROP ITEMS on INV

@@ -17,10 +17,9 @@ class EventManager:
         for subscriber in self.subscribers:
             subscriber(event)
         try:
-            self.subscriber_by_id[event.id](event)
+            self.subscribers_by_id[event.id](event)
         except KeyError:
             pass
-
 
     def subscribe(self, callback: Subscriber) -> None:
         self.subscribers.append(callback)
@@ -30,3 +29,8 @@ class EventManager:
 
     def history(self) -> typing.List['Event']:
         return self.events[::-1]
+
+    def find_npc_encounter_event(self, npc_name) -> bool:
+        for game_event in self.events:
+            if game_event.id == f'{npc_name} has been encountered.':
+                return True
