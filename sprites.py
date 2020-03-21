@@ -741,6 +741,20 @@ class Book:
         self.game.player.spell_book.add_spell(self.spell)
 
 
+class Quest_Item:
+    def __init__(self, game, name, cost, img_x, img_y, tileset = full_tileset_image):
+        self.game = game
+        self.b_image = pygame.Surface((32,32), pygame.HWSURFACE | pygame.SRCALPHA)
+        self.b_image.blit(tileset,(0,0),(img_x*TILE_SIZE, img_y*TILE_SIZE,TILE_SIZE,TILE_SIZE))
+        self.image = self.b_image
+        self.name = name
+        self.type = "quest item"
+        self.cost = cost
+        self.quest = False
+        self.rect = self.image.get_rect()
+        self.hit_rect = self.rect
+
+
 class Key(pygame.sprite.Sprite):
     def __init__(self, game, name, key, img_x, img_y, tileset = full_tileset_image):
         self.groups = game.act_lvl.items
@@ -861,16 +875,17 @@ class Player(pygame.sprite.Sprite):
         if self.char_class.spells:
             for spell in self.char_class.spells:
                 self.spell_book.add_spell_by_name(spell)
-            self.spell_book.add_spell_by_name("Fireball")
-            self.spell_book.add_spell_by_name("Tricebolt")
-            self.spell_book.add_spell_by_name("Iron Skin")
-            self.spell_book.add_spell_by_name("Cure")
-            self.spell_book.add_spell_by_name("Freeze")
-            self.spell_book.add_spell_by_name("Invisibility")
-            self.spell_book.add_spell_by_name("Icebolt")
-            self.spell_book.add_spell_by_name("Haste")
-            self.spell_book.add_spell_by_name("Poison Cloud")
-            self.spell_book.add_spell_by_name("Stone Skin")
+           #self.spell_book.add_spell_by_name("Fireball")
+           #self.spell_book.add_spell_by_name("Tricebolt")
+           #self.spell_book.add_spell_by_name("Iron Skin")
+           #self.spell_book.add_spell_by_name("Cure")
+           #self.spell_book.add_spell_by_name("Freeze")
+           #self.spell_book.add_spell_by_name("Invisibility")
+           #self.spell_book.add_spell_by_name("Icebolt")
+           #self.spell_book.add_spell_by_name("Haste")
+           #self.spell_book.add_spell_by_name("Poison Cloud")
+           #self.spell_book.add_spell_by_name("Stone Skin")
+           #self.spell_book.add_spell_by_name("Heroism")
         self.active_spell = False
         self.selected_spell = False
         self.active_quests = []
@@ -1229,6 +1244,8 @@ class Player(pygame.sprite.Sprite):
                 temp_speed_mod += effect.strength
             if effect.name == "invisibility":
                 self.invisible = True
+            if effect.name == "heroism":
+                temp_str_mod += effect.strength
         #########################
         self.strength = self.base_strength + temp_str_mod
         self.stamina = self.base_stamina + temp_sta_mod
@@ -1411,6 +1428,9 @@ class Player(pygame.sprite.Sprite):
                 self.image.fill((255, 0, 0, next(self.damage_alpha)),special_flags=pygame.BLEND_RGBA_MULT)
             except:
                 self.damaged = False
+        ### UPDATE INVISIBLE EFFECT
+        if self.invisible:
+            self.image.fill((180,180,180,100),special_flags=pygame.BLEND_RGBA_MULT)
 
 
 class Npc(pygame.sprite.Sprite):

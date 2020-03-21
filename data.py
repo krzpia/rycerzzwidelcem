@@ -104,6 +104,7 @@ e_stoneskin_ico = pygame.image.load(path.join(img_folder, 'e_stoneskin.png')).co
 e_haste_ico = pygame.image.load(path.join(img_folder, 'e_haste.png')).convert_alpha()
 e_invisibility_ico = pygame.image.load(path.join(img_folder, 'e_invisibility.png')).convert_alpha()
 e_ironskin_ico = pygame.image.load(path.join(img_folder, 'e_ironskin.png')).convert_alpha()
+e_heroism_ico = pygame.image.load(path.join(img_folder, 'e_heroism.png')).convert_alpha()
 ### SPELL ICONS
 sb_firebolt_image = pygame.image.load(path.join(img_folder, 'sb_firebolt.png')).convert_alpha()
 sb_fireball_image = pygame.image.load(path.join(img_folder, 'sb_fireball.png')).convert_alpha()
@@ -116,6 +117,7 @@ sb_stoneskin_image = pygame.image.load(path.join(img_folder, 'sb_stoneskin.png')
 sb_haste_image = pygame.image.load(path.join(img_folder, 'sb_haste.png')).convert_alpha()
 sb_invisibility_image = pygame.image.load(path.join(img_folder, 'sb_invisibility.png')).convert_alpha()
 sb_ironskin_image = pygame.image.load(path.join(img_folder, 'sb_ironskin.png')).convert_alpha()
+sb_heroism_image = pygame.image.load(path.join(img_folder, 'sb_heroism.png')).convert_alpha()
 ### SPELL BULLETS
 bullet_firebolt_image = pygame.image.load(path.join(img_folder, 'bull_fireball.png')).convert_alpha()
 bullet_fireball_image = pygame.image.load(path.join(img_folder, 'bull_fireball2.png')).convert_alpha()

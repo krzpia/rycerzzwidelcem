@@ -357,8 +357,20 @@ class QuestBook:
         if len(self.quests)<11:
             self.quests.append(quest)
         else:
-            print ("za dużo czarów")
-            ### TO DO Usuwanie czarów
+            print ("za dużo questow")
+
+    def remove(self, quest):
+        self.quests.remove(quest)
+
+    def remove_by_name(self, quest_name):
+        for i in self.quests:
+            if i.name == quest_name:
+                self.quests.remove(i)
+
+    def get_quest_by_name(self, quest_name):
+        for i in self.quests:
+            if i.name == quest_name:
+                return i
 
     def check_duplicate(self, quest):
         for i in self.quests:
@@ -407,9 +419,9 @@ class QuestBook:
         counter = 0
         for i in pages[self.act_page]:
             i.active = True
-            self.game.s_write(i.name, self.image, (x_pos + 80, 40 + counter * i.width),(BLACK))
-            self.game.s_write("Goal: ", (x_pos + 80, 70 + counter * i.width),(BLACK))
-            self.game.s_write("Reward: ", self.image,(x_pos + 180, 70 + counter * i.width),(BLACK))
+            self.game.s_write(f'Quest {i.name}', self.image, (x_pos + 20, 40 + counter * 48),(BLACK))
+            self.game.s_write("Goal: ..... TODO", self.image, (x_pos + 20, 55 + counter * 48),(BLACK))
+            self.game.s_write(f'Reward {i.reward_xp} xp, {i.reward_gold} gold.', self.image ,(x_pos + 20, 70 + counter * 48),(BLACK))
             counter += 1
             if counter >= 5:
                 x_pos = 330
@@ -518,6 +530,11 @@ class SpellBook:
                 if i.subtype == "invisibility":
                     self.game.s_write("Duration: " + str(15 + (3 * self.game.player.intellect)) + "s",
                                       self.image, (x_pos + 80, 55 + counter * i.width), (BLACK))
+                if i.subtype == "heroism":
+                    self.game.s_write("Strength bonus: " + str(5 + self.game.player.intellect),
+                                      self.image, (x_pos + 80, 55 + counter * i.width), (BLACK))
+                    self.game.s_write("Duration: " + str(15 + (2 * self.game.player.intellect)) + "s",
+                                      self.image, (x_pos + 80, 85 + counter * i.width), (BLACK))
             if i.type == "offensive":
                 if i.bullet_nr > 1:
                     self.game.s_write("Damage: " + str(i.bullet_nr) + "x " + str(i.damage + self.game.player.intellect), self.image, (x_pos + 80, 55 + counter * i.width),(BLACK))
@@ -614,6 +631,9 @@ class Spell:
                 if self.subtype == "stone skin":
                     player.active_effects_lib.add_effect(ActiveEffect("stone skin",e_stoneskin_ico,
                                                                       20 + player.intellect,15 + (3 * player.intellect)))
+                if self.subtype == "heroism":
+                    player.active_effects_lib.add_effect(ActiveEffect("heroism",e_heroism_ico,
+                                                                      5 + player.intellect,15 + (2 * player.intellect)))
                 if self.subtype == "haste":
                     player.active_effects_lib.add_effect(ActiveEffect("haste",e_haste_ico,
                                                                       5 + player.intellect, 15 + 3 * player.intellect))
@@ -696,80 +716,136 @@ class Dialog:
         self.game = game
         self.npc = npc
         self.conversation = []
-        #self.events_that_has_to_happen = []
+        self.text_returned = False
 
-    def load_text(self,ifnpc,branch,step,text,compl_event,block_event,ask,goto):
-        self.conversation.append(Text(ifnpc,branch,step,text,compl_event,block_event,ask,goto))
-        #self.events_that_has_to_happen.append(compl_event)
-        #if compl_event:
-        #    self.game.events_manager.subscribes_by_id(compl_event, self.store_event)
-
-    #def store_event(self, event):
-    #    try:
-    #        self.events_ids.remove(event.id)
-    #    except ValueError:
-    #        pass
-
-    def find_next_step(self, act_branch, act_step):
-        ##### SORTUJE PO nr GALĘzi
-        ##### TWORZE LOKALNA LISTE GALEZI ROZMOW, ODBLOKOWANYCH
-        branch_nrs = []
+    def find_branch_in_thread(self, branch_to_find, active_thread):
         for text in self.conversation:
-            if text.compl_event:
-                for game_event in self.game.events_manager.history():
-                    if game_event.id == text.compl_event:
-                        #print ("EVENT COMPLETED, UNBLOCK DIALOG BRANCH!")
-                        branch_nrs.append(text.branch)
-            # if text.compl_event not in self.events_that_has_to_happen:
-            #        print("EVENT COMPLETED, UNBLOCK DIALOG BRANCH!")
-            #        branch_nrs.append(text.branch)
-            else:
-                branch_nrs.append(text.branch)
-        ###### SORTUJE (na wszelki wypadek) ##
-        branch_nrs.sort()
-        last_branch = branch_nrs[-1]
-        branch_nrs = list(dict.fromkeys(branch_nrs))
-        ###### TWORZE ITERACJE
-        branch_iter = iter(branch_nrs)
-        cont_act_branch = True
-        ### JEZELI NIE JEST OSTATNI to przegladam kolejne itaracje galezi (branch) dialogu
-        if not act_branch == last_branch:
-            while cont_act_branch:
-                a = next(branch_iter)
-                if a == act_branch:
-                    next_branch = next(branch_iter)
-                    cont_act_branch = False
-            ##### GDY JEST TA SAMA GALAZ DODAJE +1 do DIALOG.STEP
-            for text in self.conversation:
-                if text.branch == act_branch and text.step == (act_step + 1):
-                    return text
-            ##### GDY NIE MA WIECEJ KROKOW w DANEJ GALEZI ZERUJE STEP i ZMIENIAM NA KOLEJNA GALAZ
-            for text in self.conversation:
-                if text.branch == next_branch and text.step == 0:
-                    return text
-        ##### JEZELI OSTATNIA GALAZ DIALOGU:
+            if text.thread == active_thread:
+                if text.branch == branch_to_find:
+                    if text.step == 0:
+                        return text
+
+    def reset(self):
+        self.text_returned = False
+
+    def load_text(self,ifnpc,thread,branch,step,text,ask1,ask2,ask3,ask4,next_thread,goto, event):
+        self.conversation.append(Text(ifnpc,thread,branch,step,text,ask1,ask2,ask3,ask4,next_thread,goto, event))
+
+    def find_first_step(self, encounter):
+        if not encounter:
+            for act_txt in self.conversation:
+                if act_txt.thread == "welcome" and act_txt.branch == 0 and act_txt.step == 0:
+                    self.text_returned = act_txt
+                    #print ("FOUND WELCOME TXT")
+                    return act_txt
         else:
+            for act_txt in self.conversation:
+                if act_txt.thread == "welcome" and act_txt.branch == 1 and act_txt.step == 0:
+                    self.text_returned = act_txt
+                    #print("FOUND WELCOME AGAIN TXT")
+                    return act_txt
+        print ("ERROR DID NOT FIND START TXT")
+
+    def find_next_step(self):
+        ###NAJPIERW SPRAWDZAM CZY NIE MA ZMIANY WATKU (next_thread = True)
+        if not self.text_returned.next_thread:
+            next_step = self.text_returned.step + 1
             for text in self.conversation:
-                if text.branch == act_branch and text.step == (act_step + 1):
+                if text.thread == self.text_returned.thread:
+                    if text.branch == self.text_returned.branch:
+                        if text.step == next_step:
+                            print("FOUND NEXT STEP")
+                            self.text_returned = text
+                            return text
+            print ("DID NOT FIND NEXT STEP - GO TO NEXT THREAD")
+        ### SZUKAM NOWEJ GALEZI (funkcja next_thread)
+        thread_name = self.next_thread(self.text_returned.thread)
+        ### JEZELI ZNALAZLEM NOWA GALAZ:
+        if thread_name:
+            if thread_name[:5] == "quest":
+                print ("NEXT THREAD IS A QUEST THREAD, SEARCHING FOR A NEXT BRANCH AND STEP:")
+                if self.game.events_manager.find_got_quest_event(thread_name[6:]):
+                    print (f'FOUND {thread_name[6:]} quest in event manager - Branch 1,2,3')
+                    if self.game.events_manager.find_quest_compl_event(thread_name[6:]):
+                        print ("BRANCH 3 = quest completed")
+                        text = self.find_branch_in_thread(3, thread_name)
+                        self.text_returned = text
+                        return text
+                    else:
+                        ## Tu male peligro jezeli nie bedzie questu w ksiazce a bedzie
+                        # sytuacja w ktorej Event_manager nie znajdzie quest_compl o danej nazwie [6:]!!
+                        quest_to_check = self.game.player.quest_book.get_quest_by_name(thread_name[6:])
+                        if quest_to_check.check_if_fulfiled():
+                            print ("BRANCH 2 = quest fulfiled and not completed")
+                            text = self.find_branch_in_thread(2, thread_name)
+                            self.text_returned = text
+                            return text
+                        else:
+                            print ("BRANCH 1 = quest not fulfiled and not completed")
+                            text = self.find_branch_in_thread(1, thread_name)
+                            self.text_returned = text
+                            return text
+                else:
+                    print(f'DID NOT FIND {thread_name[6:]} quest in event manager - NEXT BRANCH 0')
+                    text = self.find_branch_in_thread(0, thread_name)
+                    self.text_returned = text
                     return text
-        ####### JEZELI NIE MA JUZ WIECEJ GALEZI ANI KROKÓW to koniec
-        return False
+        else:
+        ### NIE MA KOLEJNEJ GALEZI - KONIEC DIALOGU:
+            return 0
+
+    def find_next_step_by_goto(self, goto):
+        act_thread = self.text_returned.thread
+        for text in self.conversation:
+           if text.thread == act_thread:
+                if text.branch == goto[0] and text.step == goto[1]:
+                    print("FOUND NEXT STEP BY RECIVING ANSWER")
+                    self.text_returned = text
+                    return text
+        print ("ERROR, DID NOT FIND NEXT BRANCH and STEP by GOTO")
+
+    def next_thread(self, act_thread):
+        threads = []
+        for text in self.conversation:
+            if text.thread not in threads:
+                threads.append(text.thread)
+        print(threads)
+        threads = iter(threads)
+        while True:
+            try:
+                thread = next(threads)
+                if thread == act_thread:
+                    try:
+                        return next(threads)
+                    except:
+                        print("LAST THREAD, END DIALOG")
+                        break
+            except:
+                print("No more threads!")
+                break
+
+
 
 class Text:
-    def __init__(self, ifnpc, branch, step, text, compl_event, block_event, ask, goto):
+    def __init__(self, ifnpc, thread, branch, step, text, ask1,ask2,ask3,ask4,next_thread, goto, event):
         ### ZAWIERAC BEDZIE CALA WYPOWIEDZ
         ### PODZIELIMY NA linijki tekstu
         self.ifnpc = ifnpc
+        self.thread = thread
         self.branch = branch
         self.step = step
         self.text = text
-        self.ask = ask
+        self.ask1 = ask1
+        self.ask2 = ask2
+        self.ask3 = ask3
+        self.ask4 = ask4
+        self.next_thread = next_thread
         self.goto = goto
-        self.compl_event = compl_event
-        self.block_event = block_event
+        self.event = event
         self.welcome = False
-        self.last = False
-        #self.goto = (branch, step)
+        if self.thread == "welcome" and self.branch == 0 and self.step == 0:
+            self.welcome = True
+
 
 class DialogBox:
     def __init__(self, game):
@@ -777,27 +853,23 @@ class DialogBox:
         self.pos = (50, 120)
         self.image = dialogbox_img.copy()
         self.ok_button = RadioButton(rad_ok_img,rad_ok_h_img,178,290)
-        self.resp_but_1 = RadioButton(rad_but_img,rad_but_h_img,55,125)
-        self.resp_but_2 = RadioButton(rad_but_img, rad_but_h_img, 55, 150)
-        self.resp_but_3 = RadioButton(rad_but_img, rad_but_h_img, 55, 175)
-        self.resp_but_4 = RadioButton(rad_but_img, rad_but_h_img, 55, 200)
+        self.resp_but_1 = RadioButton(rad_but_img,rad_but_h_img,55,150)
+        self.resp_but_2 = RadioButton(rad_but_img, rad_but_h_img, 55, 175)
+        self.resp_but_3 = RadioButton(rad_but_img, rad_but_h_img, 55, 200)
+        self.resp_but_4 = RadioButton(rad_but_img, rad_but_h_img, 55, 225)
         self.resp_buttons = [self.resp_but_1,self.resp_but_2,self.resp_but_3,self.resp_but_4]
         self.npc = False
         self.actual_text = False
-        #self.write("TEST", 0)
+        self.dialog_data = False
 
     def start_conversation(self,npc):
         print ("STARTING CONVERSATION")
         self.npc = npc
         self.dialog_data = self.npc.dialog_data
+        self.dialog_data.reset()
         #### SZUKAM POCZATKU DIALOGU:
-        for text in self.dialog_data.conversation:
-            if text.compl_event == f'{self.npc.name} has been encountered.':
-                if self.game.events_manager.find_npc_encounter_event(self.npc.name):
-                    self.actual_text = text
-                    break
-            if text.branch == 0 and text.step ==0:
-                self.actual_text = text
+        encounter = self.game.events_manager.find_npc_encounter_event(self.npc.name)
+        self.actual_text = self.dialog_data.find_first_step(encounter)
         self.write_actual_text()
 
     def write_actual_text(self):
@@ -810,28 +882,23 @@ class DialogBox:
         #   print ("ERROR DONT HAVE ACTUAL TEXT TO BLIT")
 
     def next_ask_step(self, goto):
-        for text in self.dialog_data.conversation:
-            if text.branch == goto[0] and text.step == goto[1]:
-                self.actual_text = text
-                print("FOUND NEXT STEP BY RECIVING ANSWER")
-                break
+        self.actual_text = self.dialog_data.find_next_step_by_goto(goto)
         self.configure_text()
 
-    def next_d_step(self):
-        #print ("next_d_step")
-        if self.actual_text.goto:
-            print ("this parse has goto with branch:")
-            print (self.actual_text.goto[0])
-            print("this parse has goto with step:")
-            print(self.actual_text.goto[1])
-            for text in self.dialog_data.conversation:
-                if text.branch == self.actual_text.goto[0] and text.step == self.actual_text.goto[1]:
-                    self.actual_text = text
-                    print("FOUND NEXT STEP BY GOTO METHOD")
-                    break
-        else:
-            #print ("this parse dont have goto")
-            self.actual_text = self.dialog_data.find_next_step(self.actual_text.branch,self.actual_text.step)
+    def next_step(self):
+        self.actual_text = self.dialog_data.find_next_step()
+        #### SPRAWDZAM CZY ACTUAL TEKST MA EVENT I GO DODAJE
+        if self.actual_text:
+            if self.actual_text.event:
+                self.game.events_manager.emit(Event(id=self.actual_text.event))
+                #### SPRAWDZAM CZY EVENT WYMAGA DZIALANIA teraz (Np. COLLECT REWARD)
+                if self.actual_text.event[-17:] == "has been rewarded":
+                    ## wycinam nazwe questa z Event.id
+                    lastcutstr = self.actual_text.event[:-18]
+                    quest_name = lastcutstr[6:]
+                    quest = self.game.player.quest_book.get_quest_by_name(quest_name)
+                    quest.collect_reward()
+        #### KONFIGURUJE I WYSWIETLAM TEXT
         self.configure_text()
 
     def configure_text(self):
@@ -839,40 +906,49 @@ class DialogBox:
         ### KONFIGURACJA UKLADU - NOWY AKTUALNY TEKST DO WYSWIETLENIA! #
         if self.actual_text:
             ## JEZELI JEST TO PYTANIE AKTYWUJE PRZYCISKI ODPOWIEDZI I PISZE ODPOWIEDZI:
-            if self.actual_text.ask:
+            how_many_answers = 0
+            if self.actual_text.ask1:
+                how_many_answers +=1
+            if self.actual_text.ask2:
+                how_many_answers +=1
+            if self.actual_text.ask3:
+                how_many_answers += 1
+            if self.actual_text.ask4:
+                 how_many_answers += 1
+
+            if how_many_answers >=1:
                 self.write_actual_text()
-                how_many_answers = len(self.actual_text.ask)
                 self.ok_button.deactivate()
                 if how_many_answers == 1:
                     self.resp_but_1.activate()
-                    print(self.actual_text.ask[0][0])
-                    self.write(self.actual_text.ask[0][0], 1)
+                    #print(self.actual_text.ask[0][0])
+                    self.write(self.actual_text.ask1[0], 2)
                 elif how_many_answers == 2:
                     self.resp_but_1.activate()
                     self.resp_but_2.activate()
-                    print(self.actual_text.ask[0][0])
-                    print(self.actual_text.ask[1][0])
-                    self.write(self.actual_text.ask[0][0], 1)
-                    self.write(self.actual_text.ask[1][0], 2)
+                    #print(self.actual_text.ask[0][0])
+                    #print(self.actual_text.ask[1][0])
+                    self.write(self.actual_text.ask1[0], 2)
+                    self.write(self.actual_text.ask2[0], 3)
                 elif how_many_answers == 3:
                     self.resp_but_1.activate()
                     self.resp_but_2.activate()
                     self.resp_but_3.activate()
-                    print(self.actual_text.ask[0][0])
-                    print(self.actual_text.ask[1][0])
-                    print(self.actual_text.ask[2][0])
-                    self.write(self.actual_text.ask[0][0], 1)
-                    self.write(self.actual_text.ask[1][0], 2)
-                    self.write(self.actual_text.ask[2][0], 3)
+                    #print(self.actual_text.ask[0][0])
+                    #print(self.actual_text.ask[1][0])
+                    #print(self.actual_text.ask[2][0])
+                    self.write(self.actual_text.ask1[0], 2)
+                    self.write(self.actual_text.ask2[0], 3)
+                    self.write(self.actual_text.ask3[0], 4)
                 elif how_many_answers == 4:
                     self.resp_but_1.activate()
                     self.resp_but_2.activate()
                     self.resp_but_3.activate()
                     self.resp_but_4.activate()
-                    self.write(self.actual_text.ask[0][0], 1)
-                    self.write(self.actual_text.ask[1][0], 2)
-                    self.write(self.actual_text.ask[2][0], 3)
-                    self.write(self.actual_text.ask[3][0], 4)
+                    self.write(self.actual_text.ask1[0], 2)
+                    self.write(self.actual_text.ask2[0], 3)
+                    self.write(self.actual_text.ask3[0], 4)
+                    self.write(self.actual_text.ask4[0], 5)
             ## JEZELI ZWYKLY TEKST
             else:
                 self.ok_button.activate()
@@ -883,7 +959,7 @@ class DialogBox:
         else:
             self.clear()
             if not self.npc.encountered:
-                self.game.events_manager.emit(Event(id=f'{self.npc.name} has been encountered.'))
+                self.game.events_manager.emit(Event(id=f'{self.npc.name} has been encountered'))
                 self.npc.encountered = True
             self.game.dialog_in_progress = False
             self.game.paused = False
@@ -900,6 +976,7 @@ class DialogBox:
         text_line_2 = ""
         text_line_3 = ""
         text_line_4 = ""
+        text_line_5 = ""
         #print (text_len)
         ## MAX LINE LENGTH 160~!
         if text_len < 40:
@@ -928,7 +1005,9 @@ class DialogBox:
         self.image = dialogbox_img.copy()
 
     def show(self, screen):
-        if not self.actual_text.ask:
+        ## Uwaga tu powinienem sprawdzic wszystkie 4 ask (odpowiedzi na pytania)
+        # ale to jest nowy draft
+        if not self.actual_text.ask1:
             self.ok_button.show_button(self.image)
         else:
             self.show_response_buttons()
@@ -957,27 +1036,27 @@ class DialogBox:
         self.mouse_pos = (mouse_x, mouse_y)
         if self.ok_button.active:
             if self.ok_button.check_if_clicked(self.mouse_pos):
-                self.next_d_step()
+                self.next_step()
         if self.resp_but_1.active:
             if self.resp_but_1.check_if_clicked(self.mouse_pos):
-                if self.actual_text.ask[0][1]:
-                    self.actual_text.ask[0][1].get_quest()
-                self.next_ask_step(self.actual_text.ask[0][2])
+                if self.actual_text.ask1[1]:
+                    self.actual_text.ask1[1].get_quest()
+                self.next_ask_step(self.actual_text.ask1[2])
         if self.resp_but_2.active:
             if self.resp_but_2.check_if_clicked(self.mouse_pos):
-                if self.actual_text.ask[1][1]:
-                    self.actual_text.ask[1][1].get_quest()
-                self.next_ask_step(self.actual_text.ask[1][2])
+                if self.actual_text.ask2[1]:
+                    self.actual_text.ask2[1].get_quest()
+                self.next_ask_step(self.actual_text.ask2[2])
         if self.resp_but_3.active:
             if self.resp_but_3.check_if_clicked(self.mouse_pos):
-                if self.actual_text.ask[2][1]:
-                    self.actual_text.ask[2][1].get_quest()
-                self.next_ask_step(self.actual_text.ask[2][2])
+                if self.actual_text.ask3[1]:
+                    self.actual_text.ask3[1].get_quest()
+                self.next_ask_step(self.actual_text.ask3[2])
         if self.resp_but_4.active:
             if self.resp_but_4.check_if_clicked(self.mouse_pos):
-                if self.actual_text.ask[3][1]:
-                    self.actual_text.ask[3][1].get_quest()
-                self.next_ask_step(self.actual_text.ask[3][2])
+                if self.actual_text.ask4[1]:
+                    self.actual_text.ask4[1].get_quest()
+                self.next_ask_step(self.actual_text.ask4[2])
 
 
 class Quest:
@@ -1005,33 +1084,44 @@ class Quest:
         self.visible = False
         self.start_time = 0
 
-    def check_if_completed(self):
-        print ("Sprawdzam czy wykonałeś quest")
-        if self.goal.mobs_to_kill:
-            for i in self.goal.mobs_to_kill:
-                for ii in self.game.player.defeated_enemies:
-                    if i == ii.name:
-                        self.completed = True
-                        print ("QUEST WYKONANO")
-                        return True
-        if self.goal.npcs_to_encounter:
-            for i in self.goal.npcs_to_encounter:
-                for ii in self.game.player.encountered_npcs:
-                    if i == ii.name:
-                        self.completed = True
-                        self.game.events_manager.emit(Event(id=f'quest {self.name} has been completed.'))
-                        print ("ODNALEZIONY NPC, QUEST WYKONANO")
-                        return True
+    def check_quest_items(self):
+        quest_items = []
+        print ("Sprawdzam czy wykonałeś quest. Sprawdzam przedmioty")
+        for slot in self.game.player.inventory.item_slots:
+            if slot.item:
+                if slot.item.type == "quest item":
+                    print ("I HAVE QUEST ITEM!!")
+                    quest_items.append(slot.item)
+        if self.goal.items_to_collect and quest_items:
+            for goal_item in self.goal.items_to_collect:
+                print (goal_item)
+                for quest_item in quest_items:
+                    print (quest_item.name)
+                    if quest_item.name == goal_item:
+                        return quest_item
+
+    def check_if_fulfiled(self) -> bool:
+        ### 1. ITEMS
+        quest_item = self.check_quest_items()
+        if quest_item:
+            self.game.events_manager.emit(Event(id=f'quest {quest_item.name} has been fulfiled'))
+            self.completed = True
+            self.game.player.inventory.remove_item(quest_item)
+            return True
+        ### 2. NPCs
+        ## TODO!
+        ### 3. MOBs to kill
+        ## TODO!
 
     def collect_reward(self):
         if self.completed:
-            self.game.player.active_quests.remove(self)
+            #self.game.player.active_quests.remove(self)
             self.game.player.gold += self.reward_gold
             self.game.player.xp += self.reward_xp
             pygame.mixer.Sound.play(coin_snd)
             #### SEND INFO
-            self.game.events_manager.emit(Event(id=f'quest {self.name} reward has been collected.'))
             self.game.player.completed_quests.append(self)
+            self.game.player.quest_book.remove(self)
             print("NAGRODA ODEBRANA i QUEST ZAPISANY JAKO WYKONANY")
 
     def get_quest(self):
@@ -1039,8 +1129,8 @@ class Quest:
             self.in_progress = True
             self.game.events_manager.emit(Event(id=f'got quest {self.name}'))
             self.game.player.active_quests.append(self)
+            self.game.player.quest_book.add_quest(self)
             self.start_time = (int(self.game.player.score_time_played * 1000))
-
 
 
 class QuestGoal:

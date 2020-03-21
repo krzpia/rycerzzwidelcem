@@ -32,5 +32,22 @@ class EventManager:
 
     def find_npc_encounter_event(self, npc_name) -> bool:
         for game_event in self.events:
-            if game_event.id == f'{npc_name} has been encountered.':
+            if game_event.id == f'{npc_name} has been encountered':
                 return True
+
+    def find_got_quest_event(self, quest_name) -> bool:
+        for game_event in self.events:
+            if game_event.id == f'got quest {quest_name}':
+                return True
+
+    def find_quest_compl_event(self, quest_name) -> bool:
+        for game_event in self.events:
+            if game_event.id == f'quest {quest_name} has been completed':
+                return True
+
+    def find_quest_rewarded_event(self, quest_name) -> bool:
+        for game_event in self.events:
+            if game_event.id == f'quest {quest_name} has been rewarded':
+                return True
+
+

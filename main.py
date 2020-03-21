@@ -176,13 +176,13 @@ class Game:
         ### CREATE CLASESS
         self.knight_class = CharClass("Knight", pl_knight_image, knight_death_anim, ["sword", "spear", "axe"],
                                       ["staff", "dagger"],
-                                      ["plate"], ["robe"], 4, 4, 1, 2, 3, 1, [])
+                                      ["plate"], ["robe"], 4, 4, 1, 2, 3, 1, ["Heroism"])
         self.wizard_class = CharClass("Wizard", pl_wizard_image, knight_death_anim, ["staff"], ["sword", "axe", "bow"],
                                       ["robe"],
                                       ["chain", "plate"], 2, 1, 4, 5, 2, 2, ["Firebolt"])
         self.thief_class = CharClass("Thief", pl_thief_image, knight_death_anim, ["dagger", "bow"], ["axe", "spear"],
                                      ["leather"],
-                                     ["plate"], 2, 2, 2, 2, 4, 5, [])
+                                     ["plate"], 2, 2, 2, 2, 4, 5, ["Haste"])
         ################
         pygame.mixer.music.stop()
         self.new_game_button = Button(intro_but_img, intro_but_h_img, 128, 32, "New Game", SCREEN_WIDTH / 2 - 64, 270,
@@ -550,7 +550,7 @@ class Game:
                         self.player.update_stats()
                 if event.key == pygame.K_e:
                     ####### ROZMAWIAJ Z NPC
-                    if not self.dialog_in_progress:
+                    if not self.dialog_in_progress and not self.paused:
                         npcs_to_talk = pygame.sprite.spritecollide(self.player,self.act_lvl.npcs,False,collide_double_hit_rect)
                         for npc in npcs_to_talk:
                             print ("TALK")
@@ -564,6 +564,7 @@ class Game:
                         if self.player.inventory.put_in_first_free_slot(item.item):
                             item.kill()
                             pygame.mixer.Sound.play(pick_item_snd)
+
                     ######## PODNIES ZLOTO
                     gold_to_pick = pygame.sprite.spritecollide(self.player, self.act_lvl.gold_to_pick, False)
                     for gold in gold_to_pick:

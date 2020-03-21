@@ -168,6 +168,9 @@ class LevelGen:
                 Treasure_Chest(self.game,object_center.x,object_center.y,tile_object.key,
                                tile_object.locked,tile_object.treasure_value,20,18)
             #### ITEMS ############
+            if tile_object.type == "quest item":
+                Item_to_take(self.game,object_center.x,object_center.y,
+                             self.gen.generate_quest_item_by_name(tile_object.name))
             #### KEYS #############
             if tile_object.type == "key":
                 Item_to_take(self.game,object_center.x,object_center.y,

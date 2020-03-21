@@ -15,6 +15,11 @@ class ItemGenerator:
         self.rings = []
         self.arrows = []
         self.books = []
+        self.q_items = []
+
+        ######## QUEST ITEMS #######
+        self.q_items.append(sprites.Quest_Item(self.game,"Holy Grail",0,23,94))
+
         ######## WEAPONS ###########
         self.weapons.append(sprites.Weapon(self.game, "Wooden Club", "weapon","blunt",
                                                      10, False, 2, 850, "medium",
@@ -289,7 +294,7 @@ class ItemGenerator:
         self.books.append(sprites.Book(self.game, "Haste", 100, 3, 49, 39))
         self.books.append(sprites.Book(self.game, "Invisibility", 225, 4, 47,39))
         self.books.append(sprites.Book(self.game, "Iron Skin", 75, 2,7, 39))
-
+        self.books.append(sprites.Book(self.game, "Heroism",60,1,56,39))
 
         #### RINGS #####
         self.rings.append(sprites.Ring(self.game,"Green Ring",100,0,1,0,0,0,0,0,0,0,1,34,42))
@@ -431,6 +436,13 @@ class ItemGenerator:
 
     def generate_potion_by_name(self, name):
         for i in self.potions:
+            if i.name == name:
+                return copy.copy(i)
+        print ("ERROR - NO ITEM of NAME: "+ name)
+        return False
+
+    def generate_quest_item_by_name(self, name):
+        for i in self.q_items:
             if i.name == name:
                 return copy.copy(i)
         print ("ERROR - NO ITEM of NAME: "+ name)
