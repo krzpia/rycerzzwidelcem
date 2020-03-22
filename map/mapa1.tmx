@@ -421,6 +421,7 @@
   </object>
   <object id="215" name="treasure chest" x="623" y="879">
    <properties>
+    <property name="item" value="Holy Grail"/>
     <property name="key" type="int" value="5"/>
     <property name="locked" type="int" value="1"/>
     <property name="treasure_value" type="int" value="40"/>
@@ -433,6 +434,7 @@
   </object>
   <object id="225" name="treasure chest" x="1263" y="623">
    <properties>
+    <property name="item" value=""/>
     <property name="key" type="int" value="0"/>
     <property name="locked" type="int" value="0"/>
     <property name="treasure_value" type="int" value="35"/>
@@ -468,6 +470,7 @@
   </object>
   <object id="257" name="treasure chest" x="256" y="705">
    <properties>
+    <property name="item" value=""/>
     <property name="key" type="int" value="0"/>
     <property name="locked" type="int" value="0"/>
     <property name="treasure_value" type="int" value="26"/>
@@ -485,11 +488,11 @@
   </object>
   <object id="271" name="treasure chest" x="34" y="33">
    <properties>
+    <property name="item" value=""/>
     <property name="key" type="int" value="0"/>
     <property name="locked" type="int" value="0"/>
     <property name="treasure_value" type="int" value="26"/>
    </properties>
   </object>
-  <object id="285" name="Holy Grail" type="quest item" x="111" y="110"/>
  </objectgroup>
 </map>

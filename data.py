@@ -57,6 +57,7 @@ next_page_img = pygame.image.load(path.join(img_folder, 'next_page_img.png')).co
 prev_page_img = pygame.image.load(path.join(img_folder, 'prev_page_img.png')).convert_alpha()
 rad_cast_img = pygame.image.load(path.join(img_folder, 'button_cast_d.png')).convert_alpha()
 rad_cast_h_img = pygame.image.load(path.join(img_folder, 'button_cast_a.png')).convert_alpha()
+quest_bcg_img = pygame.image.load(path.join(img_folder, 'quest_image_bcg.png')).convert_alpha()
 ### TILESET #####
 tileset_image = pygame.image.load(path.join(img_folder, 'tileset.png')).convert_alpha()
 full_tileset_image = pygame.image.load(path.join(img_folder, 'full_tileset.png')).convert_alpha()
@@ -172,3 +173,4 @@ bow_snd = pygame.mixer.Sound(path.join(snd_folder, 'bow.wav'))
 haste_snd = pygame.mixer.Sound(path.join(snd_folder, 'haste.wav'))
 death_snd = pygame.mixer.Sound(path.join(snd_folder, 'death2.wav'))
 pintrap_o_snd = pygame.mixer.Sound(path.join(snd_folder, 'pintrap_open.wav'))
+hurra_snd = pygame.mixer.Sound(path.join(snd_folder, 'hurra.wav'))

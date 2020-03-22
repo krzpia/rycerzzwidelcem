@@ -383,12 +383,14 @@ class Treasure_Object(pygame.sprite.Sprite):
 
 
 class Treasure_Chest(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, key, locked, treasure_value, hit_rect_width, hit_rect_height):
+    def __init__(self, game, x, y, key, locked, treasure_value, special_item,
+                 hit_rect_width, hit_rect_height):
         self._layer = FLOOR_LAYER
         self.groups = game.act_lvl.all_sprites, game.act_lvl.chest_to_open
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.inventory = Inventory(slot_img,8,4)
+        self.special_item = special_item
         if 0 < treasure_value <= 10:
             self.gold_coins = random.randint(1,treasure_value)
             self.treasure_items_no = 0
@@ -406,6 +408,9 @@ class Treasure_Chest(pygame.sprite.Sprite):
             for i in range(self.treasure_items_no):
                 self.inventory.put_in_first_free_slot(
                     self.game.levelgen.gen.generate_random_item(self.treasure_items_maxcost))
+        special_item = self.game.levelgen.gen.generate_quest_item_by_name(self.special_item)
+        if special_item:
+            self.inventory.put_in_first_free_slot(special_item)
         self.closed = True
         self.locked = locked
         self.key = key

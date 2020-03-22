@@ -12,7 +12,7 @@ class NpcGenerator:
     def generate(self, name, x, y, image):
         if name == "Gold Crusader":
             gold_crusader = sprites.Npc(self.game,name,x,y,image)
-            q_holy_grail = ui.Quest(self.game,"Holy Grail",1,[],["Holy Grail"],[],[],10,50)
+            q_holy_grail = ui.Quest(self.game,image,"Holy Grail",1,[],["Holy Grail"],[],[],10,50)
             gold_crusader.dialog_data.load_text(True,"welcome",0, 0,
                                                 "Hello, " + self.game.player.name,
                                                 False,False,False,False,False, False,False)
@@ -50,13 +50,14 @@ class NpcGenerator:
             gold_crusader.dialog_data.load_text(True, "quest Holy Grail", 3, 0,
                                                 "Thanks for your help. Now I can rest!",
                                                 False, False, False, False, True, False, False)
+            gold_crusader.dialog_data.load_text(True, "bye",0 , 0, "Goodbye, " + self.game.player.name,
+                                                False,False,False,False,False,False,False)
+            gold_crusader.dialog_data.load_text(False,"bye",0, 1, "Goodbye, " + name,
+                                                False,False,False,False,False,False,False)
             return gold_crusader
             #gold_crusader.dialog_data.load_text(True, 90,0,"So, you have killed a Rat? Impressive",
             #                                    compl_event='Rat has been killed.',
             #                                    block_event=False,block_event2=False,ask= False, goto=False)
-            #gold_crusader.dialog_data.load_text(True, 99, 0, "Goodbye, " + self.game.player.name,
-            #                                    compl_event=False,block_event=False,block_event2=False,ask= False,goto=False)
-            #gold_crusader.dialog_data.load_text(False, 99, 1, "Goodbye, " + name,
-            #                                    compl_event=False,block_event=False,block_event2=False,ask= False,goto=False)
+
 
 

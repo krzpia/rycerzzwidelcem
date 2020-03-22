@@ -42,7 +42,7 @@ class SpellGenerator:
                                      False,
                                      False, False, False, False, stoneskin_snd)
         self.heroism = ui.Spell("Heroism",sb_heroism_image,False,False,"defensive","heroism",2,1,False,False,False,
-                                False,False,False,False,False,False,False,False,False,False,haste_snd)
+                                False,False,False,False,False,False,False,False,False,False,hurra_snd)
         self.spells = [self.firebolt, self.fireball,self.icebolt,self.tricebolt,self.poisoncloud,
                        self.freeze,self.cure,self.stoneskin,self.haste, self.invisibility, self.ironskin,
                        self.heroism]

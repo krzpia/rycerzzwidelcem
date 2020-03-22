@@ -537,6 +537,7 @@ class Game:
                     else:
                         self.paused = True
                 if event.key == pygame.K_F2:
+                    print (f' Events at: {self.player.score_time_played}s of game played')
                     for game_event in self.events_manager.history():
                         print(game_event)
                 if event.key == pygame.K_F1:

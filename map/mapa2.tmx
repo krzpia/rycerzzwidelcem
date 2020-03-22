@@ -291,6 +291,7 @@
  <objectgroup id="9" name="items">
   <object id="63" name="treasure chest" x="401" y="82">
    <properties>
+    <property name="item" value=""/>
     <property name="key" type="int" value="21"/>
     <property name="locked" type="int" value="1"/>
     <property name="treasure_value" type="int" value="79"/>

@@ -166,7 +166,7 @@ class LevelGen:
                 Arrow_to_take(self.game,object_center.x,object_center.y,tile_object.number)
             if tile_object.name == "treasure chest":
                 Treasure_Chest(self.game,object_center.x,object_center.y,tile_object.key,
-                               tile_object.locked,tile_object.treasure_value,20,18)
+                               tile_object.locked,tile_object.treasure_value,tile_object.item,20,18)
             #### ITEMS ############
             if tile_object.type == "quest item":
                 Item_to_take(self.game,object_center.x,object_center.y,

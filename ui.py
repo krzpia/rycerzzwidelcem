@@ -419,9 +419,10 @@ class QuestBook:
         counter = 0
         for i in pages[self.act_page]:
             i.active = True
-            self.game.s_write(f'Quest {i.name}', self.image, (x_pos + 20, 40 + counter * 48),(BLACK))
-            self.game.s_write("Goal: ..... TODO", self.image, (x_pos + 20, 55 + counter * 48),(BLACK))
-            self.game.s_write(f'Reward {i.reward_xp} xp, {i.reward_gold} gold.', self.image ,(x_pos + 20, 70 + counter * 48),(BLACK))
+            i.show_quest_icon(self.image,x_pos + 10, 40 + counter * 64)
+            self.game.s_write(f'Quest {i.name}', self.image, (x_pos + 80, 40 + counter * 64),(BLACK))
+            self.game.s_write("Goal: ..... TODO", self.image, (x_pos + 80, 55 + counter * 464),(BLACK))
+            self.game.s_write(f'Reward {i.reward_xp} xp, {i.reward_gold} gold.', self.image ,(x_pos + 80, 70 + counter * 64),(BLACK))
             counter += 1
             if counter >= 5:
                 x_pos = 330
@@ -790,6 +791,11 @@ class Dialog:
                     text = self.find_branch_in_thread(0, thread_name)
                     self.text_returned = text
                     return text
+            ### UWAGA JEZELI BEDA INNE WATKI TRZEBA JE TUTAJ UWZGLEDNIC CZY NIE WYMAGAJA SPECJALNEJ LOGIKI!
+            else: #thread_name == "bye":
+                text = self.find_branch_in_thread(0, thread_name)
+                self.text_returned = text
+                return text
         else:
         ### NIE MA KOLEJNEJ GALEZI - KONIEC DIALOGU:
             return 0
@@ -809,22 +815,24 @@ class Dialog:
         for text in self.conversation:
             if text.thread not in threads:
                 threads.append(text.thread)
-        print(threads)
+        print (f'SEARCHING FOR A NEXT THREAD. AVAIBLE Threads: {threads}')
         threads = iter(threads)
         while True:
             try:
                 thread = next(threads)
+                #print (f'THREAD: {thread} to search')
+                #print (f'THREAD: {act_thread} was active')
                 if thread == act_thread:
                     try:
-                        return next(threads)
+                        next_thread = next(threads)
+                        #print (f'WILL RETURN NEXT THREAD: {next_thread}')
+                        return next_thread
                     except:
-                        print("LAST THREAD, END DIALOG")
+                        #print("LAST THREAD, END DIALOG")
                         break
             except:
-                print("No more threads!")
+                #print("No more threads!")
                 break
-
-
 
 class Text:
     def __init__(self, ifnpc, thread, branch, step, text, ask1,ask2,ask3,ask4,next_thread, goto, event):
@@ -886,6 +894,7 @@ class DialogBox:
         self.configure_text()
 
     def next_step(self):
+        #### POBIERAM NOWY TEXT Z MASZYNY DIALOG
         self.actual_text = self.dialog_data.find_next_step()
         #### SPRAWDZAM CZY ACTUAL TEKST MA EVENT I GO DODAJE
         if self.actual_text:
@@ -963,6 +972,8 @@ class DialogBox:
                 self.npc.encountered = True
             self.game.dialog_in_progress = False
             self.game.paused = False
+            if self.game.player.check_next_level():
+                self.game.paused = True
 
     def add_line(self, text) -> None:
         pass
@@ -1060,13 +1071,16 @@ class DialogBox:
 
 
 class Quest:
-    def __init__(self, game, name, level_req, mobs_to_kill,
+    def __init__(self, game, npc_image, name, level_req, mobs_to_kill,
                  items_to_collect,
                  tiles_to_explore,
                  npcs_to_encounter,
                  reward_xp, reward_gold):
         self.game = game
         self.name = name
+        self.image = quest_bcg_img
+        self.rect = self.image.get_rect()
+        self.image.blit(npc_image,(12,12))
         self.level_req = level_req
         self.goal = QuestGoal()
         for i in mobs_to_kill:
@@ -1083,6 +1097,11 @@ class Quest:
         self.in_progress = False
         self.visible = False
         self.start_time = 0
+
+    def show_quest_icon(self, surface, x, y):
+        self.rect.x = x
+        self.rect.y = y
+        surface.blit(self.image, (self.rect.x, self.rect.y))
 
     def check_quest_items(self):
         quest_items = []
