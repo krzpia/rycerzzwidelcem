@@ -96,6 +96,7 @@ treasure_chest_closed = pygame.image.load(path.join(img_folder, 'chest_closed.pn
 treasure_chest_open = pygame.image.load(path.join(img_folder, 'chest_open.png')).convert_alpha()
 treasure_bcg_img = pygame.image.load(path.join(img_folder, 'treasure_bcg.png')).convert_alpha()
 spellbook_bcg_img = pygame.image.load(path.join(img_folder, 'spellbook_bcg.png')).convert_alpha()
+ebroken_armor_img = pygame.image.load(path.join(img_folder, 'ebroken_armor.png')).convert_alpha()
 ### EFFECTS ICONS
 e_fav_wea_ico = pygame.image.load(path.join(img_folder, 'e_fav_wea.png')).convert_alpha()
 e_dis_wea_ico = pygame.image.load(path.join(img_folder, 'e_dis_wea.png')).convert_alpha()

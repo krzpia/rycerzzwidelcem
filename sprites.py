@@ -346,7 +346,7 @@ class Treasure_Object(pygame.sprite.Sprite):
         hits = pygame.sprite.spritecollide(self,self.game.act_lvl.melle_swing,True,collide_double_hit_rect)
         for hit in hits:
             pygame.mixer.Sound.play(chop_snd)
-            self.game.player.weapon_slot.item.breakage()
+            self.game.player.weapon_breakage()
             self.hp -= self.game.player.hit_dmg
         arrow_hits = pygame.sprite.spritecollide(self,self.game.act_lvl.arrows,False,collide_hit_rect)
         for hit in arrow_hits:
@@ -493,7 +493,7 @@ class Fence_Object(pygame.sprite.Sprite):
         hits = pygame.sprite.spritecollide(self,self.game.act_lvl.melle_swing,True,collide_double_hit_rect)
         for hit in hits:
             pygame.mixer.Sound.play(chop_snd)
-            self.game.player.weapon_slot.item.breakage()
+            self.game.player.weapon_breakage()
             self.hp -= self.game.player.hit_dmg
             #print("object hp = " + str(self.hp))
         arrow_hits = pygame.sprite.spritecollide(self, self.game.act_lvl.arrows,False)
@@ -575,6 +575,8 @@ class Weapon(pygame.sprite.Sprite):
         self.s_image = pygame.Surface((32,32), pygame.HWSURFACE | pygame.SRCALPHA)
         self.b_image.blit(tileset,(0,0),(img_x*TILE_SIZE, img_y*TILE_SIZE,TILE_SIZE,TILE_SIZE))
         self.s_image.blit(tileset,(0,0),(s_img_x*TILE_SIZE, s_img_y*TILE_SIZE,TILE_SIZE,TILE_SIZE))
+        self.breakage_surf = pygame.Surface((16,16), pygame.HWSURFACE | pygame.SRCALPHA)
+        self.breakage_icon = ebroken_armor_img
         self.name = name
         self.type = type
         self.subtype = subtype
@@ -588,13 +590,15 @@ class Weapon(pygame.sprite.Sprite):
         self.speed_mod = speed_mod
         self.ste_mod = ste_mod
         self.durability = durability
-        self.condition = 100.0
+        self.condition = 75.0
         self.hit_rate = hit_rate
         self.hit_radius = hit_radius
         self.image = self.s_image
         self.rect = self.s_image.get_rect()
         self.hit_rect = self.rect
-        self.damage = (0.4 * self.base_damage) + (0.6 * self.base_damage * self.condition / 100)
+        self.damage = round((0.4 * self.base_damage) + (0.6 * self.base_damage * self.condition / 100),0)
+        self.breakage_surf.fill((255 - (int(2.5 * self.condition)), (int(2.5 * self.condition)), 0))
+        self.breakage_surf.blit(self.breakage_icon, (0, 0))
 
     def update(self):
         #### bron bedzie tam gdzie gracz (czyli vector Pos + (4,0)
@@ -603,14 +607,20 @@ class Weapon(pygame.sprite.Sprite):
 
     def breakage(self):
         self.condition -= 5 / self.durability
+        if self.condition <=0:
+            self.condition = 0
         self.damage = round((0.4 * self.base_damage) + (0.6 * self.base_damage * self.condition / 100), 0)
-        print (f'{self.name} condition: {self.condition}')
+        #print (f'{self.name} condition: {self.condition}')
+        self.breakage_surf.fill((255 - (int(2.5 * self.condition)),(int(2.5* self.condition)),0))
+        self.breakage_surf.blit(self.breakage_icon,(0,0))
 
     def repair(self, val):
         self.condition += val
         if self.condition > 100:
             self.condition = 100.0
         self.damage = round((0.4 * self.base_damage) + (0.6 * self.base_damage * self.condition / 100), 0)
+        self.breakage_surf.fill((255 - (int(2.5 * self.condition)), (int(2.5 * self.condition)), 0))
+        self.breakage_surf.blit(self.breakage_icon, (0, 0))
 
 
 class Armor(pygame.sprite.Sprite):
@@ -625,6 +635,8 @@ class Armor(pygame.sprite.Sprite):
         self.s_image = pygame.Surface((32,32), pygame.HWSURFACE | pygame.SRCALPHA)
         self.b_image.blit(tileset,(0,0),(img_x*TILE_SIZE, img_y*TILE_SIZE,TILE_SIZE,TILE_SIZE))
         self.s_image.blit(tileset,(0,0),(s_img_x*TILE_SIZE, s_img_y*TILE_SIZE,TILE_SIZE,TILE_SIZE))
+        self.breakage_surf = pygame.Surface((16, 16), pygame.HWSURFACE | pygame.SRCALPHA)
+        self.breakage_icon = ebroken_armor_img
         self.name = name
         self.type = type
         self.subtype = subtype
@@ -644,6 +656,8 @@ class Armor(pygame.sprite.Sprite):
         self.rect.center = self.game.player.pos
         self.hit_rect = self.rect
         self.armor = round((0.4 * self.base_armor) + (0.6 * self.base_armor * self.condition / 100), 0)
+        self.breakage_surf.fill((255 - (int(2.5 * self.condition)), (int(2.5 * self.condition)), 0))
+        self.breakage_surf.blit(self.breakage_icon, (0, 0))
 
     def update(self):
         self.pos = self.game.player.pos
@@ -651,14 +665,20 @@ class Armor(pygame.sprite.Sprite):
 
     def breakage(self):
         self.condition -= 5 / self.durability
+        if self.condition <= 0:
+            self.condition = 0
         self.armor = round((0.4 * self.base_armor) + (0.6 * self.base_armor * self.condition / 100), 0)
-        print (f'{self.name} condition: {self.condition}')
+        #print (f'{self.name} condition: {self.condition}')
+        self.breakage_surf.fill((255 - (int(2.5 * self.condition)), (int(2.5 * self.condition)), 0))
+        self.breakage_surf.blit(self.breakage_icon, (0, 0))
 
     def repair(self, val):
         self.condition += val
         if self.condition > 100:
             self.condition = 100.0
         self.armor = round((0.4 * self.base_armor) + (0.6 * self.base_armor * self.condition / 100), 0)
+        self.breakage_surf.fill((255 - (int(2.5 * self.condition)), (int(2.5 * self.condition)), 0))
+        self.breakage_surf.blit(self.breakage_icon, (0, 0))
 
 
 class Ring:
@@ -774,8 +794,6 @@ class Book:
     def use(self):
         pygame.mixer.Sound.play(cure_snd)
         self.game.player.spell_book.add_spell(self.spell)
-
-
 
 
 class Quest_Item:
@@ -1093,7 +1111,7 @@ class Player(pygame.sprite.Sprite):
             if now - self.last_shot > self.arrow_rate:
                 self.last_shot = now
                 dir = self.last_dir
-                self.player.weapon_slot.item.breakage()
+                self.player.weapon_breakage()
                 Arrow(self.game, self.pos, dir)
                 self.arrows -= 1
 
@@ -1369,6 +1387,10 @@ class Player(pygame.sprite.Sprite):
             self.boots_slot.item.breakage()
         if self.helmet_slot.item:
             self.helmet_slot.item.breakage()
+
+    def weapon_breakage(self):
+        if self.weapon_slot.item:
+            self.weapon_slot.item.breakage()
 
     def check_live(self):
         if self.act_hp <=0:

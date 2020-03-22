@@ -850,7 +850,7 @@ class Game:
         for mob in hits:
             pygame.mixer.Sound.play(smash_snd)
             Mob_Hit_Splash(self, mob.pos)
-            self.player.weapon_slot.item.breakage()
+            self.player.weapon_breakage()
             txt = str("Melee hit. " + self.player.name + " inflicted " + (str(self.player.hit_dmg)) + " damage.")
             self.put_txt(txt)
             self.player.score_swing_enemy_hits.append(int(self.player.hit_dmg))
@@ -905,6 +905,7 @@ class Game:
 
     def draw_weapon_picked_info(self, item):
         self.write(("DAMAGE: " + str(item.damage)), (INV_POS[0] + 20, INV_POS[1] + 50))
+        self.screen.blit(item.breakage_surf, (INV_POS[0] + 180, INV_POS[1] + 20))
         self.write(("Cost: " + str(item.cost)), (INV_POS[0] + 20, INV_POS[1] + 70))
         self.screen.blit(gold_coin, (INV_POS[0] + 80, INV_POS[1] + 75))
         hit_rate = (1000 / item.hit_rate)
