@@ -23,253 +23,253 @@ class ItemGenerator:
         ######## WEAPONS ###########
         self.weapons.append(sprites.Weapon(self.game, "Wooden Club", "weapon","blunt",
                                                      10, False, 2, 850, "medium",
-                                                     0,0,0,0,0,0,55, 44, 35, 87))
+                                                     0,0,0,0,0,0,25,55, 44, 35, 87))
         self.weapons.append(sprites.Weapon(self.game, "Small Sword","weapon","sword",
                                            10,False,2,625,"small",
-                                           0,0,0,0,0,0,4,45,52,89))
+                                           0,0,0,0,0,0,4,50,45,52,89))
         self.weapons.append(sprites.Weapon(self.game, "Short Hammer", "weapon", "blunt",
                                            15, False, 5, 1250, "small",
-                                           0, 0, 0, 0, 0, 0, 37, 46, 37, 88))
+                                           0, 0, 0, 0, 0, 0,75, 37, 46, 37, 88))
         self.weapons.append(sprites.Weapon(self.game, "Knife", "weapon","dagger",
                                            15, False, 1, 500, "small",
-                                           0, 0, 0, 0, 0, 0, 2, 45, 42, 87))
+                                           0, 0, 0, 0, 0, 0,40, 2, 45, 42, 87))
         self.weapons.append(sprites.Weapon(self.game, "Spiked Club", "weapon","blunt",
                                            15, False, 4, 850, "medium",
-                                           0, 0, 0, 0, 0, 0, 58, 45, 14, 88))
+                                           0, 0, 0, 0, 0, 0,25, 58, 45, 14, 88))
         self.weapons.append(sprites.Weapon(self.game,"Wood Staff","weapon","staff",
                                            15,False,2,700,"big",
-                                           0,0,0,0,0,0,3,47,10,89))
+                                           0,0,0,0,0,0,25,3,47,10,89))
         self.weapons.append(sprites.Weapon(self.game, "Machete", "weapon", "sword",
                                            20, False, 4, 725, "medium",
-                                           0, 0, 0, 0, 0, 0, 36, 45, 56, 87))
+                                           0, 0, 0, 0, 0, 0,45, 36, 45, 56, 87))
         self.weapons.append(sprites.Weapon(self.game, "Hard Wood Staff", "weapon", "staff",
                                            20, False, 3, 700, "big",
-                                           0, 0, 0, 0, 0, 0, 2, 47, 10, 89))
+                                           0, 0, 0, 0, 0, 0,35, 2, 47, 10, 89))
         self.weapons.append(sprites.Weapon(self.game, "Iron Mace", "weapon", "blunt",
                                            25, False, 4, 800, "medium",
-                                           0, 0, 0, 0, 0, 0, 50, 46, 2, 89))
+                                           0, 0, 0, 0, 0, 0,60, 50, 46, 2, 89))
         self.weapons.append(sprites.Weapon(self.game, "Iron Dagger", "weapon","dagger",
                                                      25, False, 2, 500, "small",
-                                                     0, 0, 0, 0, 0, 0,5,45,42,87))
+                                                     0, 0, 0, 0, 0, 0,50,5,45,42,87))
         self.weapons.append(sprites.Weapon(self.game, "Short Sword", "weapon","sword",
                                                      25, False,3, 625,"small",
-                                                     0, 0, 0, 0, 0, 0,63,46,52,89))
+                                                     0, 0, 0, 0, 0, 0,55,63,46,52,89))
         self.weapons.append(sprites.Weapon(self.game, "Wooden Spear", "weapon","spear",
                                            30, False, 4, 900, "big",
-                                           0, 0, 0, 0, 0, 0, 27, 47, 56, 89))
+                                           0, 0, 0, 0, 0, 0,30, 27, 47, 56, 89))
         self.weapons.append(sprites.Weapon(self.game, "Wood Axe", "weapon","axe",
                                            35, False, 6, 750, "medium",
-                                           0, 0, 0, 0, 0, 0, 52, 47, 32, 90))
+                                           0, 0, 0, 0, 0, 0,45, 52, 47, 32, 90))
         self.weapons.append(sprites.Weapon(self.game,"Short Saber","weapon","sword",
                                            35,False,3,625,"small",
-                                           0,0,0,0,0,0,5,47,38,89))
+                                           0,0,0,0,0,0,45,5,47,38,89))
         self.weapons.append(sprites.Weapon(self.game, "Trident", "weapon","spear",
                                            35, False, 5, 900, "big",
-                                           0, 0, 0, 0, 0, 0, 43, 47, 7, 89))
+                                           0, 0, 0, 0, 0, 0,50, 43, 47, 7, 89))
         self.weapons.append(sprites.Weapon(self.game, "Scythe", "weapon","spear",
                                            40, False, 8, 1000, "big",
-                                           0, 0, 0, 0, 0, 0, 14, 47, 46, 89))
+                                           0, 0, 0, 0, 0, 0,40, 14, 47, 46, 89))
         self.weapons.append(sprites.Weapon(self.game, "Steel Dagger", "weapon","dagger",
                                            45, False, 3, 500, "small",
-                                           0, 0, 0, 0, 0, 0, 17, 45, 43, 87))
+                                           0, 0, 0, 0, 0, 0, 55,17, 45, 43, 87))
         self.weapons.append(sprites.Weapon(self.game, "Iron Sword", "weapon","sword",
                                            50, False, 4, 625, "small",
-                                           0, 0, 0, 0, 0, 0, 22, 47, 52, 89))
+                                           0, 0, 0, 0, 0, 0,60, 22, 47, 52, 89))
         self.weapons.append(sprites.Weapon(self.game, "Halaberd", "weapon","spear",
                                            60, False, 7, 950, "big",
-                                           0, 0, 0, 0, 0, 0, 27, 44, 19, 88))
+                                           0, 0, 0, 0, 0, 0,50, 27, 44, 19, 88))
         self.weapons.append(sprites.Weapon(self.game, "Apprentice Staff", "weapon", "staff",
                                            65, False, 4, 700, "big",
-                                           0, 0, 0, 0, 0, 0, 0, 47, 11, 89))
+                                           0, 0, 0, 0, 0, 0,40, 0, 47, 11, 89))
         self.weapons.append(sprites.Weapon(self.game, "Wood Bow", "weapon","bow",
                                            75, True, 3, 1250, False,
-                                           0, 0, 0, 0, 0, 0, 38, 49, 26, 87))
+                                           0, 0, 0, 0, 0, 0,25, 38, 49, 26, 87))
         self.weapons.append(sprites.Weapon(self.game, "Saber", "weapon","sword",
                                            75, False, 4, 625,"small",
-                                           0, 0, 0, 0, 0, 0,8,47,38,89))
+                                           0, 0, 0, 0, 0, 0,45,8,47,38,89))
         self.weapons.append(sprites.Weapon(self.game, "Sharp Axe", "weapon", "axe",
                                            80, False, 6, 750, "medium",
-                                           0, 0, 0, 0, 0, 0, 39,44,23,88))
+                                           0, 0, 0, 0, 0, 0, 50,39,44,23,88))
         self.weapons.append(sprites.Weapon(self.game,"Iron Flail","weapon","blunt",
                                            85,False,8,1000,"big",
-                                           0,0,0,0,0,0,37,47,1,88))
+                                           0,0,0,0,0,0,65,37,47,1,88))
         self.weapons.append(sprites.Weapon(self.game, "Scimitair", "weapon","sword",
                                            100, False, 5, 550, "small",
-                                           0, 0, 0, 0, 0, 0,10,47,42,89))
+                                           0, 0, 0, 0, 0, 0,50,10,47,42,89))
         self.weapons.append(sprites.Weapon(self.game,"Double Axe", "weapon","axe",
                                            120,False,9,725,"medium",
-                                           0,0,0,0,0,0,31,44,10,87))
+                                           0,0,0,0,0,0,60,31,44,10,87))
         self.weapons.append(sprites.Weapon(self.game, "Hunter`s Bow", "weapon", "bow",
                                            135, True, 4, 1200, False,
-                                           0, 0, 0, 0, 0, 0, 32,49, 26, 87))
+                                           0, 0, 0, 0, 0, 0, 45,32,49, 26, 87))
         self.weapons.append(sprites.Weapon(self.game, "Obsidian Spear", "weapon", "spear",
                                            150, False, 10, 900, "big",
-                                           0, 0, 0, 0, 0, 0, 30,47,57,89))
+                                           0, 0, 0, 0, 0, 0,65, 30,47,57,89))
         self.weapons.append(sprites.Weapon(self.game, "Dwarf Axe", "weapon", "axe",
                                            160, False, 8, 750, "medium",
-                                           0, 0, 0, 0, 0, 0, 42, 44, 23, 88))
+                                           0, 0, 0, 0, 0, 0,85, 42, 44, 23, 88))
         self.weapons.append(sprites.Weapon(self.game, "Royal Saber", "weapon","sword",
                                           175, False, 7, 625, "small",
-                                          0, 0, 0, 0, 0, 0, 9, 47, 57, 88))
+                                          0, 0, 0, 0, 0, 0,55, 9, 47, 57, 88))
         self.weapons.append(sprites.Weapon(self.game, "Golden Mace", "weapon", "blunt",
                                            175, False, 10, 800, "medium",
-                                           0, 0, 0, 0, 0, 0, 53, 46, 1, 89))
+                                           0, 0, 0, 0, 0, 0,95, 53, 46, 1, 89))
         self.weapons.append(sprites.Weapon(self.game, "Broad Sword", "weapon", "sword",
                                            185, False, 8, 700, "medium",
-                                           0, 0, 0, 0, 0, 0, 30, 46, 28, 88))
+                                           0, 0, 0, 0, 0, 0,80, 30, 46, 28, 88))
         self.weapons.append(sprites.Weapon(self.game, "Royal Scimitair", "weapon","sword",
                                            190, False, 6, 550,"small",
-                                           0, 0, 0, 0, 0, 0,11,47,41,89))
+                                           0, 0, 0, 0, 0, 0,60,11,47,41,89))
         self.weapons.append(sprites.Weapon(self.game, "Golden Flail", "weapon", "blunt",
                                            200, False, 10, 1000, "big",
-                                           0, 0, 0, 0, 0, 0, 39,47, 2, 88))
+                                           0, 0, 0, 0, 0, 0, 90,39,47, 2, 88))
         self.weapons.append(sprites.Weapon(self.game, "Golden Dwarf Axe", "weapon", "axe",
                                            220, False, 10, 750, "medium",
-                                           0, 0, 0, 0, 0, 0, 43, 44, 23, 88))
+                                           0, 0, 0, 0, 0, 0,95, 43, 44, 23, 88))
         self.weapons.append(sprites.Weapon(self.game, "Oriental Mace", "weapon", "blunt",
                                            220, False, 7, 875, "medium",
-                                           0, 0, 0, 2, 0, 0, 49,46,54,87))
+                                           0, 0, 0, 2, 0, 0, 70,49,46,54,87))
         self.weapons.append(sprites.Weapon(self.game, "Sapphire Sword", "weapon", "sword",
                                            250, False, 9, 700, "medium",
-                                           0, 1, 0, 0, 0, 0, 33,46,17,91))
+                                           0, 1, 0, 0, 0, 0,80, 33,46,17,91))
         self.weapons.append(sprites.Weapon(self.game, "Composite Bow", "weapon", "bow",
                                            275, True, 6, 1180, False,
-                                           0, 0, 0, 0, 0, 0, 33, 49, 27, 87))
+                                           0, 0, 0, 0, 0, 0,65, 33, 49, 27, 87))
         self.weapons.append(sprites.Weapon(self.game, "Obsidian Dagger", "weapon", "dagger",
                                            300, False, 5, 500, "small",
-                                           0, 0, 0, 0, 1, 0, 21,47,49,89))
+                                           0, 0, 0, 0, 1, 0,90, 21,47,49,89))
         self.weapons.append(sprites.Weapon(self.game, "Sapphire Spear", "weapon", "spear",
                                            350, False, 12, 900, "big",
-                                           0, 1, 0, 0, 0, 0, 38,48,52,90))
+                                           0, 1, 0, 0, 0, 0,80, 38,48,52,90))
         self.weapons.append(sprites.Weapon(self.game, "Devil`s Flail", "weapon", "blunt",
                                            380, False, 12, 1000, "big",
-                                           1, 0, 0, 0, 0, 0, 11, 45, 2, 88))
+                                           1, 0, 0, 0, 0, 0,90, 11, 45, 2, 88))
         self.weapons.append(sprites.Weapon(self.game, "Devil`s Sword", "weapon", "sword",
                                            400, False, 9, 575, "medium",
-                                           1, 0, 0, 0, 0, 0,  15, 48, 44, 90))
+                                           1, 0, 0, 0, 0, 0,80,  15, 48, 44, 90))
         self.weapons.append(sprites.Weapon(self.game, "Neptun Spear", "weapon", "spear",
                                            420, False, 14, 900, "big",
-                                           0, 2, 0, 0, 0, 0, 49, 47, 31, 90))
+                                           0, 2, 0, 0, 0, 0,85, 49, 47, 31, 90))
         self.weapons.append(sprites.Weapon(self.game, "Giant`s Hammer", "weapon", "blunt",
                                            450, False, 24, 1175, "medium",
-                                           2, 2, 0, 0, 0, 0,58,47,36,88))
+                                           2, 2, 0, 0, 0, 0,99,58,47,36,88))
         self.weapons.append(sprites.Weapon(self.game, "Jade Bow", "weapon", "bow",
                                            475, True, 9, 1175, False,
-                                           0, 0, 0, 0, 0, 0, 40,49, 29, 87))
+                                           0, 0, 0, 0, 0, 0,80, 40,49, 29, 87))
         self.weapons.append(sprites.Weapon(self.game, "Alladin`s Falcon", "weapon", "sword",
                                            500, False, 10, 570, "medium",
-                                           0, 0, 2, 0, 0, 0, 47, 48, 63, 90))
+                                           0, 0, 2, 0, 0, 0,95, 47, 48, 63, 90))
 
         #### ARMORS ###########
         self.armors.append(sprites.Armor(self.game,"Leather Cloak", "armor","robe",
-                                         10,4,1,0,0,0,0,0,0,9,36,60,81))
+                                         10,4,1,0,0,0,0,0,0,40,9,36,60,81))
         self.armors.append(sprites.Armor(self.game,"Apprentice Robe", "armor","robe",
-                                         12,2,1,0,0,1,0,0,0,24,38,12,82))
+                                         12,2,1,0,0,1,0,0,0,55,24,38,12,82))
         self.armors.append(sprites.Armor(self.game, "Leather Armor", "armor","leather",
-                                         16, 6, 1, 0, 0, 0, 0, 0, 0, 0, 38, 23, 82))
+                                         16, 6, 1, 0, 0, 0, 0, 0, 0,50, 0, 38, 23, 82))
         self.armors.append(sprites.Armor(self.game, "Hard Leather Armor", "armor","leather",
-                                         20, 8, 1.025, 0, 0, 0, 0, 0, 0, 1, 38, 23, 82))
+                                         20, 8, 1.025, 0, 0, 0, 0, 0, 0,65, 1, 38, 23, 82))
         self.armors.append(sprites.Armor(self.game,"Light Scale Armor","armor","chain",
-                                         25,10,1.1,0,0,0,0,0,0,22,38,23,82))
+                                         25,10,1.1,0,0,0,0,0,0,45,22,38,23,82))
         self.armors.append(sprites.Armor(self.game,"Spiked Leather Armor", "armor","leather",
-                                         30,10,1.05,0,0,0,0,0,0,45,38,39,82))
+                                         30,10,1.05,0,0,0,0,0,0,60,45,38,39,82))
         self.armors.append(sprites.Armor(self.game, "Hard Spiked Armor", "armor","leather",
-                                         35, 12, 1.1, 0, 0, 0, 0, 0, 0, 46, 38, 39, 82))
+                                         35, 12, 1.1, 0, 0, 0, 0, 0, 0,75, 46, 38, 39, 82))
         self.armors.append(sprites.Armor(self.game, "Scale Armor", "armor","chain",
-                                         40, 16, 1.25, 0, 0, 0, 0, 0, 0, 7, 38, 27, 83))
+                                         40, 16, 1.25, 0, 0, 0, 0, 0, 0,60, 7, 38, 27, 83))
         self.armors.append(sprites.Armor(self.game, "Iron Plate Armor", "armor","plate",
-                                         50, 20, 1.5, 0, 0, 0, 0, 0, 0, 14,38,53,82))
+                                         50, 20, 1.5, 0, 0, 0, 0, 0, 0,85, 14,38,53,82))
         self.armors.append(sprites.Armor(self.game, "Imperial Leather Armor", "armor","leather",
-                                         60, 10, 1, 0, 0, 0, 0, 0, 0, 2, 38, 23, 82))
+                                         60, 10, 1, 0, 0, 0, 0, 0, 0,60, 2, 38, 23, 82))
         self.armors.append(sprites.Armor(self.game, "Thief Leather Armor", "armor","leather",
-                                         60, 8, 1, 0, 0, 0, 0, 1, 0, 8, 38, 24, 82))
+                                         60, 8, 1, 0, 0, 0, 0, 1, 0,50, 8, 38, 24, 82))
         self.armors.append(sprites.Armor(self.game, "Heavy Plate Armor", "armor","plate",
-                                         65, 24, 1.6, 0, 0, 0, 0, 0, 0, 15, 38, 53, 82))
+                                         65, 24, 1.6, 0, 0, 0, 0, 0, 0,90, 15, 38, 53, 82))
         self.armors.append(sprites.Armor(self.game,"Dryad`s Armor", "armor","robe",
-                                         70,12,1,0,0,2,0,0,0,53,38,44,83))
+                                         70,12,1,0,0,2,0,0,0,70,53,38,44,83))
         self.armors.append(sprites.Armor(self.game, "Steel Plate Armor", "armor","plate",
-                                         75, 25, 1.4, 0, 0, 0, 0, 0, 0, 16, 38, 53, 82))
+                                         75, 25, 1.4, 0, 0, 0, 0, 0, 0,125, 16, 38, 53, 82))
         self.armors.append(sprites.Armor(self.game, "Spiked Plate Armor", "armor","plate",
-                                         85,30,1.66,1,0,0,0,0,0,10,38,57,82))
+                                         85,30,1.66,1,0,0,0,0,0,100,10,38,57,82))
         self.armors.append(sprites.Armor(self.game,"Imperial Scale Armor","armor","chain",
-                                         100,20,1.25,0,0,0,0,0,0,21,38,28,82))
+                                         100,20,1.25,0,0,0,0,0,0,75,21,38,28,82))
         self.armors.append(sprites.Armor(self.game,"Mithril Armor", "armor","chain",
-                                         150,25,1,0,0,0,0,0,2,33,38,27,83))
+                                         150,25,1,0,0,0,0,0,2,50,33,38,27,83))
         self.armors.append(sprites.Armor(self.game,"Royal Armor", "armor","chain",
-                                         225,28,1.1,0,0,0,1,0,0,35,38,53,81))
+                                         225,28,1.1,0,0,0,1,0,0,90,35,38,53,81))
         self.armors.append(sprites.Armor(self.game,"Wizard`s Robe", "armor","robe",
-                                         275,5,1,0,0,4,4,0,0,30,38,0,83))
+                                         275,5,1,0,0,4,4,0,0,35,30,38,0,83))
         self.armors.append(sprites.Armor(self.game,"Dragon Lava Heavy Armor","armor","plate",
-                                         500,50,1.66,2,2,0,0,0,0,39,38,50,82))
+                                         500,50,1.66,2,2,0,0,0,0,150,39,38,50,82))
 
 
 
         ### SHIELDS
         self.armors.append(sprites.Armor(self.game, "Wooden Shield", "shield","wood",
-                                         10, 4, 1, 0, 0, 0, 0, 0, 0, 5,37,38,85))
+                                         10, 4, 1, 0, 0, 0, 0, 0, 0,20, 5,37,38,85))
         self.armors.append(sprites.Armor(self.game, "Iron Round Shield", "shield","iron",
-                                         12, 8, 1.05, 0, 0, 0, 0, 0, 0, 11, 37, 16, 86))
+                                         12, 8, 1.05, 0, 0, 0, 0, 0, 0, 60,11, 37, 16, 86))
         self.armors.append(sprites.Armor(self.game, "Round Shield", "shield","wood",
-                                         15, 6, 1 ,0,0,0,0,0,0,29,37,21,86))
+                                         15, 6, 1 ,0,0,0,0,0,0,50,29,37,21,86))
         self.armors.append(sprites.Armor(self.game, "Cavalry Shield","shield","iron",
-                                         20, 9,1.05,0,0,0,0,0,0,33,37,57,85))
+                                         20, 9,1.05,0,0,0,0,0,0,60,33,37,57,85))
         self.armors.append(sprites.Armor(self.game, "Scull Round Shield", "shield","iron",
-                                         45, 10, 1, 0, 0, 0, 0, 0, 0, 31,37,26,86))
+                                         55, 10, 1, 0, 0, 0, 0, 0, 0,75, 31,37,26,86))
         self.armors.append(sprites.Armor(self.game, "Tower Shield", "shield","iron",
-                                         60, 16, 1.2, 0, 0, 0, 0, 0, 0, 17, 37, 53, 85))
+                                         60, 16, 1.2, 0, 0, 0, 0, 0, 0,85, 17, 37, 53, 85))
         self.armors.append(sprites.Armor(self.game, "Hoplite Shiled", "shield", "iron",
-                                         80, 12, 1, 0, 0, 0, 0, 0, 0, 7, 37, 46, 85))
+                                         80, 12, 1, 0, 0, 0, 0, 0, 0,65, 7, 37, 46, 85))
         self.armors.append(sprites.Armor(self.game, "Phalanx Shield", "shield", "iron",
-                                         90, 20, 1.25, 0, 0, 0, 0, 0, 0, 15, 37, 49, 85))
+                                         90, 20, 1.25, 0, 0, 0, 0, 0, 0,75, 15, 37, 49, 85))
         self.armors.append(sprites.Armor(self.game, "Orc Shiled", "shield", "leather",
-                                         100, 10, 1, 1, 0, 0, 0, 0, 0, 30,37, 27,86))
+                                         100, 10, 1, 1, 0, 0, 0, 0, 0,50, 30,37, 27,86))
         self.armors.append(sprites.Armor(self.game, "Dragon Shiled", "shield", "iron",
-                                         150, 20, 1.1, 0, 0, 0, 0, 0, 0, 25, 37, 45, 85))
+                                         150, 20, 1.1, 0, 0, 0, 0, 0, 0,90, 25, 37, 45, 85))
         self.armors.append(sprites.Armor(self.game, "High Moon Shield", "shield", "iron",
-                                         200, 24, 1.1, 0, 0, 1, 1, 0, 0, 21, 37, 4, 86))
+                                         200, 24, 1.1, 0, 0, 1, 1, 0, 0,65, 21, 37, 4, 86))
         self.armors.append(sprites.Armor(self.game, "Royal Shield", "shield", "iron",
-                                         225, 26, 1.15, 1, 1, 0, 0, 0, 0, 19, 37, 47, 85))
+                                         225, 26, 1.15, 1, 1, 0, 0, 0, 0,80, 19, 37, 47, 85))
 
 
 
         ### BOOTS
         self.armors.append(sprites.Armor(self.game, "Pilgrim Sandals", "boots", "robe",
-                                         8, 1, 1, 0, 0, 0, 0, 0, 0, 24, 36, 53, 83))
+                                         8, 1, 1, 0, 0, 0, 0, 0, 0,50, 24, 36, 53, 83))
         self.armors.append(sprites.Armor(self.game, "Leather Boots", "boots", "leather",
-                                         10, 2, 1, 0, 0, 0, 0, 0, 0, 22, 36, 59, 83))
+                                         10, 2, 1, 0, 0, 0, 0, 0, 0,40, 22, 36, 59, 83))
         self.armors.append(sprites.Armor(self.game, "Fur Boots", "boots", "leather",
-                                         15, 3, 1, 0, 0, 0, 0, 0, 0, 23, 36, 59, 83))
+                                         15, 3, 1, 0, 0, 0, 0, 0, 0,35, 23, 36, 59, 83))
         self.armors.append(sprites.Armor(self.game, "Hard Leather Boots", "boots","leather",
-                                         20, 4, 1, 0, 0, 0, 0, 0, 0, 21,36,59,83))
+                                         20, 4, 1, 0, 0, 0, 0, 0, 0,60, 21,36,59,83))
         self.armors.append(sprites.Armor(self.game, "Elf Boots", "boots", "leather",
-                                         45, 6, 1, 0, 0, 0, 0, 0, 0, 26,36,62,83))
+                                         45, 6, 1, 0, 0, 0, 0, 0, 0,50, 26,36,62,83))
         self.armors.append(sprites.Armor(self.game, "Plate Boots", "boots", "plate",
-                                         55, 12, 1.2, 0, 0, 0, 0, 0, 0, 27,36,0,84))
+                                         55, 12, 1.2, 0, 0, 0, 0, 0, 0,90, 27,36,0,84))
         self.armors.append(sprites.Armor(self.game, "Chain Boots", "boots", "chain",
-                                         75, 10, 1.05, 0, 0, 0, 0, 0, 0, 28,36,0,84))
+                                         75, 10, 1.05, 0, 0, 0, 0, 0, 0,70, 28,36,0,84))
 
 
         ### HATS
         self.armors.append(sprites.Armor(self.game, "Leather Hat", "helmet","leather",
-                                         8, 2, 1, 0, 0, 0, 0, 0, 0, 45,36,17,93))
+                                         8, 2, 1, 0, 0, 0, 0, 0, 0,20, 45,36,17,93))
         self.armors.append(sprites.Armor(self.game, "Fur Cap", "helmet", "leather",
-                                         15, 4, 1, 0, 0, 0, 0, 0, 0, 40,36,4,92))
+                                         15, 4, 1, 0, 0, 0, 0, 0, 0,20, 40,36,4,92))
         self.armors.append(sprites.Armor(self.game, "Red Hood", "helmet", "leather",
-                                         12, 3, 1, 0, 0, 0, 0, 0, 0, 41,36,61,92))
+                                         12, 3, 1, 0, 0, 0, 0, 0, 0,35, 41,36,61,92))
         self.armors.append(sprites.Armor(self.game, "Gladiator Helm", "helmet", "plate",
-                                         25, 8, 1.15, 0, 0, 0, 0, 0, 0, 50,36,59,92))
+                                         25, 8, 1.15, 0, 0, 0, 0, 0, 0,90, 50,36,59,92))
         self.armors.append(sprites.Armor(self.game, "Mameluk Helm", "helmet", "chain",
-                                         45, 6, 1.05, 0, 0, 0, 0, 0, 0, 1,37,7,92))
+                                         45, 6, 1.05, 0, 0, 0, 0, 0, 0,35, 1,37,7,92))
         self.armors.append(sprites.Armor(self.game, "Chain Hood", "helmet", "chain",
-                                         60, 8, 1.05, 0, 0, 0, 0, 0, 0, 46,36,60,92))
+                                         60, 8, 1.05, 0, 0, 0, 0, 0, 0,40, 46,36,60,92))
         self.armors.append(sprites.Armor(self.game, "Wizard`s Hat", "helmet", "robe",
-                                         70, 2, 1, 0, 0, 1, 1, 0, 0, 48, 36, 17, 93))
+                                         70, 2, 1, 0, 0, 1, 1, 0, 0,25, 48, 36, 17, 93))
         self.armors.append(sprites.Armor(self.game, "Knight Helmet", "helmet", "plate",
-                                         80, 12, 1.2, 0, 0, 0, 0, 0, 0, 58,36,39,92))
+                                         80, 12, 1.2, 0, 0, 0, 0, 0, 0,90, 58,36,39,92))
         self.armors.append(sprites.Armor(self.game, "Templar Helmet", "helmet", "plate",
-                                         125, 14, 1.1, 0, 0, 0, 0, 0, 0, 56, 36, 57, 92))
+                                         125, 14, 1.1, 0, 0, 0, 0, 0, 0,100, 56, 36, 57, 92))
         self.armors.append(sprites.Armor(self.game, "Devil`s Helmet", "helmet", "plate",
-                                         205, 20, 1.05, 1, 0, 0, 0, 0, 0, 59, 36, 52, 92))
+                                         205, 20, 1.05, 1, 0, 0, 0, 0, 0, 125,59, 36, 52, 92))
 
         #### POTIONS ###########
         self.potions.append(sprites.Potion(self.game, "Red Potion", "Cure",15,30,26,42))

@@ -58,13 +58,12 @@ class Game:
         global font20
         font20 = pygame.font.Font(self.font_arial, 20)
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF)
-        self.map_surface = pygame.Surface((MAP_WIDTH, MAP_HEIGHT), pygame.HWSURFACE | pygame.SRCALPHA)
+        self.map_surface = pygame.Surface((MAP_WIDTH, MAP_HEIGHT), pygame.HWSURFACE | pygame.SRCALPHA| pygame.DOUBLEBUF)
         pygame.display.set_caption(TITLE)
         pygame.key.set_repeat(300, 100)
         ######## ZMIENNE DO DEBUOWANIA #######
         self.unlock_updates = False
         self.fpss = []
-        self.events_manager = EventManager()
 
     def get_tile(self, tileset, x, y):
         surface = pygame.Surface((32, 32)).convert_alpha()
@@ -124,6 +123,8 @@ class Game:
         ### CREATE PLAYER ###
         #####################
         self.player = Player(self, "Kris", class_selected)
+        ### CREATE EVENTS MANAGER
+        self.events_manager = EventManager()
         ### DIALOG BOX
         self.dialog_box = DialogBox(self)
         ### UI BUTTONS
@@ -812,6 +813,7 @@ class Game:
             if not self.player.check_block():
                 #### NIE MA BLOKU #####
                 Hit_Splash(self, self.player.pos)
+                self.player.armor_breakage()
                 hit_damage_after_red = math.ceil(hit.damage * (1 - (self.player.hit_reduction / 100)))
                 txt = (hit.name + " hits wih strength: " + str(hit.damage) + ". Inflicted damage: " + str(
                     hit_damage_after_red))
@@ -829,6 +831,7 @@ class Game:
             else:
                 #### BLOCK ######
                 pygame.mixer.Sound.play(block_snd)
+                self.player.armor_breakage()
                 self.player.score_blocks += 1
                 txt = (self.player.name + "blocks!")
                 self.put_txt(txt)
@@ -847,6 +850,7 @@ class Game:
         for mob in hits:
             pygame.mixer.Sound.play(smash_snd)
             Mob_Hit_Splash(self, mob.pos)
+            self.player.weapon_slot.item.breakage()
             txt = str("Melee hit. " + self.player.name + " inflicted " + (str(self.player.hit_dmg)) + " damage.")
             self.put_txt(txt)
             self.player.score_swing_enemy_hits.append(int(self.player.hit_dmg))
@@ -966,9 +970,9 @@ class Game:
     def draw_inventory(self):
         self.player.inventory.show_inv(self.screen, INV_POS[0] + 30, INV_POS[1] + INV_HEIGHT - 170)
         if self.item_picked:
-            self.screen.blit(slot_img, (INV_POS[0] + 40, INV_POS[1] + 15))
-            self.screen.blit(self.item_picked.b_image, (INV_POS[0] + 40, INV_POS[1] + 15))
-            self.write(self.item_picked.name, (INV_POS[0] + 80, INV_POS[1] + 20))
+            self.screen.blit(slot_img, (INV_POS[0] + 20, INV_POS[1] + 15))
+            self.screen.blit(self.item_picked.b_image, (INV_POS[0] + 20, INV_POS[1] + 15))
+            self.write(self.item_picked.name, (INV_POS[0] + 60, INV_POS[1] + 20))
             if self.item_picked.type == "weapon":
                 self.draw_weapon_picked_info(self.item_picked)
             if self.item_picked.type == "armor":
@@ -1118,7 +1122,7 @@ class Game:
         frame_counter = 0
         anim_counter = 0
         while animation:
-            in_dt = self.clock.tick(FPS) / 1000
+            #in_dt = self.clock.tick(FPS) / 1000
             self.screen.fill(BGCOLOR)
             self.map_surface.blit(self.map_image, self.camera.apply_rect(self.map_rect))
             for sprite in self.act_lvl.all_sprites:

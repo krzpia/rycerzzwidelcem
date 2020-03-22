@@ -346,6 +346,7 @@ class Treasure_Object(pygame.sprite.Sprite):
         hits = pygame.sprite.spritecollide(self,self.game.act_lvl.melle_swing,True,collide_double_hit_rect)
         for hit in hits:
             pygame.mixer.Sound.play(chop_snd)
+            self.game.player.weapon_slot.item.breakage()
             self.hp -= self.game.player.hit_dmg
         arrow_hits = pygame.sprite.spritecollide(self,self.game.act_lvl.arrows,False,collide_hit_rect)
         for hit in arrow_hits:
@@ -492,6 +493,7 @@ class Fence_Object(pygame.sprite.Sprite):
         hits = pygame.sprite.spritecollide(self,self.game.act_lvl.melle_swing,True,collide_double_hit_rect)
         for hit in hits:
             pygame.mixer.Sound.play(chop_snd)
+            self.game.player.weapon_slot.item.breakage()
             self.hp -= self.game.player.hit_dmg
             #print("object hp = " + str(self.hp))
         arrow_hits = pygame.sprite.spritecollide(self, self.game.act_lvl.arrows,False)
@@ -563,7 +565,7 @@ class Arrow_Item:
 
 class Weapon(pygame.sprite.Sprite):
     def __init__(self, game, name, type,subtype, cost, ranged, damage, hit_rate, hit_radius,
-                 str_mod,sta_mod,int_mod,wis_mod,speed_mod,ste_mod,
+                 str_mod,sta_mod,int_mod,wis_mod,speed_mod,ste_mod, durability,
                  img_x, img_y, s_img_x, s_img_y, tileset = full_tileset_image):
         self._layer = ITEMS_LAYER
         self.groups = game.small_items
@@ -578,28 +580,42 @@ class Weapon(pygame.sprite.Sprite):
         self.subtype = subtype
         self.cost = cost
         self.ranged = ranged
-        self.damage = damage
+        self.base_damage = damage
         self.str_mod = str_mod
         self.sta_mod = sta_mod
         self.int_mod = int_mod
         self.wis_mod = wis_mod
         self.speed_mod = speed_mod
         self.ste_mod = ste_mod
+        self.durability = durability
+        self.condition = 100.0
         self.hit_rate = hit_rate
         self.hit_radius = hit_radius
         self.image = self.s_image
         self.rect = self.s_image.get_rect()
         self.hit_rect = self.rect
+        self.damage = (0.4 * self.base_damage) + (0.6 * self.base_damage * self.condition / 100)
 
     def update(self):
         #### bron bedzie tam gdzie gracz (czyli vector Pos + (4,0)
         self.pos = self.game.player.pos
         self.rect.center = self.pos + (4,0)
 
+    def breakage(self):
+        self.condition -= 5 / self.durability
+        self.damage = round((0.4 * self.base_damage) + (0.6 * self.base_damage * self.condition / 100), 0)
+        print (f'{self.name} condition: {self.condition}')
+
+    def repair(self, val):
+        self.condition += val
+        if self.condition > 100:
+            self.condition = 100.0
+        self.damage = round((0.4 * self.base_damage) + (0.6 * self.base_damage * self.condition / 100), 0)
+
 
 class Armor(pygame.sprite.Sprite):
     def __init__(self, game, name, type, subtype, cost, armor, hit_rate_mod,
-                 str_mod, sta_mod, int_mod, wis_mod, speed_mod, ste_mod,
+                 str_mod, sta_mod, int_mod, wis_mod, speed_mod, ste_mod, durability,
                  img_x, img_y, s_img_x, s_img_y, tileset = full_tileset_image):
         self._layer = ITEMS_LAYER
         self.groups = game.small_items
@@ -613,7 +629,7 @@ class Armor(pygame.sprite.Sprite):
         self.type = type
         self.subtype = subtype
         self.cost = cost
-        self.armor = armor
+        self.base_armor = armor
         self.hit_rate_mod = hit_rate_mod
         self.str_mod = str_mod
         self.sta_mod = sta_mod
@@ -621,14 +637,28 @@ class Armor(pygame.sprite.Sprite):
         self.wis_mod = wis_mod
         self.speed_mod = speed_mod
         self.ste_mod = ste_mod
+        self.durability = durability
+        self.condition = 100.0
         self.image = self.s_image
         self.rect = self.s_image.get_rect()
         self.rect.center = self.game.player.pos
         self.hit_rect = self.rect
+        self.armor = round((0.4 * self.base_armor) + (0.6 * self.base_armor * self.condition / 100), 0)
 
     def update(self):
         self.pos = self.game.player.pos
         self.rect.center = self.pos
+
+    def breakage(self):
+        self.condition -= 5 / self.durability
+        self.armor = round((0.4 * self.base_armor) + (0.6 * self.base_armor * self.condition / 100), 0)
+        print (f'{self.name} condition: {self.condition}')
+
+    def repair(self, val):
+        self.condition += val
+        if self.condition > 100:
+            self.condition = 100.0
+        self.armor = round((0.4 * self.base_armor) + (0.6 * self.base_armor * self.condition / 100), 0)
 
 
 class Ring:
@@ -746,6 +776,8 @@ class Book:
         self.game.player.spell_book.add_spell(self.spell)
 
 
+
+
 class Quest_Item:
     def __init__(self, game, name, cost, img_x, img_y, tileset = full_tileset_image):
         self.game = game
@@ -858,7 +890,7 @@ class Player(pygame.sprite.Sprite):
             self.inventory.put_in_first_free_slot(Potion(self.game, "Small Red Potion", "Cure",5,15,24,42))
             self.inventory.put_in_first_free_slot(Weapon(self.game, "Small Sword","weapon","sword",
                                            10,False,2,625,"small",
-                                           0,0,0,0,0,0,4,45,52,89))
+                                           0,0,0,0,0,0,50,4,45,52,89))
         if self.char_class.name == "Wizard":
             self.inventory.put_in_first_free_slot(Potion(self.game, "Blue Potion", "Mana",15,30,58,41))
             self.inventory.put_in_first_free_slot(Potion(self.game, "Blue Potion", "Mana", 15, 30, 58, 41))
@@ -866,14 +898,14 @@ class Player(pygame.sprite.Sprite):
             self.inventory.put_in_first_free_slot(Potion(self.game, "Small Red Potion", "Cure", 5, 15, 24,42))
             self.inventory.put_in_first_free_slot(Weapon(self.game,"Wood Staff","weapon","staff",
                                            15,False,2,700,"big",
-                                           0,0,0,0,0,0,3,47,10,89))
+                                           0,0,0,0,0,0,25,3,47,10,89))
         if self.char_class.name == "Thief":
             self.inventory.put_in_first_free_slot(Potion(self.game, "Small Blue Potion", "Mana", 5, 15, 23, 42))
             self.inventory.put_in_first_free_slot(Potion(self.game, "Small Red Potion", "Cure", 5, 15, 24, 42))
             self.inventory.put_in_first_free_slot(Potion(self.game, "Red Potion", "Cure", 15, 30, 26, 42))
             self.inventory.put_in_first_free_slot(Weapon(self.game, "Knife", "weapon","dagger",
                                            15, False, 1, 500, "small",
-                                           0, 0, 0, 0, 0, 0, 2, 45, 42, 87))
+                                           0, 0, 0, 0, 0, 0,40, 2, 45, 42, 87))
         self.active_effects_lib = ActiveEffectsLibrary(self.game)
         self.quest_book = QuestBook(self.game)
         self.spell_book = SpellBook(self.game)
@@ -1061,6 +1093,7 @@ class Player(pygame.sprite.Sprite):
             if now - self.last_shot > self.arrow_rate:
                 self.last_shot = now
                 dir = self.last_dir
+                self.player.weapon_slot.item.breakage()
                 Arrow(self.game, self.pos, dir)
                 self.arrows -= 1
 
@@ -1327,6 +1360,16 @@ class Player(pygame.sprite.Sprite):
         result = max(80, int(result))
         return result
 
+    def armor_breakage(self):
+        if self.armor_slot.item:
+            self.armor_slot.item.breakage()
+        if self.shield_slot.item:
+            self.shield_slot.item.breakage()
+        if self.boots_slot.item:
+            self.boots_slot.item.breakage()
+        if self.helmet_slot.item:
+            self.helmet_slot.item.breakage()
+
     def check_live(self):
         if self.act_hp <=0:
             self.start_death_animation = True
@@ -1383,12 +1426,14 @@ class Player(pygame.sprite.Sprite):
                 if ouch_snd.get_num_channels() > 2:
                     ouch_snd.stop()
                 ouch_snd.play()
+                self.armor_breakage()
                 hit.kill()
                 #### SPRAWDZAM CZY ZYJE PO KAZDYM UDERZENIU
                 self.check_live()
             else:
                 #### BLOCK ######
                 pygame.mixer.Sound.play(block_snd)
+                self.armor_breakage()
                 self.player.score_blocks += 1
                 txt = (self.player.name + "blocks!")
                 self.put_txt(txt)
@@ -1409,6 +1454,7 @@ class Player(pygame.sprite.Sprite):
                 if ouch_snd.get_num_channels() > 2:
                     ouch_snd.stop()
                 ouch_snd.play()
+                self.armor_breakage()
                 self.last_damage = now
             #### SPRAWDZAM CZY ZYJE PO KAZDYM UDERZENIU
             self.check_live()

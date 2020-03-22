@@ -12,7 +12,7 @@ class NpcGenerator:
     def generate(self, name, x, y, image):
         if name == "Gold Crusader":
             gold_crusader = sprites.Npc(self.game,name,x,y,image)
-            q_holy_grail = ui.Quest(self.game,image,"Holy Grail",1,[],["Holy Grail"],[],[],10,50)
+            q_holy_grail = ui.Quest(self.game,image,"Holy Grail","Find and bring a Holy Grail",1,[],["Holy Grail"],[],[],10,50)
             gold_crusader.dialog_data.load_text(True,"welcome",0, 0,
                                                 "Hello, " + self.game.player.name,
                                                 False,False,False,False,False, False,False)

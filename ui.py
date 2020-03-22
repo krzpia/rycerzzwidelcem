@@ -421,8 +421,8 @@ class QuestBook:
             i.active = True
             i.show_quest_icon(self.image,x_pos + 10, 40 + counter * 64)
             self.game.s_write(f'Quest {i.name}', self.image, (x_pos + 80, 40 + counter * 64),(BLACK))
-            self.game.s_write("Goal: ..... TODO", self.image, (x_pos + 80, 55 + counter * 464),(BLACK))
-            self.game.s_write(f'Reward {i.reward_xp} xp, {i.reward_gold} gold.', self.image ,(x_pos + 80, 70 + counter * 64),(BLACK))
+            self.game.s_write(i.goal_descr, self.image, (x_pos + 80, 55 + counter * 464),(BLACK))
+            self.game.s_write(f'Reward {i.reward_xp} XP,  {i.reward_gold} gold.', self.image ,(x_pos + 80, 70 + counter * 64),(BLACK))
             counter += 1
             if counter >= 5:
                 x_pos = 330
@@ -776,16 +776,19 @@ class Dialog:
                         ## Tu male peligro jezeli nie bedzie questu w ksiazce a bedzie
                         # sytuacja w ktorej Event_manager nie znajdzie quest_compl o danej nazwie [6:]!!
                         quest_to_check = self.game.player.quest_book.get_quest_by_name(thread_name[6:])
-                        if quest_to_check.check_if_fulfiled():
-                            print ("BRANCH 2 = quest fulfiled and not completed")
-                            text = self.find_branch_in_thread(2, thread_name)
-                            self.text_returned = text
-                            return text
+                        if quest_to_check:
+                            if quest_to_check.check_if_fulfiled():
+                                print ("BRANCH 2 = quest fulfiled and not completed")
+                                text = self.find_branch_in_thread(2, thread_name)
+                                self.text_returned = text
+                                return text
+                            else:
+                                print ("BRANCH 1 = quest not fulfiled and not completed")
+                                text = self.find_branch_in_thread(1, thread_name)
+                                self.text_returned = text
+                                return text
                         else:
-                            print ("BRANCH 1 = quest not fulfiled and not completed")
-                            text = self.find_branch_in_thread(1, thread_name)
-                            self.text_returned = text
-                            return text
+                            print (f'ERROR - No quest {thread_name[6:]} in quest book')
                 else:
                     print(f'DID NOT FIND {thread_name[6:]} quest in event manager - NEXT BRANCH 0')
                     text = self.find_branch_in_thread(0, thread_name)
@@ -1071,7 +1074,7 @@ class DialogBox:
 
 
 class Quest:
-    def __init__(self, game, npc_image, name, level_req, mobs_to_kill,
+    def __init__(self, game, npc_image, name, goal_descr, level_req, mobs_to_kill,
                  items_to_collect,
                  tiles_to_explore,
                  npcs_to_encounter,
@@ -1082,6 +1085,7 @@ class Quest:
         self.rect = self.image.get_rect()
         self.image.blit(npc_image,(12,12))
         self.level_req = level_req
+        self.goal_descr = goal_descr
         self.goal = QuestGoal()
         for i in mobs_to_kill:
             self.goal.add_mob_to_kill(i)
