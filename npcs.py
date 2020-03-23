@@ -42,5 +42,5 @@ class NpcGenerator:
         if name == "Blue Gnom":
             blue_gnom = sprites.Npc(self.game,name,x,y,image)
             blue_gnom.dialog_data.load_from_dict(self.blue_gnom_csv, self.quest_gen)
-            blue_gnom.dialog_data.thread_block_with_event("intro",['thread intro has been read'])
+            blue_gnom.dialog_data.thread_block_with_event("intro",['thread intro blue gnom has been read'])
             return blue_gnom
