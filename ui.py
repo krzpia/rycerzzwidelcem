@@ -743,11 +743,12 @@ class Dialog:
     def thread_block_with_event(self, thread, events):
         for game_event in events:
             self.threads_to_block_by_event[game_event] = thread
+        # print (self.threads_to_block_by_event)
 
     def thread_unblock_with_event(self, thread, events):
         for game_event in events:
             self.threads_to_unblock_by_event[game_event] = thread
-        print (self.threads_to_unblock_by_event)
+        #print (self.threads_to_unblock_by_event)
 
     def setup_blocked_threads(self):
         ## EVENTY TO WARUNKI DO SPELNIENIA. WYSTARCZY 1 SPELNIONY z wielu mozliwych..
@@ -763,9 +764,9 @@ class Dialog:
             if self.game.events_manager.search_event(event):
                 self.remove_blocked_thread(thread)
         ############
-        print ("BLOCKED THREADS:")
-        print (self.blocked_threads)
-        print ("----------------")
+        #print ("BLOCKED THREADS:")
+        #print (self.blocked_threads)
+        #print ("----------------")
 
     def find_branch_in_thread(self, branch_to_find, active_thread):
         for text in self.conversation:

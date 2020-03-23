@@ -445,7 +445,7 @@ class ItemGenerator:
         for i in self.q_items:
             if i.name == name:
                 return copy.copy(i)
-        print ("NO ITEM of NAME: "+ name)
+        print ("NO ITEM of NAME: " + name)
         return False
 
 
