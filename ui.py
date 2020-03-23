@@ -716,6 +716,7 @@ class Dialog:
     def __init__(self, game, npc):
         self.game = game
         self.npc = npc
+        self.dialog_dict = {}
         self.conversation = []
         self.text_returned = False
 
@@ -728,6 +729,108 @@ class Dialog:
 
     def reset(self):
         self.text_returned = False
+
+    def decode_bool(self, input_string):
+        if input_string == "False":
+            return False
+        elif input_string == "True":
+            return True
+        elif input_string == "Next":
+            return True
+        else:
+            print ("DECODE ERROR")
+
+    def decode_int(self, input_string):
+        if input_string != "False":
+            return int(input_string)
+        else:
+            return False
+
+    def decode_event(self, input_string):
+        if input_string == "False":
+            return False
+        else:
+            return input_string
+
+    def decode_ask(self, input_string):
+        if input_string == "False":
+            return False
+        ask_text = ""
+        ask_quest = ""
+        ask_goto_step = ""
+        ask_goto_branch = ""
+        ###############
+        counter = 0
+        #print(input_string)
+        for case in input_string:
+            if case != ">":
+                counter += 1
+                ask_text = ask_text + case
+            else:
+                break
+        counter += 1
+        input_string = input_string[counter:]
+        #print(input_string)
+        ###############
+        counter = 0
+        for case in input_string:
+            if case != ">":
+                counter += 1
+                ask_quest = ask_quest + case
+            else:
+                break
+        counter += 1
+        input_string = input_string[counter:]
+        #print(input_string)
+        ################
+        counter = 0
+        for case in input_string:
+            if case != ",":
+                counter += 1
+                ask_goto_branch = ask_goto_branch + case
+            else:
+                break
+        counter += 1
+        input_string = input_string[counter:]
+        #print(input_string)
+        for case in input_string:
+            ask_goto_step = ask_goto_step + case
+        #print("Result")
+        #print("ask_text: " + ask_text)
+        #print("ask_quest: " + ask_quest)
+        #print("ask_goto_branch: " + ask_goto_branch)
+        #print("ask_goto_step: " + ask_goto_step)
+        #############
+        ##############
+        if ask_quest == "False":
+            ask_quest = False
+        elif ask_quest[:5] == "quest":
+            ask_quest = self.quest_gen.return_quest_by_name(ask_quest[6:])
+        ask_goto_step = int(ask_goto_step)
+        ask_goto_branch = int(ask_goto_branch)
+        return (ask_text, ask_quest, (ask_goto_branch, ask_goto_step))
+
+    def load_from_dict(self, dialog_dict, quest_gen):
+        self.dialog_dict = dialog_dict
+        self.quest_gen = quest_gen
+        for row in self.dialog_dict:
+            ifnpc = self.decode_bool(row['Npc'])
+            thread = row['Thread']
+            branch = self.decode_int(row['Branch'])
+            step = self.decode_int(row['Step'])
+            text = row['Text']
+            ask1 = self.decode_ask(row['Ask1'])
+            ask2 = self.decode_ask(row['Ask2'])
+            ask3 = self.decode_ask(row['Ask3'])
+            ask4 = self.decode_ask(row['Ask4'])
+            ### TODO / byc moze mozna dodac wartosc typu string do Next Thread..
+            next_thread = self.decode_bool(row['Next_Thread'])
+            goto_branch = self.decode_int(row['Goto_Branch'])
+            goto_step = self.decode_int(row['Goto_Step'])
+            event = self.decode_event(row['Event'])
+            self.conversation.append(
+                Text(ifnpc, thread, branch, step, text, ask1, ask2, ask3, ask4,
+                     next_thread, (goto_branch, goto_step), event))
 
     def load_text(self,ifnpc,thread,branch,step,text,ask1,ask2,ask3,ask4,next_thread,goto, event):
         self.conversation.append(Text(ifnpc,thread,branch,step,text,ask1,ask2,ask3,ask4,next_thread,goto, event))
@@ -1074,7 +1177,7 @@ class DialogBox:
 
 
 class Quest:
-    def __init__(self, game, npc_image, name, goal_descr, level_req, mobs_to_kill,
+    def __init__(self, game, name, goal_descr, level_req, mobs_to_kill,
                  items_to_collect,
                  tiles_to_explore,
                  npcs_to_encounter,
@@ -1083,7 +1186,6 @@ class Quest:
         self.name = name
         self.image = quest_bcg_img
         self.rect = self.image.get_rect()
-        self.image.blit(npc_image,(12,12))
         self.level_req = level_req
         self.goal_descr = goal_descr
         self.goal = QuestGoal()
@@ -1105,6 +1207,10 @@ class Quest:
     def show_quest_icon(self, surface, x, y):
         self.rect.x = x
         self.rect.y = y
+        #try:
+        #    self.image.blit(npc_image,(12,12))
+        #except:
+        #    print ("TODO NPC IMAGE TO QUEST BOOK")
         surface.blit(self.image, (self.rect.x, self.rect.y))
 
     def check_quest_items(self):
