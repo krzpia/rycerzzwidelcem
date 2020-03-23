@@ -36,11 +36,11 @@ class NpcGenerator:
             gold_crusader = sprites.Npc(self.game,name,x,y,image)
             gold_crusader.dialog_data.load_from_dict(self.gold_crusader_csv,self.quest_gen)
             gold_crusader.dialog_data.thread_unblock_with_event("quest Holy Grail",['level 2 achieved'])
-            gold_crusader.dialog_data.thread_block_with_event("intro",['level 2 achieved'])
+            gold_crusader.dialog_data.thread_block_with_event("intro gold crusader",['level 2 achieved'])
             return gold_crusader
 
         if name == "Blue Gnom":
             blue_gnom = sprites.Npc(self.game,name,x,y,image)
             blue_gnom.dialog_data.load_from_dict(self.blue_gnom_csv, self.quest_gen)
-            blue_gnom.dialog_data.thread_block_with_event("intro",['thread intro blue gnom has been read'])
+            blue_gnom.dialog_data.thread_block_with_event("intro blue gnom",['thread intro blue gnom has been read'])
             return blue_gnom
