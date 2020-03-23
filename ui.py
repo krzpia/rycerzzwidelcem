@@ -718,7 +718,54 @@ class Dialog:
         self.npc = npc
         self.dialog_dict = {}
         self.conversation = []
+        self.blocked_threads = []
+        self.threads_to_block_by_event = {}
+        self.threads_to_unblock_by_event = {}
         self.text_returned = False
+
+    #### DODAJE SILNIK BLOKOWANIA I ODBLOKOWANIA WATKOW W ZALEZNOSCI OD PRZYPISANIA I EVENT MANAGERA
+    def add_blocked_thread(self, blocked_thread):
+        if blocked_thread not in self.blocked_threads:
+            self.blocked_threads.append(blocked_thread)
+
+    def remove_blocked_thread(self, blocked_thread):
+        if blocked_thread in self.blocked_threads:
+            self.blocked_threads.remove(blocked_thread)
+        else:
+            print ("ERROR ! DONT HAVE THREAD, YOU WISH TO REMOVE FROM BLOCKED!")
+
+    def check_thread_if_blocked(self, thread_to_check) -> bool:
+        if thread_to_check in self.blocked_threads:
+            return True
+        else:
+            return False
+
+    def thread_block_with_event(self, thread, events):
+        for game_event in events:
+            self.threads_to_block_by_event[game_event] = thread
+
+    def thread_unblock_with_event(self, thread, events):
+        for game_event in events:
+            self.threads_to_unblock_by_event[game_event] = thread
+        print (self.threads_to_unblock_by_event)
+
+    def setup_blocked_threads(self):
+        ## EVENTY TO WARUNKI DO SPELNIENIA. WYSTARCZY 1 SPELNIONY z wielu mozliwych..
+        ## TE KTORE SA DO ODBLOKOWANIA SA PER SE ZABLOKOWANE:
+        for thread in self.threads_to_unblock_by_event.values():
+            self.add_blocked_thread(thread)
+        ## TE KTORE SA DO ZABLOKOWANIA I MAJA EVENT spelniony:
+        for event, thread in self.threads_to_block_by_event.items():
+            if self.game.events_manager.search_event(event):
+                self.add_blocked_thread(thread)
+        ## TE KTORE SA ZABLOKOWANE I MAJA EVENT spelniony ODBLOKOWUJE:
+        for event, thread in self.threads_to_unblock_by_event.items():
+            if self.game.events_manager.search_event(event):
+                self.remove_blocked_thread(thread)
+        ############
+        print ("BLOCKED THREADS:")
+        print (self.blocked_threads)
+        print ("----------------")
 
     def find_branch_in_thread(self, branch_to_find, active_thread):
         for text in self.conversation:
@@ -735,10 +782,22 @@ class Dialog:
             return False
         elif input_string == "True":
             return True
-        elif input_string == "Next":
-            return True
         else:
             print ("DECODE ERROR")
+
+    def decode_next_thread(self, input_string):
+        if input_string == "False":
+            #print("DECODE NEXT THREAD - bool False")
+            return False
+        elif input_string == "True":
+            #print("DECODE NEXT THREAD - bool True")
+            return True
+        elif input_string == "Next":
+            #print("DECODE NEXT THREAD - NEXT convert into bool True")
+            return True
+        else:
+            #print("DECODE NEXT THREAD - STRING")
+            return input_string
 
     def decode_int(self, input_string):
         if input_string != "False":
@@ -823,8 +882,7 @@ class Dialog:
             ask2 = self.decode_ask(row['Ask2'])
             ask3 = self.decode_ask(row['Ask3'])
             ask4 = self.decode_ask(row['Ask4'])
-            ### TODO / byc moze mozna dodac wartosc typu string do Next Thread..
-            next_thread = self.decode_bool(row['Next_Thread'])
+            next_thread = self.decode_next_thread(row['Next_Thread'])
             goto_branch = self.decode_int(row['Goto_Branch'])
             goto_step = self.decode_int(row['Goto_Step'])
             event = self.decode_event(row['Event'])
@@ -850,22 +908,55 @@ class Dialog:
                     return act_txt
         print ("ERROR DID NOT FIND START TXT")
 
+    def check_goto(self) -> bool:
+        if self.text_returned.goto:
+            branch = self.text_returned.goto[0]
+            step = self.text_returned.goto[1]
+            if branch or step:
+                return True
+            else:
+                return False
+        else:
+            print ("Error, couldnt decode goto")
+            return False
+
     def find_next_step(self):
-        ###NAJPIERW SPRAWDZAM CZY NIE MA ZMIANY WATKU (next_thread = True)
+        ###NAJPIERW SPRAWDZAM CZY NIE MA ZMIANY WATKU (next_thread = False)
+        ## JEZELI NIE TO:
         if not self.text_returned.next_thread:
-            next_step = self.text_returned.step + 1
-            for text in self.conversation:
-                if text.thread == self.text_returned.thread:
-                    if text.branch == self.text_returned.branch:
-                        if text.step == next_step:
-                            print("FOUND NEXT STEP")
+            print (self.text_returned.goto)
+            if not self.check_goto():
+                next_step = self.text_returned.step + 1
+                for text in self.conversation:
+                    if text.thread == self.text_returned.thread:
+                        if text.branch == self.text_returned.branch:
+                            if text.step == next_step:
+                                print("FOUND NEXT STEP")
+                                self.text_returned = text
+                                return text
+            else:
+                for text in self.conversation:
+                    if text.thread == self.text_returned.thread:
+                        if text.branch == self.text_returned.goto[0] and text.step == self.text_returned.goto[1]:
+                            print("FOUND NEXT STEP BY GOTO")
                             self.text_returned = text
                             return text
-            print ("DID NOT FIND NEXT STEP - GO TO NEXT THREAD")
-        ### SZUKAM NOWEJ GALEZI (funkcja next_thread)
-        thread_name = self.next_thread(self.text_returned.thread)
+        print ("DID NOT FIND NEXT STEP - GO TO NEXT THREAD")
+        ### TERAZ SPRAWDZAM CZY JEST ZMIANA WATKU (next_thread = "string"
+        if isinstance(self.text_returned.next_thread, str):
+            print ("FOUND NEXT THREAD BY NEXT TRHEAD STRING")
+            thread_name = self.text_returned.next_thread
+            #print (f'Thread will be - {thread_name}')
+        ### SPRAWDZAM NOWY WATEK (next_thread = True lub next_thread = False ale nie znaleziono next step ani goto)
+        else:
+            thread_name = self.next_thread(self.text_returned.thread)
         ### JEZELI ZNALAZLEM NOWA GALAZ:
         if thread_name:
+            ### DODAJE EVENT ZE ZNAM JUZ WATEK
+            if not self.game.events_manager.find_thread_read_event(thread_name):
+                if thread_name != "bye":
+                    self.game.events_manager.emit(Event(id=f'thread {thread_name} has been read'))
+            ### JEZELI TO QUEST TO SILNIK ROZDZIELI GALEZIE WG Eventów:
             if thread_name[:5] == "quest":
                 print ("NEXT THREAD IS A QUEST THREAD, SEARCHING FOR A NEXT BRANCH AND STEP:")
                 if self.game.events_manager.find_got_quest_event(thread_name[6:]):
@@ -909,7 +1000,7 @@ class Dialog:
     def find_next_step_by_goto(self, goto):
         act_thread = self.text_returned.thread
         for text in self.conversation:
-           if text.thread == act_thread:
+            if text.thread == act_thread:
                 if text.branch == goto[0] and text.step == goto[1]:
                     print("FOUND NEXT STEP BY RECIVING ANSWER")
                     self.text_returned = text
@@ -921,23 +1012,27 @@ class Dialog:
         for text in self.conversation:
             if text.thread not in threads:
                 threads.append(text.thread)
-        print (f'SEARCHING FOR A NEXT THREAD. AVAIBLE Threads: {threads}')
+        print (f'removing blocked Threads...')
+        for thread in threads:
+            if thread in self.blocked_threads:
+                threads.remove(thread)
+        print(f'SEARCHING FOR A NEXT THREAD. AVAIBLE Threads: {threads}')
         threads = iter(threads)
         while True:
             try:
                 thread = next(threads)
-                #print (f'THREAD: {thread} to search')
-                #print (f'THREAD: {act_thread} was active')
+                print (f'THREAD: {thread} to search')
+                print (f'THREAD: {act_thread} was active')
                 if thread == act_thread:
                     try:
                         next_thread = next(threads)
-                        #print (f'WILL RETURN NEXT THREAD: {next_thread}')
+                        print (f'WILL RETURN NEXT THREAD: {next_thread}')
                         return next_thread
                     except:
-                        #print("LAST THREAD, END DIALOG")
+                        print("LAST THREAD, END DIALOG")
                         break
             except:
-                #print("No more threads!")
+                print("No more threads!")
                 break
 
 class Text:
@@ -981,6 +1076,7 @@ class DialogBox:
         self.npc = npc
         self.dialog_data = self.npc.dialog_data
         self.dialog_data.reset()
+        self.dialog_data.setup_blocked_threads()
         #### SZUKAM POCZATKU DIALOGU:
         encounter = self.game.events_manager.find_npc_encounter_event(self.npc.name)
         self.actual_text = self.dialog_data.find_first_step(encounter)
@@ -1094,26 +1190,52 @@ class DialogBox:
         text_line_3 = ""
         text_line_4 = ""
         text_line_5 = ""
+        text_line_6 = ""
+        text_line_7 = ""
         #print (text_len)
-        ## MAX LINE LENGTH 160~!
-        if text_len < 40:
-            text_line_1 = text[:40]
-        if text_len >= 40 and text_len <80:
-            text_line_1 = text[:40]
-            text_line_2 = text[40:80]
-        if text_len >=80 and text_len <120:
-            text_line_1 = text[:40]
-            text_line_2 = text[40:80]
-            text_line_3 = text[80:120]
-        if text_len >=120 and text_len <160:
-            text_line_1 = text[:40]
-            text_line_2 = text[40:80]
-            text_line_3 = text[80:120]
-            text_line_4 = text[120:160]
+        ## MAX LINE LENGTH 350~!
+        if text_len < 50:
+            text_line_1 = text[:50]
+        if text_len >= 50 and text_len <100:
+            text_line_1 = text[:50]
+            text_line_2 = text[50:100]
+        if text_len >=100 and text_len <150:
+            text_line_1 = text[:50]
+            text_line_2 = text[50:100]
+            text_line_3 = text[100:120]
+        if text_len >=150 and text_len <200:
+            text_line_1 = text[:50]
+            text_line_2 = text[50:100]
+            text_line_3 = text[100:150]
+            text_line_4 = text[150:200]
+        if text_len >= 200 and text_len < 250:
+            text_line_1 = text[:50]
+            text_line_2 = text[50:100]
+            text_line_3 = text[100:150]
+            text_line_4 = text[150:200]
+            text_line_5 = text[200:250]
+        if text_len >=250 and text_len <300:
+            text_line_1 = text[:50]
+            text_line_2 = text[50:100]
+            text_line_3 = text[100:150]
+            text_line_4 = text[150:200]
+            text_line_5 = text[200:250]
+            text_line_6 = text[250:300]
+        if text_len >=300 and text_len <350:
+            text_line_1 = text[:50]
+            text_line_2 = text[50:100]
+            text_line_3 = text[100:150]
+            text_line_4 = text[150:200]
+            text_line_5 = text[200:250]
+            text_line_6 = text[250:300]
+            text_line_7 = text[300:350]
         self.write(text_line_1, 0)
         self.write(text_line_2, 1)
         self.write(text_line_3, 2)
         self.write(text_line_4, 3)
+        self.write(text_line_5, 4)
+        self.write(text_line_6, 5)
+        self.write(text_line_7, 6)
 
     def write(self, txt, ln):
         self.game.s_write(txt,self.image, (85, 100 + ln * 24), (WHITE))

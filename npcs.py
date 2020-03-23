@@ -28,10 +28,19 @@ class NpcGenerator:
         self.quest_gen = QuestGenerator(self.game)
         ##### DIALOGS
         self.gold_crusader_csv = csv.DictReader(open(path.join(dialog_folder, 'gold_crusader_dialog.csv')),delimiter=';')
+        self.blue_gnom_csv = csv.DictReader(open(path.join(dialog_folder,'blue_gnom_dialog.csv')),delimiter=';')
         #############
 
     def generate(self, name, x, y, image):
         if name == "Gold Crusader":
             gold_crusader = sprites.Npc(self.game,name,x,y,image)
             gold_crusader.dialog_data.load_from_dict(self.gold_crusader_csv,self.quest_gen)
+            gold_crusader.dialog_data.thread_unblock_with_event("quest Holy Grail",['level 2 achieved'])
+            gold_crusader.dialog_data.thread_block_with_event("intro",['level 2 achieved'])
             return gold_crusader
+
+        if name == "Blue Gnom":
+            blue_gnom = sprites.Npc(self.game,name,x,y,image)
+            blue_gnom.dialog_data.load_from_dict(self.blue_gnom_csv, self.quest_gen)
+            blue_gnom.dialog_data.thread_block_with_event("intro",['thread intro has been read'])
+            return blue_gnom

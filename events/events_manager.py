@@ -30,6 +30,11 @@ class EventManager:
     def history(self) -> typing.List['Event']:
         return self.events[::-1]
 
+    def search_event(self, search_event) -> bool:
+        for game_event in self.events:
+            if game_event.id == search_event:
+                return True
+
     def find_npc_encounter_event(self, npc_name) -> bool:
         for game_event in self.events:
             if game_event.id == f'{npc_name} has been encountered':
@@ -41,6 +46,7 @@ class EventManager:
                 return True
 
     def find_quest_compl_event(self, quest_name) -> bool:
+        print ("SEARCHING IN EVENTS TO FIND quest xxxx has been completed")
         for game_event in self.events:
             if game_event.id == f'quest {quest_name} has been completed':
                 return True
@@ -49,5 +55,12 @@ class EventManager:
         for game_event in self.events:
             if game_event.id == f'quest {quest_name} has been rewarded':
                 return True
+
+    def find_thread_read_event(self, thread_name) -> bool:
+        for game_event in self.events:
+            if game_event.id == f'thread {thread_name} has been read':
+                return True
+
+
 
 

@@ -61,7 +61,7 @@ class ItemGenerator:
                                            35, False, 6, 750, "medium",
                                            0, 0, 0, 0, 0, 0,45, 52, 47, 32, 90))
         self.weapons.append(sprites.Weapon(self.game,"Short Saber","weapon","sword",
-                                           35,False,3,625,"small",
+                                           35,False,3,600,"small",
                                            0,0,0,0,0,0,45,5,47,38,89))
         self.weapons.append(sprites.Weapon(self.game, "Trident", "weapon","spear",
                                            35, False, 5, 900, "big",
