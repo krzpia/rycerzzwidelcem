@@ -1373,11 +1373,12 @@ class Quest:
                 for mob_name in mobs_killed:
                     if mob_name == mob_goal:
                         mobs_killed_to_fulfil.append(mob_name)
-            print("LISTA wykonania z questu " + self.name)
-            print(mobs_killed_to_fulfil)
-            print("LISTA goal.mobs_to_kill:")
-            print(self.goal.mobs_to_kill)
-            print("SPRAWDZAM CZY SIE ZGADZA LICZBA OBIEKTOW!")
+                        break
+            #print("LISTA wykonania z questu " + self.name)
+            #print(mobs_killed_to_fulfil)
+            #print("LISTA goal.mobs_to_kill:")
+            #print(self.goal.mobs_to_kill)
+            #print("SPRAWDZAM CZY SIE ZGADZA LICZBA OBIEKTOW!")
             if len(mobs_killed_to_fulfil) == len(self.goal.mobs_to_kill):
                 return True
             else:
