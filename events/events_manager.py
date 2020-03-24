@@ -35,6 +35,14 @@ class EventManager:
             if game_event.id == search_event:
                 return True
 
+    def return_killed_mobs_names(self) -> list:
+        mobs_killed = []
+        for game_event in self.events:
+            if game_event.id[-15:] == "has been killed":
+                print(f'"Appending {game_event.id[:-16]} to mobs_killed list')
+                mobs_killed.append(game_event.id[:-16])
+        return mobs_killed
+
     def find_npc_encounter_event(self, npc_name) -> bool:
         for game_event in self.events:
             if game_event.id == f'{npc_name} has been encountered':
@@ -46,9 +54,10 @@ class EventManager:
                 return True
 
     def find_quest_compl_event(self, quest_name) -> bool:
-        print ("SEARCHING IN EVENTS TO FIND quest xxxx has been completed")
+        #print ("SEARCHING IN EVENTS TO FIND quest xxxx has been completed")
         for game_event in self.events:
             if game_event.id == f'quest {quest_name} has been completed':
+                #print ("SEARCHING IN EVENTS TO FIND quest xxxxx has been completed = True.")
                 return True
 
     def find_quest_rewarded_event(self, quest_name) -> bool:

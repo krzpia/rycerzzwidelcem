@@ -590,14 +590,14 @@ class Weapon(pygame.sprite.Sprite):
         self.speed_mod = speed_mod
         self.ste_mod = ste_mod
         self.durability = durability
-        self.condition = 75.0
+        self.condition = 100.0
         self.hit_rate = hit_rate
         self.hit_radius = hit_radius
         self.image = self.s_image
         self.rect = self.s_image.get_rect()
         self.hit_rect = self.rect
         self.damage = round((0.4 * self.base_damage) + (0.6 * self.base_damage * self.condition / 100),0)
-        self.breakage_surf.fill((255 - (int(2.5 * self.condition)), (int(2.5 * self.condition)), 0))
+        self.breakage_surf.fill((255 - (int(2.5 * self.condition)), (int(2.0 * self.condition)), 0))
         self.breakage_surf.blit(self.breakage_icon, (0, 0))
 
     def update(self):
@@ -606,11 +606,11 @@ class Weapon(pygame.sprite.Sprite):
         self.rect.center = self.pos + (4,0)
 
     def breakage(self):
-        self.condition -= 5 / self.durability
+        self.condition -= 10 / self.durability
         if self.condition <=0:
             self.condition = 0
         self.damage = round((0.4 * self.base_damage) + (0.6 * self.base_damage * self.condition / 100), 0)
-        #print (f'{self.name} condition: {self.condition}')
+        print (f'{self.name} condition: {self.condition}')
         self.breakage_surf.fill((255 - (int(2.5 * self.condition)),(int(2.5* self.condition)),0))
         self.breakage_surf.blit(self.breakage_icon,(0,0))
 
@@ -664,7 +664,7 @@ class Armor(pygame.sprite.Sprite):
         self.rect.center = self.pos
 
     def breakage(self):
-        self.condition -= 5 / self.durability
+        self.condition -= 10 / self.durability
         if self.condition <= 0:
             self.condition = 0
         self.armor = round((0.4 * self.base_armor) + (0.6 * self.base_armor * self.condition / 100), 0)
@@ -1111,7 +1111,7 @@ class Player(pygame.sprite.Sprite):
             if now - self.last_shot > self.arrow_rate:
                 self.last_shot = now
                 dir = self.last_dir
-                self.player.weapon_breakage()
+                self.weapon_slot.item.weapon_breakage()
                 Arrow(self.game, self.pos, dir)
                 self.arrows -= 1
 
@@ -1456,9 +1456,9 @@ class Player(pygame.sprite.Sprite):
                 #### BLOCK ######
                 pygame.mixer.Sound.play(block_snd)
                 self.armor_breakage()
-                self.player.score_blocks += 1
-                txt = (self.player.name + "blocks!")
-                self.put_txt(txt)
+                self.score_blocks += 1
+                txt = (self.name + "blocks!")
+                self.game.put_txt(txt)
         ### OBRAZENIA(kolizja) OD(z) LAVA
         hits = pygame.sprite.spritecollide(self,self.game.act_lvl.lavas,False,collide_double_hit_rect)
         for hit in hits:
@@ -1526,6 +1526,7 @@ class Npc(pygame.sprite.Sprite):
         self.hit_rect = pygame.Rect(0, 0, TILE_SIZE - 5, TILE_SIZE - 5)
         self.hit_rect.center = self.rect.center
         self.dialog_data = Dialog(self.game, self)
+        self.sound = False
 
     def put_quest(self, quest):
         self.quests.append(quest)
@@ -1533,6 +1534,9 @@ class Npc(pygame.sprite.Sprite):
     def encounter(self):
         self.game.events_manager.emit(Event(id=f'{self.name} has been encountered.'))
         self.encountered = True
+
+    def put_sound(self, sound):
+        self.sound = sound
 
 
 class Mob(pygame.sprite.Sprite):
@@ -1823,7 +1827,7 @@ class Mob(pygame.sprite.Sprite):
             Flesh(self.game,self.pos)
             ### METODY DO KOLEKCJI INFORMACJI, jedna MOJA, druga COPALCO
             self.game.player.score_killed_enemies.append(self)
-            self.game.events_manager.emit(Event(id=f'{self.name} has been killed.'))
+            self.game.events_manager.emit(Event(id=f'{self.name} has been killed'))
             self.kill()
             pygame.mixer.Sound.play(win_snd)
             if self.game.player.check_next_level():

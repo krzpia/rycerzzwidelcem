@@ -26,7 +26,7 @@ class ItemGenerator:
                                                      0,0,0,0,0,0,25,55, 44, 35, 87))
         self.weapons.append(sprites.Weapon(self.game, "Small Sword","weapon","sword",
                                            10,False,2,625,"small",
-                                           0,0,0,0,0,0,4,50,45,52,89))
+                                           0,0,0,0,0,0,50,4,45,52,89))
         self.weapons.append(sprites.Weapon(self.game, "Short Hammer", "weapon", "blunt",
                                            15, False, 5, 1250, "small",
                                            0, 0, 0, 0, 0, 0,75, 37, 46, 37, 88))
@@ -445,7 +445,7 @@ class ItemGenerator:
         for i in self.q_items:
             if i.name == name:
                 return copy.copy(i)
-        print ("NO ITEM of NAME: " + name)
+        print ("e NO ITEM of NAME: " + name)
         return False
 
 

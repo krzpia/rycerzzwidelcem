@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="50" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="10" nextobjectid="76">
+<map version="1.2" tiledversion="1.3.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="50" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="95">
  <tileset firstgid="1" source="terrain_tile_set.tsx"/>
  <tileset firstgid="1025" source="build atlas.tsx"/>
  <tileset firstgid="2049" source="indoor.tsx"/>
@@ -123,11 +123,11 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,784,0,0,0,0,1020,1021,0,0,0,0,0,0,0,0,3100,3101,833,833,833,833,833,833,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,816,0,1019,0,0,956,957,0,0,0,0,0,0,0,0,3132,3133,865,865,865,865,865,865,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1019,0,0,0,505,506,507,988,989,0,0,0,0,0,0,0,0,0,0,897,898,898,898,898,899,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,910,910,0,0,0,0,537,538,539,1020,1021,0,0,0,0,0,409,410,411,3036,3037,929,930,930,930,930,931,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1019,0,942,942,0,1019,0,0,569,570,571,956,957,0,0,0,956,957,441,442,443,3068,3069,929,930,930,930,930,931,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,816,0,0,1019,0,0,0,0,505,506,507,988,989,0,0,0,988,989,473,474,475,3036,3037,929,930,930,930,930,931,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,537,538,539,1020,1021,0,0,0,1020,1021,0,0,0,3068,3069,929,930,930,930,930,931,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,569,570,571,956,957,0,0,0,956,957,0,0,0,0,0,929,930,930,930,930,931,845,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,910,910,0,0,0,0,537,538,539,1020,1021,0,0,0,0,0,0,0,0,3036,3037,929,930,930,930,930,931,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1019,0,942,942,0,1019,0,0,569,570,571,956,957,0,0,0,956,957,0,0,0,3068,3069,929,930,930,930,930,931,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,816,0,0,1019,0,0,0,0,505,506,507,988,989,0,0,0,988,989,409,410,411,3036,3037,929,930,930,930,930,931,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,537,538,539,1020,1021,0,0,0,1020,1021,441,442,443,3068,3069,929,930,930,930,930,931,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,569,570,571,956,957,0,0,0,956,957,473,474,475,0,0,929,930,930,930,930,931,845,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,409,410,411,988,989,0,0,0,988,989,0,0,909,0,0,929,930,930,930,930,931,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1019,0,441,442,443,1020,1021,0,0,0,1020,1021,0,845,0,0,0,929,930,930,930,930,931,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,473,474,475,956,957,0,0,0,956,957,0,0,0,0,0,961,962,962,962,962,963,0,0,0,0,0,0,
@@ -251,8 +251,8 @@
   <object id="41" name="wall" x="1305" y="303" width="32" height="32"/>
   <object id="42" name="wall" x="917" y="197" width="23" height="52"/>
   <object id="43" name="wall" x="681" y="71" width="73" height="64"/>
-  <object id="44" name="wall" x="1078" y="463" width="50" height="59"/>
-  <object id="45" name="wall" x="1296" y="111" width="63" height="63"/>
+  <object id="44" name="wall" x="1080" y="523" width="50" height="59"/>
+  <object id="45" name="wall" x="1296" y="111" width="63" height="54"/>
   <object id="46" name="wall" x="244" y="193" width="30" height="18"/>
   <object id="47" name="wall" x="1360" y="20" width="15" height="86"/>
   <object id="48" name="wall" x="1432" y="19" width="32" height="88"/>
@@ -287,6 +287,12 @@
   <object id="73" name="wall" x="352" y="592" width="96" height="25"/>
   <object id="74" name="wall" x="95" y="577" width="175" height="15"/>
   <object id="75" name="wall" x="52" y="578" width="63" height="38"/>
+  <object id="82" name="wall" x="1183" y="543" width="26" height="19"/>
+  <object id="83" name="wall" x="1155" y="533" width="26" height="19"/>
+  <object id="84" name="wall" x="1171" y="522" width="26" height="20"/>
+  <object id="85" name="wall" x="1181" y="481" width="26" height="19"/>
+  <object id="86" name="wall" x="1154" y="470" width="26" height="21"/>
+  <object id="87" name="wall" x="1171" y="457" width="26" height="21"/>
  </objectgroup>
  <objectgroup id="9" name="items">
   <object id="63" name="treasure chest" x="401" y="82">
@@ -295,6 +301,30 @@
     <property name="key" type="int" value="21"/>
     <property name="locked" type="int" value="1"/>
     <property name="treasure_value" type="int" value="79"/>
+   </properties>
+  </object>
+  <object id="76" name="John the Farmer" type="npc" gid="7427" x="1057" y="424" width="32" height="32"/>
+  <object id="78" name="Piggy" type="npc" gid="7673" x="1113" y="453" width="32" height="32"/>
+  <object id="80" name="Piggy" type="npc" gid="7673" x="1087" y="504" width="32" height="32"/>
+  <object id="81" name="Piggy" type="npc" gid="7673" x="1031" y="493" width="32" height="32"/>
+ </objectgroup>
+ <objectgroup id="10" name="enemies">
+  <object id="88" name="Killer Bee" type="enemy s" x="1376" y="576">
+   <properties>
+    <property name="sx" type="int" value="1376"/>
+    <property name="sy" type="int" value="632"/>
+   </properties>
+  </object>
+  <object id="91" name="Killer Bee" type="enemy s" x="1368" y="653">
+   <properties>
+    <property name="sx" type="int" value="1312"/>
+    <property name="sy" type="int" value="673"/>
+   </properties>
+  </object>
+  <object id="92" name="Killer Bee" type="enemy s" x="1310" y="611">
+   <properties>
+    <property name="sx" type="int" value="1349"/>
+    <property name="sy" type="int" value="647"/>
    </properties>
   </object>
  </objectgroup>

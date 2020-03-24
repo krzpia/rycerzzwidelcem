@@ -161,7 +161,7 @@ class Game:
         self.levelgen = levels.LevelGen(self)
         self.levelgen.load_level_01()
         self.levelgen.load_level_02()
-        self.levelgen.go_to_level("level01", 2, 2)
+        self.levelgen.go_to_level("level02", 44, 6)
         ##### CAMERA INIT
         self.camera = tilemap.Camera(self.map.width, self.map.height)
         self.draw_debug = False
@@ -557,6 +557,8 @@ class Game:
                         for npc in npcs_to_talk:
                             print ("TALK")
                             self.paused = True
+                            if npc.sound:
+                                pygame.mixer.Sound.play(npc.sound)
                             self.dialog_in_progress = True
                             self.dialog_box.start_conversation(npc)
                     ######## PODNIES PRZEDMIOT
@@ -918,6 +920,7 @@ class Game:
 
     def draw_armor_picked_info(self, item):
         self.write(("ARMOR: " + str(item.armor)), (INV_POS[0] + 20, INV_POS[1] + 50))
+        self.screen.blit(item.breakage_surf, (INV_POS[0] + 180, INV_POS[1] + 20))
         self.write(("Cost: " + str(item.cost)), (INV_POS[0] + 20, INV_POS[1] + 70))
         self.screen.blit(gold_coin, (INV_POS[0] + 80, INV_POS[1] + 75))
         self.write(("Hit rate ratio:" + str(item.hit_rate_mod)), (INV_POS[0] + 20, INV_POS[1] + 90))

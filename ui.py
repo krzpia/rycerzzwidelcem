@@ -783,8 +783,13 @@ class Dialog:
             return False
         elif input_string == "True":
             return True
+        elif input_string == False:
+            return False
+        elif input_string == True:
+            return True
         else:
             print ("DECODE ERROR")
+            return False
 
     def decode_next_thread(self, input_string):
         if input_string == "False":
@@ -796,12 +801,18 @@ class Dialog:
         elif input_string == "Next":
             #print("DECODE NEXT THREAD - NEXT convert into bool True")
             return True
+        elif input_string == False:
+            return False
+        elif input_string == True:
+            return True
         else:
             #print("DECODE NEXT THREAD - STRING")
             return input_string
 
     def decode_int(self, input_string):
-        if input_string != "False":
+        if input_string == False:
+            return False
+        elif input_string != "False":
             return int(input_string)
         else:
             return False
@@ -809,10 +820,14 @@ class Dialog:
     def decode_event(self, input_string):
         if input_string == "False":
             return False
-        else:
-            return input_string
+        if input_string == False:
+            return False
+        #print ("PASSING EVENT "+ input_string)
+        return input_string
 
     def decode_ask(self, input_string):
+        if input_string == False:
+            return False
         if input_string == "False":
             return False
         ask_text = ""
@@ -907,7 +922,14 @@ class Dialog:
                     self.text_returned = act_txt
                     #print("FOUND WELCOME AGAIN TXT")
                     return act_txt
-        print ("ERROR DID NOT FIND START TXT")
+
+        print ("ERROR DID NOT FIND next welcome TXT, SO SENDING welcome branch 0 step 0")
+        for act_txt in self.conversation:
+            if act_txt.thread == "welcome" and act_txt.branch == 0 and act_txt.step == 0:
+                self.text_returned = act_txt
+                # print ("FOUND WELCOME TXT")
+                return act_txt
+        print("ERROR DID NOT FOUND ANY WELCOME BRANCH")
 
     def check_goto(self) -> bool:
         if self.text_returned.goto:
@@ -1022,8 +1044,8 @@ class Dialog:
         while True:
             try:
                 thread = next(threads)
-                print (f'THREAD: {thread} to search')
-                print (f'THREAD: {act_thread} was active')
+                #print (f'THREAD: {thread} to search')
+                #print (f'THREAD: {act_thread} was active')
                 if thread == act_thread:
                     try:
                         next_thread = next(threads)
@@ -1116,17 +1138,26 @@ class DialogBox:
     def configure_text(self):
         #####################################################
         ### KONFIGURACJA UKLADU - NOWY AKTUALNY TEKST DO WYSWIETLENIA! #
+        self.resp_but_1.deactivate()
+        self.resp_but_2.deactivate()
+        self.resp_but_3.deactivate()
+        self.resp_but_4.deactivate()
         if self.actual_text:
             ## JEZELI JEST TO PYTANIE AKTYWUJE PRZYCISKI ODPOWIEDZI I PISZE ODPOWIEDZI:
             how_many_answers = 0
             if self.actual_text.ask1:
+                print(self.actual_text.ask1)
                 how_many_answers +=1
             if self.actual_text.ask2:
+                print(self.actual_text.ask2)
                 how_many_answers +=1
             if self.actual_text.ask3:
+                print(self.actual_text.ask3)
                 how_many_answers += 1
             if self.actual_text.ask4:
-                 how_many_answers += 1
+                print(self.actual_text.ask4)
+                how_many_answers += 1
+            #print (how_many_answers)
 
             if how_many_answers >=1:
                 self.write_actual_text()
@@ -1177,9 +1208,6 @@ class DialogBox:
             self.game.paused = False
             if self.game.player.check_next_level():
                 self.game.paused = True
-
-    def add_line(self, text) -> None:
-        pass
 
     def write_line(self, speaker, text) -> None:
         self.clear()
@@ -1336,34 +1364,69 @@ class Quest:
         #    print ("TODO NPC IMAGE TO QUEST BOOK")
         surface.blit(self.image, (self.rect.x, self.rect.y))
 
-    def check_quest_items(self):
-        quest_items = []
-        print ("Sprawdzam czy wykonałeś quest. Sprawdzam przedmioty")
-        for slot in self.game.player.inventory.item_slots:
-            if slot.item:
-                if slot.item.type == "quest item":
-                    print ("I HAVE QUEST ITEM!!")
-                    quest_items.append(slot.item)
-        if self.goal.items_to_collect and quest_items:
-            for goal_item in self.goal.items_to_collect:
-                print (goal_item)
-                for quest_item in quest_items:
-                    print (quest_item.name)
-                    if quest_item.name == goal_item:
-                        return quest_item
+    def check_mobs_to_kill(self) -> bool:
+        if len(self.goal.mobs_to_kill) > 0:
+            mobs_killed_to_fulfil = []
+            print("Sprawdzam czy wykonałeś quest. Sprawdzam zabitych przeciwników")
+            mobs_killed = self.game.events_manager.return_killed_mobs_names()
+            for mob_goal in self.goal.mobs_to_kill:
+                for mob_name in mobs_killed:
+                    if mob_name == mob_goal:
+                        mobs_killed_to_fulfil.append(mob_name)
+            print("LISTA wykonania z questu " + self.name)
+            print(mobs_killed_to_fulfil)
+            print("LISTA goal.mobs_to_kill:")
+            print(self.goal.mobs_to_kill)
+            print("SPRAWDZAM CZY SIE ZGADZA LICZBA OBIEKTOW!")
+            if len(mobs_killed_to_fulfil) == len(self.goal.mobs_to_kill):
+                return True
+            else:
+                return False
+        return False
+
+    def check_quest_items(self) -> list:
+        if len(self.goal.items_to_collect) > 0:
+            collected_quest_items = []
+            quest_items_to_fulfil = []
+            print ("Sprawdzam czy wykonałeś quest. Sprawdzam przedmioty")
+            for slot in self.game.player.inventory.item_slots:
+                if slot.item:
+                    if slot.item.type == "quest item":
+                        #print ("I HAVE QUEST ITEM!!")
+                        collected_quest_items.append(slot.item)
+            if self.goal.items_to_collect and collected_quest_items:
+                for goal_item in self.goal.items_to_collect:
+                    #print (goal_item)
+                    for quest_item in collected_quest_items:
+                        #print (quest_item.name)
+                        if quest_item.name == goal_item:
+                            quest_items_to_fulfil.append(quest_item)
+            ### JEZELI NA LISCIE SA WSZYSTKIE PRZEDMIOTY dopiero wysyłam listę przedmiotów!
+            if len(quest_items_to_fulfil) == len(self.goal.items_to_collect):
+                return quest_items_to_fulfil
+            else:
+                return False
+        else:
+            return False
 
     def check_if_fulfiled(self) -> bool:
         ### 1. ITEMS
-        quest_item = self.check_quest_items()
-        if quest_item:
-            self.game.events_manager.emit(Event(id=f'quest {quest_item.name} has been fulfiled'))
+        quest_items_to_remove = self.check_quest_items()
+        if quest_items_to_remove:
+            self.game.events_manager.emit(Event(id=f'quest {self.name} has been fulfiled'))
             self.completed = True
-            self.game.player.inventory.remove_item(quest_item)
+            for item in quest_items_to_remove:
+                self.game.player.inventory.remove_item(item)
             return True
         ### 2. NPCs
         ## TODO!
         ### 3. MOBs to kill
-        ## TODO!
+        npcs_to_kill = self.check_mobs_to_kill()
+        if npcs_to_kill:
+            self.game.events_manager.emit(Event(id=f'quest {self.name} has been fulfiled'))
+            self.completed = True
+            return True
+
 
     def collect_reward(self):
         if self.completed:
@@ -1392,8 +1455,8 @@ class QuestGoal:
         self.tiles_to_explore = []
         self.npcs_to_encounter = []
 
-    def add_mob_to_kill(self,mob):
-        self.mobs_to_kill.append(mob)
+    def add_mob_to_kill(self,mob_name):
+        self.mobs_to_kill.append(mob_name)
 
     def add_item_to_collect(self,item):
         self.items_to_collect.append(item)
