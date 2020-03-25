@@ -39,9 +39,17 @@ class EventManager:
         mobs_killed = []
         for game_event in self.events:
             if game_event.id[-15:] == "has been killed":
-                print(f'"Appending {game_event.id[:-16]} to mobs_killed list')
+                #print(f'"Appending {game_event.id[:-16]} to mobs_killed list')
                 mobs_killed.append(game_event.id[:-16])
         return mobs_killed
+
+    def return_npcs_encountered_names(self) -> list:
+        npcs_encountered = []
+        for game_event in self.events:
+            if game_event.id[-20:] == "has been encountered":
+                #print(f'"Appending {game_event.id[:-21]} to npcs_encountered list')
+                npcs_encountered.append(game_event.id[:-21])
+        return npcs_encountered
 
     def find_npc_encounter_event(self, npc_name) -> bool:
         for game_event in self.events:

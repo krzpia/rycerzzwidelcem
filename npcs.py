@@ -1,10 +1,19 @@
 import sprites
 import ui
+import sys
 from os import path
 import csv
 from data import *
 from events.event import Event
-game_folder = path.dirname(__file__)
+
+if getattr(sys, 'frozen', False): # PyInstaller adds this attribute
+    # Running in a bundle
+    CurrentPath = sys._MEIPASS
+else:
+    # Running in normal Python environment
+    CurrentPath = path.dirname(__file__)
+
+game_folder = CurrentPath
 dialog_folder = path.join(game_folder, 'dialog')
 
 class QuestGenerator:
@@ -13,7 +22,7 @@ class QuestGenerator:
         self.q_holy_grail = ui.Quest(self.game,
                                      "Holy Grail", "Find and bring a Holy Grail",
                                      1, [], ["Holy Grail"], [], [], 10, 50)
-        self.q_killer_bees = ui.Quest(self.game,"Killer Bees","Eradicate three giant bees from the John`s filed",1,["Killer Bee", "Killer Bee", "Killer Bee"],[],[],[],15,10)
+        self.q_killer_bees = ui.Quest(self.game,"Killer Bees","Kill 3 giant bees from the John`s filed",1,["Killer Bee", "Killer Bee", "Killer Bee"],[],[],[],15,10)
         self.quests = [self.q_holy_grail, self.q_killer_bees]
 
     def return_quest_by_name(self, name):

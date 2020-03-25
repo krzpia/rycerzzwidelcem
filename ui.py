@@ -1,11 +1,18 @@
 import typing
+import sys
 from events.event import Event
 from data import *
 import spells
-
 pygame.init()
 
-snd_folder = path.join(path.dirname(__file__), 'sound')
+if getattr(sys, 'frozen', False): # PyInstaller adds this attribute
+    # Running in a bundle
+    CurrentPath = sys._MEIPASS
+else:
+    # Running in normal Python environment
+    CurrentPath = path.dirname(__file__)
+
+snd_folder = path.join(CurrentPath, 'sound')
 pick_item_snd = pygame.mixer.Sound(path.join(snd_folder, 'pick_item.wav'))
 click_snd = pygame.mixer.Sound(path.join(snd_folder, 'click2.wav'))
 wear_item_snd = pygame.mixer.Sound(path.join(snd_folder, 'wear_item.wav'))
@@ -1364,6 +1371,21 @@ class Quest:
         #    print ("TODO NPC IMAGE TO QUEST BOOK")
         surface.blit(self.image, (self.rect.x, self.rect.y))
 
+    def check_npcs_to_encounter(self) -> bool:
+        if len(self.goal.npcs_to_encounter) > 0:
+            npc_to_fulfil = []
+            print("Sprawdzam czy wykonałes quest. Sprawdzam czy napotkałes npcs")
+            npcs_encountered = self.game.events_manager.return_npcs_encountered_names()
+            for npc in self.goal.npcs_to_encounter:
+                for npc_encountered in npcs_encountered:
+                    if npc == npc_encountered:
+                        npc_to_fulfil.append(npc)
+                        break
+            if len(npc_to_fulfil) == len(self.goal.npcs_to_encounter):
+                return True
+            else:
+                return False
+
     def check_mobs_to_kill(self) -> bool:
         if len(self.goal.mobs_to_kill) > 0:
             mobs_killed_to_fulfil = []
@@ -1420,13 +1442,18 @@ class Quest:
                 self.game.player.inventory.remove_item(item)
             return True
         ### 2. NPCs
-        ## TODO!
-        ### 3. MOBs to kill
-        npcs_to_kill = self.check_mobs_to_kill()
-        if npcs_to_kill:
+        npcs_to_encounter = self.check_npcs_to_encounter()
+        if npcs_to_encounter:
             self.game.events_manager.emit(Event(id=f'quest {self.name} has been fulfiled'))
             self.completed = True
             return True
+        ### 3. MOBs to kill
+        mobs_to_kill = self.check_mobs_to_kill()
+        if mobs_to_kill:
+            self.game.events_manager.emit(Event(id=f'quest {self.name} has been fulfiled'))
+            self.completed = True
+            return True
+        ### 4. TODO tile(area) to explore
 
 
     def collect_reward(self):

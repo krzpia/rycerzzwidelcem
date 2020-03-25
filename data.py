@@ -1,10 +1,18 @@
+import sys
 import pygame
 from settings import *
 from os import path
 pygame.init()
 pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.HWSURFACE|pygame.DOUBLEBUF)
 
-game_folder = path.dirname(__file__)
+if getattr(sys, 'frozen', False): # PyInstaller adds this attribute
+    # Running in a bundle
+    CurrentPath = sys._MEIPASS
+else:
+    # Running in normal Python environment
+    CurrentPath = path.dirname(__file__)
+
+game_folder = CurrentPath
 img_folder = path.join(game_folder, 'img')
 map_folder = path.join(game_folder, 'map')
 music_folder = path.join(game_folder, 'music')

@@ -1,6 +1,6 @@
 from sprites import *
-from ui import *
 import sys
+from ui import *
 from settings import *
 import tilemap
 from os import path
