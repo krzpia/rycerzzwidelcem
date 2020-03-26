@@ -4,6 +4,7 @@ import sprites
 import math
 import copy
 
+
 class ItemGenerator:
     def __init__(self, game, tileset1, tileset2):
         self.game = game
@@ -263,7 +264,7 @@ class ItemGenerator:
         self.armors.append(sprites.Armor(self.game, "Chain Hood", "helmet", "chain",
                                          60, 8, 1.05, 0, 0, 0, 0, 0, 0,40, 46,36,60,92))
         self.armors.append(sprites.Armor(self.game, "Wizard`s Hat", "helmet", "robe",
-                                         70, 2, 1, 0, 0, 1, 1, 0, 0,25, 48, 36, 17, 93))
+                                         70, 2, 1, 0, 0, 1, 1, 0, 0,25, 48, 36, 15, 93))
         self.armors.append(sprites.Armor(self.game, "Knight Helmet", "helmet", "plate",
                                          80, 12, 1.2, 0, 0, 0, 0, 0, 0,90, 58,36,39,92))
         self.armors.append(sprites.Armor(self.game, "Templar Helmet", "helmet", "plate",
@@ -336,7 +337,10 @@ class ItemGenerator:
         self.rings.append(sprites.Necklace(self.game, "Solar Pedant", 425, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.82, 7, 35))
         self.rings.append(sprites.Necklace(self.game, "Amethyst Bat`s Wings", 225, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0.96, 31, 35))
 
-
+        #### SMITH ITEMS
+        self.smith_items = self.weapons + self.armors
+        #### MAGIC ITEMS
+        self.magic_items = self.potions + self.books + self.rings
         #### ALL ITEMS
         self.all_items = self.weapons + self.armors + self.potions + self.arrows + self.books + self.rings
 
@@ -355,8 +359,39 @@ class ItemGenerator:
             self.count(2615, 0)
             return sprites.Key(self.game, "Key", key, self.x, self.y)
 
+    def generate_random_smith_item(self, max_cost = False):
+        #print("GENERUJE LOSOWE BRONIE")
+        if not max_cost:
+            return copy.copy(random.choice(self.smith_items))
+        else:
+            temp_list = []
+            for i in self.smith_items:
+                if i.cost <= max_cost:
+                    temp_list.append(i)
+            if len(temp_list) == 0:
+                print ("ERROR - EMPTY TEMP LIST!")
+            #else:
+            #    print ("LIST of " + str(len(temp_list)) + "objects with max cost: "+ str(max_cost))
+            return copy.copy(random.choice(temp_list))
+
+    def generate_random_magic_item(self, max_cost = False):
+        #print("GENERUJE LOSOWE MAGICZNE PRZEDMIOTY")
+        if not max_cost:
+            return copy.copy(random.choice(self.magic_items))
+        else:
+            temp_list = []
+            for i in self.magic_items:
+                if i.cost <= max_cost:
+                    temp_list.append(i)
+            if len(temp_list) == 0:
+                print ("ERROR - EMPTY TEMP LIST!")
+            #else:
+            #    print ("LIST of " + str(len(temp_list)) + "objects with max cost: "+ str(max_cost))
+            return copy.copy(random.choice(temp_list))
+
+
     def generate_random_weapon(self, max_cost = False):
-        print("GENERUJE LOSOWE BRONIE")
+        #print("GENERUJE LOSOWE BRONIE")
         if not max_cost:
             return copy.copy(random.choice(self.weapons))
         else:

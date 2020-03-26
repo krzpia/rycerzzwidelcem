@@ -42,14 +42,15 @@ class Level:
         self.active_items = pygame.sprite.LayeredUpdates()
         ### TELEPORTS
         self.teleports = pygame.sprite.LayeredUpdates()
-
+        ### SHOPS
+        self.shops = pygame.sprite.LayeredUpdates()
 
 class Game:
     def __init__(self):
         pygame.mixer.pre_init(44100, -16, 1, 2048)
         pygame.init()
         #### USTAWIC POZNIEJ SILE DZWIEKU!
-        print(pygame.mixer.Channel(1).get_volume())
+        #print(pygame.mixer.Channel(1).get_volume())
         ######
         self.clock = pygame.time.Clock()
         self.font_arial = pygame.font.match_font("arial")
@@ -64,6 +65,7 @@ class Game:
         ######## ZMIENNE DO DEBUOWANIA #######
         self.unlock_updates = False
         self.fpss = []
+        print ("STARTING GAME MODULE - Correct. Version alfa 0.1")
 
     def get_tile(self, tileset, x, y):
         surface = pygame.Surface((32, 32)).convert_alpha()
@@ -92,6 +94,7 @@ class Game:
 
     def new(self, class_selected):
         #### LOADING LEVELS ####
+        print("LOADING LEVELS...")
         self.levels = {}
         self.map_levels = {}
         self.level_01 = Level()
@@ -122,11 +125,14 @@ class Game:
         #####################
         ### CREATE PLAYER ###
         #####################
+        print ("CREATING PLAYER...")
         self.player = Player(self, "Kris", class_selected)
         ### CREATE EVENTS MANAGER
         self.events_manager = EventManager()
+        print ("INITIALIZING USER INTERFACE...")
         ### DIALOG BOX
         self.dialog_box = DialogBox(self)
+        self.shop_dialog_box = ShopDialogBox(self)
         ### UI BUTTONS
         self.inv_use_button = RadioButton(rad_use_img, rad_use_h_img,
                                           INV_POS[0] + 140, INV_POS[1] + 80)
@@ -158,10 +164,12 @@ class Game:
         self.att_buttons = [self.str_ad_button, self.sta_ad_button, self.int_ad_button,
                             self.wis_ad_button, self.spe_ad_button, self.ste_ad_button]
         ####### START LEVEL
+        print ("STARTING LEVEL...")
         self.levelgen = levels.LevelGen(self)
         self.levelgen.load_level_01()
         self.levelgen.load_level_02()
         self.levelgen.go_to_level("level02", 44, 6)
+        print ("INITIALIZING CAMERA...")
         ##### CAMERA INIT
         self.camera = tilemap.Camera(self.map.width, self.map.height)
         self.draw_debug = False
@@ -443,6 +451,7 @@ class Game:
         pygame.display.flip()
 
     def run(self):
+        print ("STARTING GAME LOOP...")
         self.playing = True
         ##### FLAGI DO MECHANIKI GRY ############
         self.first_loop = False
@@ -452,12 +461,15 @@ class Game:
         self.treasure_inv = False
         self.ph_spell_book = False
         self.ph_shop = False
+        self.ph_buy_and_sell = False
+        self.active_shop = False
         self.ph_quest_book = False
         self.dialog_in_progress = False
         ##### FLAGI DO OBSLUGI INVENTARZA #######
         self.item_picked = False
         self.toggle_clean_item_picked = False
         self.toggle_open_chest = False
+        self.toggle_open_shop = False
         ##### TEXT BOX ###########
         self.line1 = "1"
         self.line2 = "2"
@@ -515,6 +527,9 @@ class Game:
         self.ph_spell_book = False
         self.ph_quest_book = False
         self.ph_treasure_inv = False
+        self.ph_shop = False
+        self.ph_buy_and_sell = False
+        self.active_shop = False
         self.paused = False
         self.player.update_stats()
 
@@ -551,11 +566,19 @@ class Game:
                         self.player.active_spell = self.player.selected_spell
                         self.player.update_stats()
                 if event.key == pygame.K_e:
+                    ####### WEJDZ DO SKLEPU
+                    if not self.ph_shop and not self.paused:
+                        shop_doors = pygame.sprite.spritecollide(self.player, self.act_lvl.shops,False,collide_hit_rect)
+                        for shop_door in shop_doors:
+                            self.ph_shop = True
+                            self.active_shop = shop_door.shop
+                            self.shop_dialog_box.start_conversation(shop_door.shop)
+                            print ("ENTERING SHOP: " + shop_door.shop.name)
                     ####### ROZMAWIAJ Z NPC
                     if not self.dialog_in_progress and not self.paused:
                         npcs_to_talk = pygame.sprite.spritecollide(self.player,self.act_lvl.npcs,False,collide_double_hit_rect)
                         for npc in npcs_to_talk:
-                            print ("TALK")
+                            #print ("TALK")
                             self.paused = True
                             if npc.sound:
                                 pygame.mixer.Sound.play(npc.sound)
@@ -596,24 +619,37 @@ class Game:
                                 self.ph_treasure_inv = False
                                 self.treasure_inv = False
                                 # print("PUSTO!")
-                    ######## ZAMYKANIE OTWARTEJ SKRZYNI
+                    ######## ZAMYKANIE OTWARTEJ SKRZYNI klawiszem E
                     if self.toggle_open_chest:
                         self.paused = False
                         self.ph_treasure_inv = False
                         self.treasure_inv = False
                         self.toggle_open_chest = False
+                    ######## ZAMYKANIE SKLEPU klawiszem E
+                    #if self.toggle_open_shop:
+                    #    self.paused = False
+                    #    self.ph_shop = False
+                    #    self.toggle_open_shop = False
+            ##############################################################
+            ######## EVENTY MOUSE CONTROL ################################
+            ##############################################################
+            # # # # # # ############################################ # # #
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     mouse_pos = pygame.mouse.get_pos()
+                    dial_pos_x = DIAL_BOX_POS[0]
+                    dial_pos_y = DIAL_BOX_POS[1]
+                    ### POZYCJONOWANIE Wskaznika myszy dla sklepu
+                    shop_mouse_pos = (mouse_pos[0] - dial_pos_x, mouse_pos[1] - dial_pos_y)
                     ### PAUZA
-                    if not self.dialog_in_progress:
+                    if not self.dialog_in_progress or not self.ph_shop:
                         if self.pause_button.check_if_clicked(mouse_pos):
                             if self.paused:
                                 self.back_to_game_and_unpause()
                             else:
                                 self.paused = True
                     ### PRZYCISK QUEST BOOK
-                    if not self.dialog_in_progress:
+                    if not self.dialog_in_progress or not self.ph_shop:
                         if self.quest_book_button.check_if_highlight(mouse_pos):
                             if not self.ph_quest_book:
                                 if not self.paused:
@@ -625,7 +661,7 @@ class Game:
                             else:
                                 self.back_to_game_and_unpause()
                     ### PRZYCISK SPELL BOOK
-                    if not self.dialog_in_progress:
+                    if not self.dialog_in_progress or not self.ph_shop:
                         if self.spell_book_button.check_if_clicked(mouse_pos):
                             if not self.ph_spell_book:
                                 if not self.paused:
@@ -640,27 +676,41 @@ class Game:
                     self.ad_buttons_check(mouse_pos)
                     ### PICK UP AND DROP ITEMS on INV
                     if self.item_picked:
+                        print(f'{self.item_picked.name} owner = {self.item_picked.owner}')
                         ##################################
                         # GDY MAM PRZEDMIOT PODNIESIONY  #
                         ##################################
                         # 1. ODKLADAM DO PLECAKA
                         if self.player.inventory.check_if_clicked(mouse_pos):
-                            put_item_success_bool = self.player.inventory.put_item_to_inv(mouse_pos,
+                            if self.item_picked.owner == "shop":
+                                print ("KUPUJE!")
+                                if self.player.check_gold(self.item_picked,self.active_shop):
+                                    put_item_success_bool = self.player.inventory.put_item_to_inv(mouse_pos,
+                                                                                              self.item_picked)
+                                    if put_item_success_bool:
+                                        pygame.mixer.Sound.play(coin_snd)
+                                        self.item_picked.owner = "player"
+                                        self.toggle_clean_item_picked = True
+                                else:
+                                    pygame.mixer.Sound.play(empty_spell_snd)
+                            else:
+                                put_item_success_bool = self.player.inventory.put_item_to_inv(mouse_pos,
                                                                                           self.item_picked)
-                            if put_item_success_bool:  # GDY UDALO SIE ODLOZYC WTEDY OCZYSZCzAM ITEM PICKED
-                                self.toggle_clean_item_picked = True
-                        # 2. 0DKLADAM NA AKTYWNY SLOT
-                        for slot in self.player.active_slots:
-                            if slot.check_itemslot_to_item_corr(mouse_pos, self.item_picked):
-                                if slot.occ == False:
+                                if put_item_success_bool:  # GDY UDALO SIE ODLOZYC WTEDY OCZYSZCzAM ITEM PICKED
                                     self.toggle_clean_item_picked = True
-                                ### POLOZ PRZEDMIOT NA AKTYWNYM SLOCIE i UPDATE STATISTICS
-                                pygame.mixer.Sound.play(wear_item_snd)
-                                if slot.put_item(self.item_picked):
-                                    ### TYLKO BRON LUB ZBROJE SA SPRITEAMI DO WYSWIELTENIA NA LUDZIKU
-                                    if isinstance(self.item_picked, Armor) or isinstance(self.item_picked, Weapon):
-                                        self.player_group.add(self.item_picked)
-                                self.player.update_stats()
+                        # 2. 0DKLADAM NA AKTYWNY SLOT
+                        if not self.ph_buy_and_sell:
+                            for slot in self.player.active_slots:
+                                if slot.check_itemslot_to_item_corr(mouse_pos, self.item_picked):
+                                    if slot.occ == False:
+                                        self.toggle_clean_item_picked = True
+                                    ### POLOZ PRZEDMIOT NA AKTYWNYM SLOCIE i UPDATE STATISTICS
+                                    pygame.mixer.Sound.play(wear_item_snd)
+                                    if slot.put_item(self.item_picked):
+                                        ### TYLKO BRON LUB ZBROJE SA SPRITEAMI DO WYSWIELTENIA NA LUDZIKU
+                                        if isinstance(self.item_picked, Armor) or isinstance(self.item_picked, Weapon):
+                                            self.player_group.add(self.item_picked)
+                                    self.player.update_stats()
                         # 3. ODKLADAM NA TREASURE
                         if self.treasure_inv:
                             if self.treasure_inv.check_if_clicked(mouse_pos):
@@ -668,7 +718,21 @@ class Game:
                                                                                           self.item_picked)
                                 if put_item_success_bool:  # GDY UDALO SIE ODLOZYC WTEDY OCZYSZCzAM ITEM PICKED
                                     self.toggle_clean_item_picked = True
-
+                        # 4. ODKLADAM NA POLKE SKLEPU
+                        if self.ph_buy_and_sell:
+                            if self.active_shop.inventory.check_if_clicked(shop_mouse_pos):
+                                if self.item_picked.owner == "shop":
+                                    put_item_success_bool = self.active_shop.inventory.put_item_to_inv(shop_mouse_pos, self.item_picked)
+                                    if put_item_success_bool:  # GDY UDALO SIE ODLOZYC WTEDY OCZYSZCzAM ITEM PICKED
+                                        self.toggle_clean_item_picked = True
+                                else:
+                                    print("SELL ITEM")
+                                    if self.active_shop.check_gold(self.item_picked):
+                                        put_item_success_bool = self.active_shop.inventory.put_item_to_inv(shop_mouse_pos, self.item_picked)
+                                        if put_item_success_bool:
+                                            pygame.mixer.Sound.play(coin_snd)
+                                            self.item_picked.owner = "shop"
+                                            self.toggle_clean_item_picked = True
                         ## PRZEDMIOTY DO UZYCIA
                         ## UZYCIE ELIKSIROW
                         if self.inv_use_button.check_if_clicked(mouse_pos):
@@ -689,6 +753,10 @@ class Game:
                         # 1. PODNIES ITEM Z INV
                         if self.player.inventory.check_if_clicked(mouse_pos):
                             self.item_picked = self.player.inventory.pick_item_from_inv(mouse_pos)
+                        # 2. PODNIES ITEM Z SHOP
+                        if self.ph_buy_and_sell:
+                            if self.active_shop.inventory.check_if_clicked(shop_mouse_pos):
+                                self.item_picked = self.active_shop.inventory.pick_item_from_inv(shop_mouse_pos)
                         # 2. PODNIES ITEM Z TREASURE INV
                         if self.treasure_inv:
                             if self.treasure_inv.check_if_clicked(mouse_pos):
@@ -731,6 +799,12 @@ class Game:
                         # 5. PRZYCISKI DIALOG BOX
                         if self.dialog_in_progress:
                             self.dialog_box.check_buttons(mouse_pos)
+                        # 7. PRZYCISKI SHOP DIALOG BOX
+                        if self.ph_shop:
+                            self.shop_dialog_box.check_buttons(mouse_pos)
+                        # 8. PRZYCKISK EXIT SHOP:
+                        if self.ph_buy_and_sell:
+                            self.active_shop.check_exit_button(mouse_pos)
                         # 6. PRZYCISKI QUEST BOOK
                         if self.ph_quest_book:
                             self.player.quest_book.check_page_buttons(mouse_pos)
@@ -742,6 +816,8 @@ class Game:
             self.toggle_open_chest = True
         else:
             self.toggle_open_chest = False
+        #### CZYSZCZE TOGGLE OPEN SHOP
+        ## TODO jezeli chce wychodzi ze sklepu literą E
         #### CZYSZCZE ITEM PICKED ####
         if self.toggle_clean_item_picked:
             self.item_picked = False
@@ -754,6 +830,9 @@ class Game:
             self.player.spell_book.update_buttons(mouse_pos)
         if self.ph_quest_book:
             self.player.quest_book.update_buttons(mouse_pos)
+        #### HIGHLIGHT CLOSE SHOP BUTTON
+        if self.ph_buy_and_sell:
+            self.active_shop.update(mouse_pos)
         ### ACTIVATE ADD BUTTONS ####
         if self.player.attribute_points > 0:
             for button in self.att_buttons:
@@ -772,6 +851,9 @@ class Game:
         #### DIALOG BUTTONS ####
         if self.dialog_in_progress:
             self.dialog_box.update(mouse_pos)
+        #### SHOP DIALOG BUTTONS @@@
+        if self.ph_shop:
+            self.shop_dialog_box.update(mouse_pos)
         #### ACTIVATE INV_USE_BUTTON ####
         if self.item_picked:
             if self.item_picked.type == "potion" or self.item_picked.type == "book":
@@ -990,6 +1072,7 @@ class Game:
             if self.item_picked.type == "potion":
                 self.write(("Type: " + str(self.item_picked.potion_type)), (INV_POS[0] + 20, INV_POS[1] + 70))
                 self.write(("Strength: " + str(self.item_picked.strength)), (INV_POS[0] + 20, INV_POS[1] + 90))
+                self.write(("Cost: " + str(self.item_picked.cost)),(INV_POS[0] + 20, INV_POS[1] + 110))
                 self.inv_use_button.show_button(self.screen)
             if self.item_picked.type == "book":
                 self.write(("Min. intellect: " + str(self.item_picked.min_int)), (INV_POS[0] + 20, INV_POS[1] + 70))
@@ -1011,9 +1094,9 @@ class Game:
         self.player.necklace_slot.show_slot(self.screen, INV_POS[0] + INV_WIDTH - 140, INV_POS[1] + 20)
         self.screen.blit(inv_bar, (INV_POS[0] + 20, INV_POS[1] + 410))
         self.screen.blit(gold_coin, (INV_POS[0] + 30, INV_POS[1] + 420))
-        self.write(str(self.player.gold), (INV_POS[0] + 55, INV_POS[1] + 414), (255, 255, 0))
+        self.write(str(self.player.gold), (INV_POS[0] + 55, INV_POS[1] + 414), YELLOW)
         self.screen.blit(arrow_icon, (INV_POS[0] + 114, INV_POS[1] + 407))
-        self.write(str(self.player.arrows), (INV_POS[0] + 145, INV_POS[1] + 414), (255, 255, 0))
+        self.write(str(self.player.arrows), (INV_POS[0] + 145, INV_POS[1] + 414), YELLOW)
         self.write("ARMOR: " + str(self.player.armor), (INV_POS[0] + 20, INV_POS[1] + 160))
         block_chance = str(self.player.block_chance)[:3]
         hit_red = str(self.player.hit_reduction)[:3]
@@ -1178,6 +1261,10 @@ class Game:
                 self.map_surface.blit(sprite.image, self.camera.apply(sprite))
             ### DEBUG MODE
             if self.draw_debug:
+                #### RYSUJEMY TEKST ROBOCZY
+                self.write(str(self.clock.get_fps()), (0, 0))
+                mouse_pos = pygame.mouse.get_pos()
+                self.write(f'(Mouse position: {mouse_pos}',(150,0))
                 for wall in self.act_lvl.walls:
                     pygame.draw.rect(self.map_surface, (70, 30, 170), self.camera.apply_rect(wall.rect), 1)
                 for lava in self.act_lvl.lavas:
@@ -1201,12 +1288,22 @@ class Game:
         self.quest_book_button.show_button(self.screen)
         if self.paused:
             self.screen.blit(dim_screen, (MAP_TOPLEFT))
+            if self.draw_debug:
+                #### RYSUJEMY TEKST ROBOCZY
+                self.write(str(self.clock.get_fps()), (0, 0))
+                mouse_pos = pygame.mouse.get_pos()
+                self.write(f'(Mouse position: {mouse_pos}',(150,0))
             #### STANY SPECJALNE
             ### NEXT LEVEL
             if self.player.attribute_points > 0:
                 self.h_write("NEXT LEVEL", (MAP_WIDTH / 2 - 100, MAP_HEIGHT / 2 - 10), "gothic", 36, (WHITE))
+            ### PHASE SHOP
+            if self.ph_shop:
+                self.shop_dialog_box.show(self.screen)
+            if self.ph_buy_and_sell:
+                self.active_shop.show(self.screen)
             ### TREASURE CHEST
-            if self.ph_treasure_inv:
+            elif self.ph_treasure_inv:
                 self.blit_alpha(self.screen, treasure_bcg_img, (MAP_TOPLEFT[0] + 120, MAP_TOPLEFT[1] + 120), 220)
                 self.treasure_inv.show_inv(self.screen, MAP_TOPLEFT[0] + 200, MAP_TOPLEFT[1] + 350)
             ### SPELL BOOK
@@ -1219,8 +1316,7 @@ class Game:
             # DIALOG BOX
             elif self.dialog_in_progress:
                 self.dialog_box.show(self.screen)
-        #### RYSUJEMY TEKST ROBOCZY
-        self.write(str(self.clock.get_fps()), (0, 0))
+
         #### SREDNIA FPS
         # if self.draw_debug:
         #    x = int(self.clock.get_fps())

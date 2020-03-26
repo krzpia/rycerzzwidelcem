@@ -19,10 +19,10 @@ dialog_folder = path.join(game_folder, 'dialog')
 class QuestGenerator:
     def __init__(self,game):
         self.game = game
-        self.q_holy_grail = ui.Quest(self.game,
-                                     "Holy Grail", "Find and bring a Holy Grail",
+        self.q_holy_grail = ui.Quest(self.game,"Holy Grail", "Find and bring a Holy Grail",
                                      1, [], ["Holy Grail"], [], [], 10, 50)
-        self.q_killer_bees = ui.Quest(self.game,"Killer Bees","Kill 3 giant bees from the John`s filed",1,["Killer Bee", "Killer Bee", "Killer Bee"],[],[],[],15,10)
+        self.q_killer_bees = ui.Quest(self.game,"Killer Bees","Kill 3 giant bees from the John`s filed",
+                                      1,["Killer Bee", "Killer Bee", "Killer Bee"],[],[],[],15,10)
         self.quests = [self.q_holy_grail, self.q_killer_bees]
 
     def return_quest_by_name(self, name):
@@ -46,8 +46,8 @@ class NpcGenerator:
         if name == "Gold Crusader":
             gold_crusader = sprites.Npc(self.game,name,x,y,image)
             gold_crusader.dialog_data.load_from_dict(self.gold_crusader_csv,self.quest_gen)
-            #gold_crusader.dialog_data.thread_unblock_with_event("quest Holy Grail",['level 2 achieved'])
-            #gold_crusader.dialog_data.thread_block_with_event("intro gold crusader",['level 2 achieved'])
+            gold_crusader.dialog_data.thread_unblock_with_event("quest Holy Grail",['level 2 achieved'])
+            gold_crusader.dialog_data.thread_block_with_event("intro gold crusader",['level 2 achieved'])
             return gold_crusader
 
         if name == "Blue Gnom":

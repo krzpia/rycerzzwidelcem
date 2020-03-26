@@ -12,6 +12,7 @@ class LevelGen:
         self.gen = ItemGenerator(self.game,tileset_image,full_tileset_image)
         self.enemy_gen = EnemyGenerator(self.game,tileset_image,full_tileset_image)
         self.npcs_gen = NpcGenerator(self.game,tileset_image,full_tileset_image)
+        self.shop_gen = ShopGenerator(self.game)
 
     def load(self,name):
         if name == "level01":
@@ -59,6 +60,8 @@ class LevelGen:
         self.game.level_02.chest_to_open = pygame.sprite.LayeredUpdates()
         ## TELEPORTS
         self.game.level_02.teleports = pygame.sprite.LayeredUpdates()
+        ## SHOPS
+        self.game.level_02.shops = pygame.sprite.LayeredUpdates()
         #### LOAD TILE OBJECTS
         self.load_objects(self.game.map_level_02.tmxdata.objects)
 
@@ -103,6 +106,8 @@ class LevelGen:
         self.game.level_01.chest_to_open = pygame.sprite.LayeredUpdates()
         ## TELEPORTS
         self.game.level_01.teleports = pygame.sprite.LayeredUpdates()
+        ## SHOPS
+        self.game.level_01.shops = pygame.sprite.LayeredUpdates()
         ### LOAD TILE OBJECTS
         self.load_objects(self.game.map_level_01.tmxdata.objects)
 
@@ -129,6 +134,9 @@ class LevelGen:
                 Lava(self.game,tile_object.x,tile_object.y,tile_object.width,tile_object.height, 15)
             if tile_object.name == "teleport":
                 Teleport(self.game, tile_object.destination, tile_object.pos_x, tile_object.pos_y,
+                         tile_object.x,tile_object.y,tile_object.width,tile_object.height)
+            if tile_object.type == "shop":
+                ShopDoor(self.game,tile_object.name, tile_object.pos_x, tile_object.pos_y,
                          tile_object.x,tile_object.y,tile_object.width,tile_object.height)
             ### MAP DECORATIONS
             if tile_object.name == "torch":
@@ -169,6 +177,7 @@ class LevelGen:
                                tile_object.locked,tile_object.treasure_value,tile_object.item,20,18)
             #### ITEMS ############
             if tile_object.type == "quest item":
+                #print (f'Generating Quest item name: {tile_object.name}')
                 Item_to_take(self.game,object_center.x,object_center.y,
                              self.gen.generate_quest_item_by_name(tile_object.name))
             #### KEYS #############

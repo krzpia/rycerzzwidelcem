@@ -3,6 +3,7 @@ import sys
 from events.event import Event
 from data import *
 import spells
+import random
 pygame.init()
 
 if getattr(sys, 'frozen', False): # PyInstaller adds this attribute
@@ -1065,6 +1066,7 @@ class Dialog:
                 print("No more threads!")
                 break
 
+
 class Text:
     def __init__(self, ifnpc, thread, branch, step, text, ask1,ask2,ask3,ask4,next_thread, goto, event):
         ### ZAWIERAC BEDZIE CALA WYPOWIEDZ
@@ -1086,11 +1088,112 @@ class Text:
             self.welcome = True
 
 
+class ShopDialogBox:
+    def __init__(self,game):
+        self.game = game
+        self.shop = False
+        self.pos = DIAL_BOX_POS
+        self.image = dialogbox_img_2.copy()
+        self.ok_button = RadioButton(rad_ok_img, rad_ok_h_img, 178, 290)
+        self.resp_but_1 = RadioButton(rad_but_img, rad_but_h_img, 55, 150)
+        self.resp_but_2 = RadioButton(rad_but_img, rad_but_h_img, 55, 175)
+        self.resp_but_3 = RadioButton(rad_but_img, rad_but_h_img, 55, 200)
+        self.resp_but_4 = RadioButton(rad_but_img, rad_but_h_img, 55, 225)
+        self.resp_buttons = [self.resp_but_1, self.resp_but_2, self.resp_but_3, self.resp_but_4]
+
+    def clear(self):
+        self.image = dialogbox_img_2.copy()
+        self.shop = False
+        for button in self.resp_buttons:
+            button.deactivate()
+
+    def activate_and_write_ask(self):
+        if self.shop.ask1:
+            self.resp_but_1.activate()
+            self.write(self.shop.ask1, 2)
+        if self.shop.ask2:
+            self.resp_but_2.activate()
+            self.write(self.shop.ask2, 3)
+        if self.shop.ask3:
+            self.resp_but_3.activate()
+            self.write(self.shop.ask3, 4)
+        if self.shop.ask4:
+            self.resp_but_4.activate()
+            self.write(self.shop.ask4, 5)
+
+    def start_conversation(self, shop):
+        self.clear()
+        self.game.paused = True
+        self.shop = shop
+        self.game.put_txt(f'Entering {self.shop.shop_name}')
+        print("START SPEAKING WITH SHOP OWNER")
+        self.activate_and_write_ask()
+        self.draw_upper_part()
+
+    def draw_upper_part(self) -> None:
+        self.image.blit(self.shop.owner_image, DB2_IMG_POS)
+        self.game.s_write(self.shop.owner_name, self.image, DB2_TXT_POS, WHITE)
+        self.write(self.shop.welcome_text, 0)
+
+    def write(self, txt, ln):
+        self.game.s_write(txt, self.image, (85, 100 + ln * 24), (WHITE))
+
+    def check_buttons(self, mouse_pos):
+        mouse_x = mouse_pos[0]
+        mouse_y = mouse_pos[1]
+        mouse_x -= self.pos[0]
+        mouse_y -= self.pos[1]
+        self.mouse_pos = (mouse_x, mouse_y)
+        if self.ok_button.active:
+            if self.ok_button.check_if_clicked(self.mouse_pos):
+                print ("OK CLICKED - EXIT SHOP DIALOG")
+                self.game.active_shop = False
+                self.game.back_to_game_and_unpause()
+        if self.resp_but_1.active:
+            if self.resp_but_1.check_if_clicked(self.mouse_pos):
+                print("Buy and sell!")
+                self.shop.activate_buy_and_sell()
+                self.game.ph_shop = False
+                self.game.ph_buy_and_sell = True
+        if self.resp_but_2.active:
+            if self.resp_but_2.check_if_clicked(self.mouse_pos):
+                print("2st option")
+        if self.resp_but_3.active:
+            if self.resp_but_3.check_if_clicked(self.mouse_pos):
+                print("3rd option")
+        if self.resp_but_4.active:
+            if self.resp_but_4.check_if_clicked(self.mouse_pos):
+                print("4th option")
+
+    def update(self, mouse_pos):
+        mouse_x = mouse_pos[0]
+        mouse_y = mouse_pos[1]
+        mouse_x -= self.pos[0]
+        mouse_y -= self.pos[1]
+        self.mouse_pos = (mouse_x, mouse_y)
+        self.ok_button.check_if_highlight(self.mouse_pos)
+        for i in self.resp_buttons:
+            i.check_if_highlight(self.mouse_pos)
+
+    def show_buttons(self):
+        for i in self.resp_buttons:
+            if i.active:
+                i.show_button(self.image)
+        self.ok_button.show_button(self.image)
+
+    def show(self, screen):
+        self.show_buttons()
+        screen.blit(self.image, self.pos)
+
+
 class DialogBox:
     def __init__(self, game):
         self.game = game
-        self.pos = (50, 120)
-        self.image = dialogbox_img.copy()
+        self.pos = DIAL_BOX_POS
+        self.image = dialogbox_img_2.copy()
+        self.rew_image = scroll_160_img.copy()
+        self.rew_scroll_show = False
+        self.rew_pos = REW_BOX_POS
         self.ok_button = RadioButton(rad_ok_img,rad_ok_h_img,178,290)
         self.resp_but_1 = RadioButton(rad_but_img,rad_but_h_img,55,150)
         self.resp_but_2 = RadioButton(rad_but_img, rad_but_h_img, 55, 175)
@@ -1103,6 +1206,7 @@ class DialogBox:
 
     def start_conversation(self,npc):
         print ("STARTING CONVERSATION")
+        self.game.put_txt(f'Speaking with {npc.name}')
         self.npc = npc
         self.dialog_data = self.npc.dialog_data
         self.dialog_data.reset()
@@ -1111,15 +1215,6 @@ class DialogBox:
         encounter = self.game.events_manager.find_npc_encounter_event(self.npc.name)
         self.actual_text = self.dialog_data.find_first_step(encounter)
         self.write_actual_text()
-
-    def write_actual_text(self):
-        if self.actual_text.ifnpc:
-            speaker = self.npc
-        else:
-            speaker = self.game.player
-        self.write_line(speaker, self.actual_text.text)
-        #except:
-        #   print ("ERROR DONT HAVE ACTUAL TEXT TO BLIT")
 
     def next_ask_step(self, goto):
         self.actual_text = self.dialog_data.find_next_step_by_goto(goto)
@@ -1138,13 +1233,32 @@ class DialogBox:
                     lastcutstr = self.actual_text.event[:-18]
                     quest_name = lastcutstr[6:]
                     quest = self.game.player.quest_book.get_quest_by_name(quest_name)
+                    self.show_reward(quest)
                     quest.collect_reward()
         #### KONFIGURUJE I WYSWIETLAM TEXT
         self.configure_text()
 
+    def show_reward(self, quest):
+        self.rew_scroll_show = True
+        print ("REW SCROLL SHOW = True")
+        self.game.s_write(f'You have recieved a reward:', self.rew_image,(80,10),BLACK)
+        g_l_m = 10 * (len(str(quest.reward_gold)) - 1)
+        e_l_m = 10 * (len(str(quest.reward_xp)) - 1)
+        if quest.reward_gold > 0:
+            self.rew_image.blit(gold_coin,(100 + g_l_m,40))
+            self.game.s_write(f'+ {quest.reward_gold}',self.rew_image,(80,35),BLACK)
+        if quest.reward_xp > 0:
+            self.rew_image.blit(xp_icon,(100 + e_l_m,60))
+            self.game.s_write(f'+ {quest.reward_gold}', self.rew_image, (80, 60),BLACK)
+        if quest.reward_item:
+            self.game.s_write(f'You get {quest.reward_item.name}', self.rew_image, (120, 85),BLACK)
+            self.rew_image.blit(quest.reward_item.image,(80,80))
+
     def configure_text(self):
-        #####################################################
+        ################################################################
         ### KONFIGURACJA UKLADU - NOWY AKTUALNY TEKST DO WYSWIETLENIA! #
+        ################################################################
+        # Czyszcze zmienne i dodatki #
         self.resp_but_1.deactivate()
         self.resp_but_2.deactivate()
         self.resp_but_3.deactivate()
@@ -1165,7 +1279,6 @@ class DialogBox:
                 print(self.actual_text.ask4)
                 how_many_answers += 1
             #print (how_many_answers)
-
             if how_many_answers >=1:
                 self.write_actual_text()
                 self.ok_button.deactivate()
@@ -1216,10 +1329,19 @@ class DialogBox:
             if self.game.player.check_next_level():
                 self.game.paused = True
 
+    def write_actual_text(self):
+        if self.actual_text.ifnpc:
+            speaker = self.npc
+        else:
+            speaker = self.game.player
+        self.write_line(speaker, self.actual_text.text)
+        #except:
+        #   print ("ERROR DONT HAVE ACTUAL TEXT TO BLIT")
+
     def write_line(self, speaker, text) -> None:
         self.clear()
-        self.image.blit(pygame.transform.scale(speaker.image, (48, 48)), (210, 18))
-        self.game.s_write(speaker.name, self.image, (85, 35), WHITE)
+        self.image.blit(speaker.image, DB2_IMG_POS)
+        self.game.s_write(speaker.name, self.image, DB2_TXT_POS, WHITE)
         text_len = len(text)
         text_line_1 = ""
         text_line_2 = ""
@@ -1277,7 +1399,7 @@ class DialogBox:
         self.game.s_write(txt,self.image, (85, 100 + ln * 24), (WHITE))
 
     def clear(self):
-        self.image = dialogbox_img.copy()
+        self.image = dialogbox_img_2.copy()
 
     def show(self, screen):
         ## Uwaga tu powinienem sprawdzic wszystkie 4 ask (odpowiedzi na pytania)
@@ -1286,6 +1408,8 @@ class DialogBox:
             self.ok_button.show_button(self.image)
         else:
             self.show_response_buttons()
+        if self.rew_scroll_show:
+            screen.blit(self.rew_image, self.rew_pos)
         screen.blit(self.image, self.pos)
 
     def show_response_buttons(self):
@@ -1311,6 +1435,7 @@ class DialogBox:
         self.mouse_pos = (mouse_x, mouse_y)
         if self.ok_button.active:
             if self.ok_button.check_if_clicked(self.mouse_pos):
+                self.rew_scroll_show = False
                 self.next_step()
         if self.resp_but_1.active:
             if self.resp_but_1.check_if_clicked(self.mouse_pos):
@@ -1339,7 +1464,7 @@ class Quest:
                  items_to_collect,
                  tiles_to_explore,
                  npcs_to_encounter,
-                 reward_xp, reward_gold):
+                 reward_xp, reward_gold, reward_item = False):
         self.game = game
         self.name = name
         self.image = quest_bcg_img
@@ -1357,6 +1482,7 @@ class Quest:
             self.goal.add_npc_to_encounter(i)
         self.reward_xp = reward_xp
         self.reward_gold = reward_gold
+        self.reward_item = reward_item
         self.completed = False
         self.in_progress = False
         self.visible = False
@@ -1461,14 +1587,22 @@ class Quest:
             #self.game.player.active_quests.remove(self)
             self.game.player.gold += self.reward_gold
             self.game.player.xp += self.reward_xp
+            if self.reward_item:
+                item_collected = self.game.player.inventory.put_in_first_free_slot(self.reward_item)
+                if not item_collected:
+                    print ("QUEST ITEM NOT COLLECTED DUE TO FULL INVENTORY!")
+                    # TODO put item on the ground?
             pygame.mixer.Sound.play(coin_snd)
             #### SEND INFO
+            self.game.put_txt(f'Quest {self.name} finished')
             self.game.player.completed_quests.append(self)
             self.game.player.quest_book.remove(self)
             print("NAGRODA ODEBRANA i QUEST ZAPISANY JAKO WYKONANY")
 
     def get_quest(self):
         if self not in self.game.player.active_quests:
+            print("GOT NEW QUEST")
+            self.game.put_txt(f'Got quest {self.name}')
             self.in_progress = True
             self.game.events_manager.emit(Event(id=f'got quest {self.name}'))
             self.game.player.active_quests.append(self)
@@ -1494,6 +1628,174 @@ class QuestGoal:
 
     def add_npc_to_encounter(self,npc):
         self.npcs_to_encounter.append(npc)
+
+
+class ShopGenerator:
+    def __init__(self, game):
+        self.game = game
+
+    def generate_shop_by_name(self, name):
+        self.level_02_magic_shop = Shop(self.game,name,"magic",129,150,"Harold the Alchemist")
+        self.level_02_smith_shop = Shop(self.game,name,"smith",59,100,"Jendryk the Smith")
+        if name == "Magic Shop 02":
+            #print("shop on level 02 created")
+            return self.level_02_magic_shop
+        if name == "Smith 02":
+            #print("shop on level 02 created")
+            return self.level_02_smith_shop
+        print ("ERROR IN SHOP GENERATION (name not recognized")
+
+
+class Shop:
+        def __init__(self, game, name, type, quality, owner_gold, owner_name, owner_image=default_shop_owner_img):
+            self.game = game
+            self.name = name
+            self.shop_name = name[:-2]
+            self.owner_name = owner_name
+            self.inventory = Inventory(slot_img, 10, 6)
+            self.image = dialogbox_img_2.copy()
+            self.pos = DIAL_BOX_POS
+            ### type - Magical, Smith etc..
+            self.type = type
+            self.ask1 = False
+            self.ask2 = False
+            self.ask3 = False
+            self.ask4 = False
+            ### quality - Max cost of items...
+            self.quality = quality
+            self.owner_image = owner_image
+            self.owner_attitude = 100
+            self.owner_gold = owner_gold
+            self.open = True
+            self.welcome_text = "Welcome adventurer!"
+            if self.type == "magic":
+                self.genrate_new_magic_items()
+                self.ask1 = "What do you have for sale?"
+                self.ask2 = "Please restore my magic points"
+                self.ask3 = "I`d like to see your magic items for sale"
+                self.ask4 = "Please recharge my wand"
+            elif self.type == "smith":
+                self.genrate_new_smith_items()
+                self.ask1 = "What do you have for sale?"
+                self.ask2 = "Please reapir my item"
+                self.ask3 = "I`d like to buy some arrows"
+            else:
+                self.ask1 = "Wish you trade?"
+            #### POSIBLE PHASES
+            self.local_ph_buy_and_sell = False
+            self.local_ph_reapir = False
+            self.local_ph_charge_wands = False
+            #### EXIT BUTTON
+            self.exit_button = RadioButton(rad_ok_img, rad_ok_h_img, 178,290)
+            ##########
+            self.subscribe_owner_to_all_items()
+
+        def subscribe_owner_to_all_items(self):
+            for slot in self.inventory.item_slots:
+                if slot.item:
+                    slot.item.owner = "shop"
+
+        def check_gold(self, item) -> bool:
+            if self.owner_gold >= item.cost:
+                ### TO DO TYPES TO BUY!
+                self.game.player.gold += item.cost
+                self.owner_gold -= item.cost
+                return True
+            else:
+                return False
+
+        def local_ph_deactivate(self):
+            self.local_ph_buy_and_sell = False
+            self.local_ph_reapir = False
+            self.local_ph_charge_wands = False
+            self.exit_button.deactivate()
+
+        def activate_buy_and_sell(self):
+            ### ENTER THE SHOP`S INVENTRORY
+            self.local_ph_buy_and_sell = True
+            self.blit_upper_part()
+            self.exit_button.activate()
+
+        def genrate_new_smith_items(self):
+            items_no = 0
+            items_maxcost = 0
+            if 0 < self.quality <= 100:
+                items_no = random.randint(1, 8)
+                items_maxcost = self.quality
+            elif 100 < self.quality:
+                items_no = random.randint(5, 25)
+                items_maxcost = self.quality
+            else:
+                print("ERROR 0 or neg number of items in shop while generating shop items")
+            if items_no > 0:
+                for i in range(items_no):
+                    self.inventory.put_in_first_free_slot(
+                        self.game.levelgen.gen.generate_random_smith_item(items_maxcost))
+
+        def genrate_new_magic_items(self):
+            items_no = 0
+            items_maxcost = 0
+            if 0 < self.quality <= 100:
+                items_no = random.randint(1, 8)
+                items_maxcost = self.quality
+            elif 100 < self.quality:
+                items_no = random.randint(5, 25)
+                items_maxcost = self.quality
+            else:
+                print("ERROR 0 or neg number of items in shop while generating shop items")
+            ## TODO wiecej eliksirow mniej innych, sie zobaczy jak wyskakują
+            if items_no > 0:
+                for i in range(items_no):
+                    self.inventory.put_in_first_free_slot(
+                        self.game.levelgen.gen.generate_random_magic_item(items_maxcost))
+
+        def clear_image(self):
+            self.image = dialogbox_img_2.copy()
+
+        def blit_upper_part(self):
+            self.image.blit(self.owner_image, DB2_IMG_POS)
+            self.game.s_write(self.owner_name, self.image, DB2_TXT_POS, WHITE)
+
+        def show(self, screen):
+            if self.local_ph_buy_and_sell:
+                self.clear_image()
+                self.blit_upper_part()
+                self.inventory.show_inv(self.image,MAP_TOPLEFT[0] + 60,MAP_TOPLEFT[1]+70)
+                self.exit_button.show_button(self.image)
+                self.image.blit(gold_coin,(85,305))
+                self.game.s_write(str(self.owner_gold),self.image,(102,300),YELLOW)
+                screen.blit(self.image, (self.pos))
+            else:
+                print ("ERROR DONT KNOW WHAT ACTIVITY OF THE SHOP I HAVE TO SHOW")
+
+        def update(self, mouse_pos):
+            mouse_x = mouse_pos[0]
+            mouse_y = mouse_pos[1]
+            mouse_x -= self.pos[0]
+            mouse_y -= self.pos[1]
+            self.mouse_pos = (mouse_x, mouse_y)
+            #
+            # print ("mod_mouse a (%d, %d)" % self.mouse_pos)
+            self.exit_button.check_if_highlight(self.mouse_pos)
+
+        def check_exit_button(self, mouse_pos):
+            mouse_x = mouse_pos[0]
+            mouse_y = mouse_pos[1]
+            mouse_x -= self.pos[0]
+            mouse_y -= self.pos[1]
+            self.mouse_pos = (mouse_x, mouse_y)
+            if self.exit_button.check_if_clicked(self.mouse_pos):
+                self.exit_shop()
+
+        def repair(self):
+            pass
+
+        def exit_shop(self):
+            self.local_ph_deactivate()
+            self.clear_image()
+            self.game.ph_buy_and_sell = False
+            self.game.ph_shop = False
+            self.game.back_to_game_and_unpause()
 
 
 

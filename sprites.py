@@ -409,8 +409,8 @@ class Treasure_Chest(pygame.sprite.Sprite):
             for i in range(self.treasure_items_no):
                 self.inventory.put_in_first_free_slot(
                     self.game.levelgen.gen.generate_random_item(self.treasure_items_maxcost))
-        special_item = self.game.levelgen.gen.generate_quest_item_by_name(self.special_item)
         if special_item:
+            special_item = self.game.levelgen.gen.generate_quest_item_by_name(self.special_item)
             self.inventory.put_in_first_free_slot(special_item)
         self.closed = True
         self.locked = locked
@@ -571,6 +571,7 @@ class Weapon(pygame.sprite.Sprite):
         self.groups = game.small_items
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
+        self.owner = False
         self.b_image = pygame.Surface((32,32), pygame.HWSURFACE | pygame.SRCALPHA)
         self.s_image = pygame.Surface((32,32), pygame.HWSURFACE | pygame.SRCALPHA)
         self.b_image.blit(tileset,(0,0),(img_x*TILE_SIZE, img_y*TILE_SIZE,TILE_SIZE,TILE_SIZE))
@@ -631,6 +632,7 @@ class Armor(pygame.sprite.Sprite):
         self.groups = game.small_items
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
+        self.owner = False
         self.b_image = pygame.Surface((32,32), pygame.HWSURFACE | pygame.SRCALPHA)
         self.s_image = pygame.Surface((32,32), pygame.HWSURFACE | pygame.SRCALPHA)
         self.b_image.blit(tileset,(0,0),(img_x*TILE_SIZE, img_y*TILE_SIZE,TILE_SIZE,TILE_SIZE))
@@ -685,6 +687,7 @@ class Ring:
     def __init__(self, game, name, cost, str_mod, sta_mod,int_mod,wis_mod,speed_mod,ste_mod,
                  armor_mod,damage_mod,arrow_damage_mod, hit_rate_mod,img_x, img_y, tileset = full_tileset_image):
         self.game = game
+        self.owner = False
         self.b_image = pygame.Surface((32,32), pygame.HWSURFACE | pygame.SRCALPHA)
         self.b_image.blit(tileset,(0,0),(img_x*TILE_SIZE, img_y*TILE_SIZE,TILE_SIZE,TILE_SIZE))
         self.image = self.b_image
@@ -709,6 +712,7 @@ class Necklace:
     def __init__(self, game, name, cost, str_mod, sta_mod,int_mod,wis_mod,speed_mod,ste_mod,
                  armor_mod,damage_mod,arrow_damage_mod, hit_rate_mod,img_x, img_y, tileset = full_tileset_image):
         self.game = game
+        self.owner = False
         self.b_image = pygame.Surface((32,32), pygame.HWSURFACE | pygame.SRCALPHA)
         self.b_image.blit(tileset,(0,0),(img_x*TILE_SIZE, img_y*TILE_SIZE,TILE_SIZE,TILE_SIZE))
         self.image = self.b_image
@@ -732,6 +736,7 @@ class Necklace:
 class Potion:
     def __init__(self, game, name, potion_type, cost, strength, img_x, img_y, tileset = full_tileset_image):
         self.game = game
+        self.owner = False
         self.b_image = pygame.Surface((32,32), pygame.HWSURFACE | pygame.SRCALPHA)
         self.b_image.blit(tileset,(0,0),(img_x*TILE_SIZE, img_y*TILE_SIZE,TILE_SIZE,TILE_SIZE))
         self.image = self.b_image
@@ -744,6 +749,8 @@ class Potion:
         self.hit_rect = self.rect
 
     def try_use(self):
+        if self.owner == "shop":
+            return False
         if self.potion_type == "Cure":
             if self.game.player.act_hp == self.game.player.max_hp:
                 return False
@@ -773,6 +780,7 @@ class Book:
     def __init__(self, game, name, cost, min_int, img_x, img_y, tileset = full_tileset_image):
         self.spell_generator = spells.SpellGenerator()
         self.game = game
+        self.owner = False
         self.b_image = pygame.Surface((32,32), pygame.HWSURFACE | pygame.SRCALPHA)
         self.b_image.blit(tileset,(0,0),(img_x*TILE_SIZE, img_y*TILE_SIZE,TILE_SIZE,TILE_SIZE))
         self.image = self.b_image
@@ -785,6 +793,8 @@ class Book:
         self.hit_rect = self.rect
 
     def try_use(self):
+        if self.owner == "shop":
+            return False
         if self.min_int > self.game.player.intellect:
             return False
         if self.game.player.spell_book.check_duplicate(self.spell):
@@ -799,6 +809,7 @@ class Book:
 class Quest_Item:
     def __init__(self, game, name, cost, img_x, img_y, tileset = full_tileset_image):
         self.game = game
+        self.owner = False
         self.b_image = pygame.Surface((32,32), pygame.HWSURFACE | pygame.SRCALPHA)
         self.b_image.blit(tileset,(0,0),(img_x*TILE_SIZE, img_y*TILE_SIZE,TILE_SIZE,TILE_SIZE))
         self.image = self.b_image
@@ -815,6 +826,7 @@ class Key(pygame.sprite.Sprite):
         self.groups = game.act_lvl.items
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
+        self.owner = False
         self.b_image = pygame.Surface((32,32), pygame.HWSURFACE | pygame.SRCALPHA)
         self.b_image.blit(tileset,(0,0),(img_x*TILE_SIZE, img_y*TILE_SIZE,TILE_SIZE,TILE_SIZE))
         self.image = self.b_image
@@ -980,7 +992,7 @@ class Player(pygame.sprite.Sprite):
         self.act_hp = self.max_hp
         self.max_mana = max(4, self.wisdom * 8 - 15)
         self.act_mana = self.max_mana
-        self.gold = 0
+        self.gold = 120
         self.arrows = 0
         self.xp = 0
         self.attribute_points = 0
@@ -1397,6 +1409,14 @@ class Player(pygame.sprite.Sprite):
             self.start_death_animation = True
         else:
             return True
+
+    def check_gold(self, item, shop) -> bool:
+        if self.gold >= item.cost:
+            shop.owner_gold += item.cost
+            self.gold -= item.cost
+            return True
+        else:
+            return False
 
     def check_next_level(self):
         self.xp_step = 10 * self.level + ((self.level - 1) * self.level)
@@ -1932,6 +1952,20 @@ class Teleport(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.destination = destination
+        self.pos_x = pos_x
+        self.pos_y = pos_y
+        self.rect = pygame.Rect(x, y, w, h)
+        self.x = x
+        self.y = y
+        self.rect.x = x
+        self.rect.y = y
+
+class ShopDoor(pygame.sprite.Sprite):
+    def __init__(self, game, shop, pos_x, pos_y, x, y, w, h):
+        self.groups = game.act_lvl.shops
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.shop = self.game.levelgen.shop_gen.generate_shop_by_name(shop)
         self.pos_x = pos_x
         self.pos_y = pos_y
         self.rect = pygame.Rect(x, y, w, h)
