@@ -324,7 +324,7 @@ class Treasure_Object(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         if item == "random":
-            self.item = self.game.levelgen.gen.generate_random_item(max_cost)
+            self.item = self.game.levelgen.gen.generate_random_item("all",max_cost)
         elif item == "gold":
             self.item = "gold"
         else:
@@ -408,7 +408,7 @@ class Treasure_Chest(pygame.sprite.Sprite):
         if self.treasure_items_no > 0:
             for i in range(self.treasure_items_no):
                 self.inventory.put_in_first_free_slot(
-                    self.game.levelgen.gen.generate_random_item(self.treasure_items_maxcost))
+                    self.game.levelgen.gen.generate_random_item("all",self.treasure_items_maxcost))
         if special_item:
             special_item = self.game.levelgen.gen.generate_quest_item_by_name(self.special_item)
             self.inventory.put_in_first_free_slot(special_item)
@@ -915,12 +915,18 @@ class Player(pygame.sprite.Sprite):
         self.hit_rect.centerx = self.pos.x
         self.hit_rect.centery = self.pos.y
         self.inventory = Inventory(slot_img,9,4)
+        ## ZDOLNOSCI SPEJALNE
+        self.plate_armor_penalty_reduction = 1
+        self.spell_power_bonus = 1
+        self.bow_hit_rate_bonus = 1
+        ##############################
         if self.char_class.name == "Knight":
             self.inventory.put_in_first_free_slot(Potion(self.game, "Red Potion", "Cure", 15, 30, 26, 42))
             self.inventory.put_in_first_free_slot(Potion(self.game, "Small Red Potion", "Cure",5,15,24,42))
             self.inventory.put_in_first_free_slot(Weapon(self.game, "Small Sword","weapon","sword",
                                            10,False,2,625,"small",
                                            0,0,0,0,0,0,50,4,45,52,89))
+            self.plate_armor_penalty_reduction = 1.5
         if self.char_class.name == "Wizard":
             self.inventory.put_in_first_free_slot(Potion(self.game, "Blue Potion", "Mana",15,30,58,41))
             self.inventory.put_in_first_free_slot(Potion(self.game, "Blue Potion", "Mana", 15, 30, 58, 41))
@@ -929,6 +935,7 @@ class Player(pygame.sprite.Sprite):
             self.inventory.put_in_first_free_slot(Weapon(self.game,"Wood Staff","weapon","staff",
                                            15,False,2,700,"big",
                                            0,0,0,0,0,0,25,3,47,10,89))
+            self.spell_power_bonus = 1.5
         if self.char_class.name == "Thief":
             self.inventory.put_in_first_free_slot(Potion(self.game, "Small Blue Potion", "Mana", 5, 15, 23, 42))
             self.inventory.put_in_first_free_slot(Potion(self.game, "Small Red Potion", "Cure", 5, 15, 24, 42))
@@ -936,6 +943,7 @@ class Player(pygame.sprite.Sprite):
             self.inventory.put_in_first_free_slot(Weapon(self.game, "Knife", "weapon","dagger",
                                            15, False, 1, 500, "small",
                                            0, 0, 0, 0, 0, 0,40, 2, 45, 42, 87))
+            self.bow_hit_rate_bonus = 1.33
         self.active_effects_lib = ActiveEffectsLibrary(self.game)
         self.quest_book = QuestBook(self.game)
         self.spell_book = SpellBook(self.game)
@@ -1330,7 +1338,7 @@ class Player(pygame.sprite.Sprite):
         ##########################
         if temp_arrow_rate:
             self.arrow_rate = temp_arrow_rate
-            self.arrow_rate *= temp_hit_rate_mod
+            self.arrow_rate *= (temp_hit_rate_mod * self.bow_hit_rate_bonus)
         else:
             self.hit_rate = temp_hit_rate
             self.hit_rate *= temp_hit_rate_mod

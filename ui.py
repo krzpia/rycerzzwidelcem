@@ -4,6 +4,7 @@ from events.event import Event
 from data import *
 import spells
 import random
+import sprites
 pygame.init()
 
 if getattr(sys, 'frozen', False): # PyInstaller adds this attribute
@@ -1108,25 +1109,29 @@ class ShopDialogBox:
             button.deactivate()
 
     def activate_and_write_ask(self):
-        if self.shop.ask1:
+        if self.shop.shop_ask1.text:
             self.resp_but_1.activate()
-            self.write(self.shop.ask1, 2)
-        if self.shop.ask2:
+            self.write(self.shop.shop_ask1.text, 2)
+        if self.shop.shop_ask2.text:
             self.resp_but_2.activate()
-            self.write(self.shop.ask2, 3)
-        if self.shop.ask3:
+            self.write(self.shop.shop_ask2.text, 3)
+        if self.shop.shop_ask3.text:
             self.resp_but_3.activate()
-            self.write(self.shop.ask3, 4)
-        if self.shop.ask4:
+            self.write(self.shop.shop_ask3.text, 4)
+        if self.shop.shop_ask4.text:
             self.resp_but_4.activate()
-            self.write(self.shop.ask4, 5)
+            self.write(self.shop.shop_ask4.text, 5)
 
     def start_conversation(self, shop):
         self.clear()
         self.game.paused = True
         self.shop = shop
         self.game.put_txt(f'Entering {self.shop.shop_name}')
+        self.game.ph_shop = True
         print("START SPEAKING WITH SHOP OWNER")
+        print(f'ph_shop: {self.game.ph_shop}')
+        print(f'ph_buy and sell: {self.game.ph_buy_and_sell}')
+        print(f'ph_repair: {self.game.ph_repair}')
         self.activate_and_write_ask()
         self.draw_upper_part()
 
@@ -1151,19 +1156,16 @@ class ShopDialogBox:
                 self.game.back_to_game_and_unpause()
         if self.resp_but_1.active:
             if self.resp_but_1.check_if_clicked(self.mouse_pos):
-                print("Buy and sell!")
-                self.shop.activate_buy_and_sell()
-                self.game.ph_shop = False
-                self.game.ph_buy_and_sell = True
+                self.shop.activate_ask(self.shop.shop_ask1)
         if self.resp_but_2.active:
             if self.resp_but_2.check_if_clicked(self.mouse_pos):
-                print("2st option")
+                self.shop.activate_ask(self.shop.shop_ask2)
         if self.resp_but_3.active:
             if self.resp_but_3.check_if_clicked(self.mouse_pos):
-                print("3rd option")
+                self.shop.activate_ask(self.shop.shop_ask3)
         if self.resp_but_4.active:
             if self.resp_but_4.check_if_clicked(self.mouse_pos):
-                print("4th option")
+                self.shop.activate_ask(self.shop.shop_ask4)
 
     def update(self, mouse_pos):
         mouse_x = mouse_pos[0]
@@ -1646,157 +1648,341 @@ class ShopGenerator:
         print ("ERROR IN SHOP GENERATION (name not recognized")
 
 
+class ShopAsk:
+    def __init__(self, shop_type):
+        self.shop_type = shop_type
+        self.text = ""
+        self.activity = False
+        self.inventory = Inventory(slot_img,10,6)
+
+    def put_text(self, text):
+        self.text = text
+
+    def configure_activity(self, activity):
+        self.activity = activity
+
+
 class Shop:
-        def __init__(self, game, name, type, quality, owner_gold, owner_name, owner_image=default_shop_owner_img):
-            self.game = game
-            self.name = name
-            self.shop_name = name[:-2]
-            self.owner_name = owner_name
-            self.inventory = Inventory(slot_img, 10, 6)
-            self.image = dialogbox_img_2.copy()
-            self.pos = DIAL_BOX_POS
-            ### type - Magical, Smith etc..
-            self.type = type
-            self.ask1 = False
-            self.ask2 = False
-            self.ask3 = False
-            self.ask4 = False
-            ### quality - Max cost of items...
-            self.quality = quality
-            self.owner_image = owner_image
-            self.owner_attitude = 100
-            self.owner_gold = owner_gold
-            self.open = True
-            self.welcome_text = "Welcome adventurer!"
-            if self.type == "magic":
-                self.genrate_new_magic_items()
-                self.ask1 = "What do you have for sale?"
-                self.ask2 = "Please restore my magic points"
-                self.ask3 = "I`d like to see your magic items for sale"
-                self.ask4 = "Please recharge my wand"
-            elif self.type == "smith":
-                self.genrate_new_smith_items()
-                self.ask1 = "What do you have for sale?"
-                self.ask2 = "Please reapir my item"
-                self.ask3 = "I`d like to buy some arrows"
-            else:
-                self.ask1 = "Wish you trade?"
-            #### POSIBLE PHASES
-            self.local_ph_buy_and_sell = False
-            self.local_ph_reapir = False
-            self.local_ph_charge_wands = False
-            #### EXIT BUTTON
-            self.exit_button = RadioButton(rad_ok_img, rad_ok_h_img, 178,290)
-            ##########
-            self.subscribe_owner_to_all_items()
+    def __init__(self, game, name, shop_type, quality, owner_gold, owner_name, owner_image=default_shop_owner_img):
+        self.game = game
+        self.name = name
+        self.shop_name = name[:-2]
+        self.owner_name = owner_name
+        self.act_inventory = False
+        self.image = dialogbox_img_2.copy()
+        self.pos = DIAL_BOX_POS
+        ### type - Magical, Smith etc..
+        self.shop_type = shop_type
+        self.shop_ask1 = ShopAsk(self.shop_type)
+        self.shop_ask2 = ShopAsk(self.shop_type)
+        self.shop_ask3 = ShopAsk(self.shop_type)
+        self.shop_ask4 = ShopAsk(self.shop_type)
+        ### quality - Max cost of items...
+        self.quality = quality
+        self.owner_image = owner_image
+        self.owner_attitude = 100
+        self.owner_gold = owner_gold
+        self.repair_cost = 0
+        self.arrow_price = 5
+        self.arrow_pack = 10
+        self.open = True
+        self.welcome_text = "Welcome adventurer!"
+        if self.shop_type == "magic":
+            self.shop_ask1.put_text("Can I see your potions?")
+            self.shop_ask1.configure_activity("buy and sell")
+            self.generate_new_potions(self.shop_ask1.inventory)
+            self.shop_ask2.put_text("Can I see your books?")
+            self.shop_ask2.configure_activity("buy and sell")
+            self.generate_new_books(self.shop_ask2.inventory)
+            self.shop_ask3.put_text("I`d like to see your magic items for sale")
+            self.shop_ask3.configure_activity("buy and sell")
+            self.generate_new_magic_items(self.shop_ask3.inventory)
+            # W II Czesci gry beda rozdzki...
+            #self.shop_ask4.put_text("Please recharge my wand")
+            #self.shop_ask4.configure_activity("recharge wand")
+        elif self.shop_type == "smith":
+            self.shop_ask1.put_text("Can I see your armors?")
+            self.shop_ask1.configure_activity("buy and sell")
+            self.generate_new_items("armor",self.shop_ask1.inventory)
+            self.shop_ask2.put_text("Can I see yout weapons?")
+            self.shop_ask2.configure_activity("buy and sell")
+            self.generate_new_items("weapon",self.shop_ask2.inventory)
+            self.shop_ask3.put_text("Please reapir my item")
+            self.shop_ask3.configure_activity("repair")
+            self.shop_ask4.put_text("I`d like to buy some arrows (10 arrows for 5 gold)")
+            self.shop_ask4.configure_activity("arrows")
+        else:
+            self.shop_ask1.put_text("Wish you trade?")
+            self.shop_ask1.configure_activity("buy and sell")
+            print ("ERROR IN DECODING SHOP TYPE")
+        #### POSIBLE PHASES
+        self.local_ph_buy_and_sell = False
+        self.local_ph_repair = False
+        self.local_ph_charge_wands = False
+        self.local_ph_arrows = False
+        #### EXIT BUTTON
+        self.exit_button = RadioButton(rad_ok_img, rad_ok_h_img, 178,290)
+        self.repair_button = RadioButton(repb_img, repb_h_img,345,145)
+        ##########
+        self.subscribe_owner_to_all_items()
 
-        def subscribe_owner_to_all_items(self):
-            for slot in self.inventory.item_slots:
-                if slot.item:
-                    slot.item.owner = "shop"
+    def subscribe_owner_to_all_items(self):
+        for slot in self.shop_ask1.inventory.item_slots:
+            if slot.item:
+                slot.item.owner = "shop"
+        for slot in self.shop_ask2.inventory.item_slots:
+            if slot.item:
+                slot.item.owner = "shop"
+        for slot in self.shop_ask3.inventory.item_slots:
+            if slot.item:
+                slot.item.owner = "shop"
+        for slot in self.shop_ask4.inventory.item_slots:
+            if slot.item:
+                slot.item.owner = "shop"
 
-        def check_gold(self, item) -> bool:
-            if self.owner_gold >= item.cost:
-                ### TO DO TYPES TO BUY!
-                self.game.player.gold += item.cost
-                self.owner_gold -= item.cost
-                return True
-            else:
-                return False
+    def check_gold(self, item) -> bool:
+        if self.owner_gold >= item.cost:
+            ### TO DO TYPES TO BUY!
+            self.game.player.gold += item.cost
+            self.owner_gold -= item.cost
+            return True
+        else:
+            return False
 
-        def local_ph_deactivate(self):
-            self.local_ph_buy_and_sell = False
-            self.local_ph_reapir = False
-            self.local_ph_charge_wands = False
-            self.exit_button.deactivate()
+    def local_ph_deactivate(self):
+        self.local_ph_buy_and_sell = False
+        self.local_ph_repair = False
+        self.local_ph_charge_wands = False
+        self.local_ph_arrows = False
+        self.act_inventory = False
+        self.exit_button.deactivate()
 
-        def activate_buy_and_sell(self):
-            ### ENTER THE SHOP`S INVENTRORY
-            self.local_ph_buy_and_sell = True
-            self.blit_upper_part()
-            self.exit_button.activate()
-
-        def genrate_new_smith_items(self):
-            items_no = 0
-            items_maxcost = 0
-            if 0 < self.quality <= 100:
-                items_no = random.randint(1, 8)
-                items_maxcost = self.quality
-            elif 100 < self.quality:
-                items_no = random.randint(5, 25)
-                items_maxcost = self.quality
-            else:
-                print("ERROR 0 or neg number of items in shop while generating shop items")
-            if items_no > 0:
-                for i in range(items_no):
-                    self.inventory.put_in_first_free_slot(
-                        self.game.levelgen.gen.generate_random_smith_item(items_maxcost))
-
-        def genrate_new_magic_items(self):
-            items_no = 0
-            items_maxcost = 0
-            if 0 < self.quality <= 100:
-                items_no = random.randint(1, 8)
-                items_maxcost = self.quality
-            elif 100 < self.quality:
-                items_no = random.randint(5, 25)
-                items_maxcost = self.quality
-            else:
-                print("ERROR 0 or neg number of items in shop while generating shop items")
-            ## TODO wiecej eliksirow mniej innych, sie zobaczy jak wyskakują
-            if items_no > 0:
-                for i in range(items_no):
-                    self.inventory.put_in_first_free_slot(
-                        self.game.levelgen.gen.generate_random_magic_item(items_maxcost))
-
-        def clear_image(self):
-            self.image = dialogbox_img_2.copy()
-
-        def blit_upper_part(self):
-            self.image.blit(self.owner_image, DB2_IMG_POS)
-            self.game.s_write(self.owner_name, self.image, DB2_TXT_POS, WHITE)
-
-        def show(self, screen):
-            if self.local_ph_buy_and_sell:
-                self.clear_image()
-                self.blit_upper_part()
-                self.inventory.show_inv(self.image,MAP_TOPLEFT[0] + 60,MAP_TOPLEFT[1]+70)
-                self.exit_button.show_button(self.image)
-                self.image.blit(gold_coin,(85,305))
-                self.game.s_write(str(self.owner_gold),self.image,(102,300),YELLOW)
-                screen.blit(self.image, (self.pos))
-            else:
-                print ("ERROR DONT KNOW WHAT ACTIVITY OF THE SHOP I HAVE TO SHOW")
-
-        def update(self, mouse_pos):
-            mouse_x = mouse_pos[0]
-            mouse_y = mouse_pos[1]
-            mouse_x -= self.pos[0]
-            mouse_y -= self.pos[1]
-            self.mouse_pos = (mouse_x, mouse_y)
-            #
-            # print ("mod_mouse a (%d, %d)" % self.mouse_pos)
-            self.exit_button.check_if_highlight(self.mouse_pos)
-
-        def check_exit_button(self, mouse_pos):
-            mouse_x = mouse_pos[0]
-            mouse_y = mouse_pos[1]
-            mouse_x -= self.pos[0]
-            mouse_y -= self.pos[1]
-            self.mouse_pos = (mouse_x, mouse_y)
-            if self.exit_button.check_if_clicked(self.mouse_pos):
-                self.exit_shop()
-
-        def repair(self):
-            pass
-
-        def exit_shop(self):
-            self.local_ph_deactivate()
-            self.clear_image()
-            self.game.ph_buy_and_sell = False
+    def activate_ask(self, ask):
+        if ask.activity == "buy and sell":
             self.game.ph_shop = False
-            self.game.back_to_game_and_unpause()
+            self.game.ph_buy_and_sell = True
+            self.activate_buy_and_sell(ask.inventory)
+        elif ask.activity == "repair":
+            self.game.ph_shop = False
+            self.game.ph_repair = True
+            self.activate_repair()
+        elif ask.activity == "recharge wand":
+            pass
+            ## TODO
+        elif ask.activity == "arrows":
+            ## FOR KNOW NO SPECIAL PHASE< DIRECT pack to buy wih price. arrows unlimited.
+            self.buy_arrows()
+        else:
+            print ("ERROR couldnt encode ask1 activity")
 
+    def buy_arrows(self):
+        if self.game.player.gold >= self.arrow_price:
+            self.game.player.gold -= self.arrow_price
+            self.game.player.arrows += self.arrow_pack
+            pygame.mixer.Sound.play(coin_snd)
+        else:
+            pygame.mixer.Sound.play(empty_spell_snd)
+        self.back_to_shop_dialog()
+
+    def activate_repair(self):
+        self.local_ph_repair = True
+        self.blit_upper_part()
+        self.exit_button.activate()
+        self.repair_button.activate()
+
+    def activate_buy_and_sell(self, inventory):
+        print ("ENTERING INVENTORY (ph buy_and_sell")
+        ### ENTER THE SHOP`S INVENTRORY
+        self.act_inventory = inventory
+        self.local_ph_buy_and_sell = True
+        self.blit_upper_part()
+        self.exit_button.activate()
+
+    def generate_new_items(self,item_type,inventory):
+        items_no = 0
+        items_maxcost = 0
+        if 0 < self.quality <= 100:
+            items_no = random.randint(5, 10)
+            items_maxcost = self.quality
+        elif 100 < self.quality:
+            items_no = random.randint(5, 25)
+            items_maxcost = self.quality
+        else:
+            print("ERROR 0 or neg number of items in shop while generating shop items")
+        if items_no > 0:
+            for i in range(items_no):
+                inventory.put_in_first_free_slot(
+                    self.game.levelgen.gen.generate_random_item(item_type,items_maxcost))
+
+    def generate_new_smith_items(self,inventory):
+        items_no = 0
+        items_maxcost = 0
+        if 0 < self.quality <= 100:
+            items_no = random.randint(8, 16)
+            items_maxcost = self.quality
+        elif 100 < self.quality:
+            items_no = random.randint(10, 25)
+            items_maxcost = self.quality
+        else:
+            print("ERROR 0 or neg number of items in shop while generating shop items")
+        if items_no > 0:
+            for i in range(items_no):
+                inventory.put_in_first_free_slot(
+                    self.game.levelgen.gen.generate_random_item("smith",items_maxcost))
+
+    def generate_new_books(self,inventory):
+        items_no = 0
+        items_maxcost = 0
+        if 0 < self.quality <= 100:
+            items_no = random.randint(1, 3)
+            items_maxcost = self.quality + 200
+        elif 100 < self.quality:
+            items_no = random.randint(2, 6)
+            items_maxcost = self.quality + 400
+        else:
+            print("ERROR 0 or neg number of items in shop while generating shop items")
+        ## TODO wiecej eliksirow mniej innych, sie zobaczy jak wyskakują
+        if items_no > 0:
+            for i in range(items_no):
+                inventory.put_in_first_free_slot(
+                    self.game.levelgen.gen.generate_random_item("book", items_maxcost))
+
+    def generate_new_potions(self,inventory):
+        items_no = 0
+        items_maxcost = 0
+        if 0 < self.quality <= 100:
+            items_no = random.randint(5, 15)
+            items_maxcost = self.quality
+        elif 100 < self.quality:
+            items_no = random.randint(10, 25)
+            items_maxcost = self.quality
+        else:
+            print("ERROR 0 or neg number of items in shop while generating shop items")
+        ## TODO wiecej eliksirow mniej innych, sie zobaczy jak wyskakują
+        if items_no > 0:
+            for i in range(items_no):
+                inventory.put_in_first_free_slot(
+                    self.game.levelgen.gen.generate_random_item("potion",items_maxcost))
+
+    def generate_new_magic_items(self,inventory):
+        items_no = 0
+        items_maxcost = 0
+        if 0 < self.quality <= 100:
+            items_no = random.randint(2, 5)
+            items_maxcost = self.quality
+        elif 100 < self.quality:
+            items_no = random.randint(4, 10)
+            items_maxcost = self.quality
+        else:
+            print("ERROR 0 or neg number of items in shop while generating shop items")
+        ## TODO wiecej eliksirow mniej innych, sie zobaczy jak wyskakują
+        if items_no > 0:
+            for i in range(items_no):
+                inventory.put_in_first_free_slot(
+                    self.game.levelgen.gen.generate_random_item("rings",items_maxcost))
+
+    def clear_image(self):
+        self.image = dialogbox_img_2.copy()
+
+    def blit_upper_part(self):
+        self.image.blit(self.owner_image, DB2_IMG_POS)
+        self.game.s_write(self.owner_name, self.image, DB2_TXT_POS, WHITE)
+
+    def show(self, screen):
+        if self.local_ph_buy_and_sell:
+            self.clear_image()
+            self.blit_upper_part()
+            self.act_inventory.show_inv(self.image,MAP_TOPLEFT[0] + 60,MAP_TOPLEFT[1]+70)
+            self.exit_button.show_button(self.image)
+            self.image.blit(gold_coin,(85,305))
+            self.game.s_write(str(self.owner_gold),self.image,(102,300),YELLOW)
+            screen.blit(self.image, (self.pos))
+        elif self.local_ph_repair:
+            self.clear_image()
+            self.blit_upper_part()
+            self.exit_button.show_button(self.image)
+            self.repair_button.show_button(self.image)
+            self.image.blit(gold_coin, (85, 305))
+            self.game.s_write(str(self.owner_gold), self.image, (102, 300), YELLOW)
+            if self.game.item_picked:
+                if isinstance(self.game.item_picked, sprites.Armor) or isinstance(self.game.item_picked, sprites.Weapon):
+                    item_condition = int(self.game.item_picked.condition)
+                    item_repair_cost = int(self.calculate_repair_cost(self.game.item_picked))
+                    self.image.blit(slot_img, (50,85))
+                    self.image.blit(self.game.item_picked.b_image, (50,85))
+                    self.game.s_write(self.game.item_picked.name,self.image, (90,90))
+                    self.game.s_write(f'Item condition: {item_condition}',self.image,(50,130),WHITE)
+                    self.game.s_write(f'Item durability: {self.game.item_picked.durability}',self.image,(50,155),WHITE)
+                    self.game.s_write(f'COST TO REPAIR: {item_repair_cost}',self.image,(50,180),WHITE)
+            screen.blit(self.image, (self.pos))
+        else:
+            print ("ERROR DONT KNOW WHAT ACTIVITY OF THE SHOP I HAVE TO SHOW")
+
+    def calculate_repair_cost(self, item):
+        #print ("calculating repair cost")
+        max_cost = item.cost
+        condition_percentage = item.condition/100
+        durability_factor = 1 + item.durability/100
+        repair_cost = (max_cost - (max_cost * condition_percentage)) * durability_factor
+        self.repair_cost = int(repair_cost)
+        return repair_cost
+
+    def update(self, mouse_pos):
+        mouse_x = mouse_pos[0]
+        mouse_y = mouse_pos[1]
+        mouse_x -= self.pos[0]
+        mouse_y -= self.pos[1]
+        self.mouse_pos = (mouse_x, mouse_y)
+        # print ("mod_mouse a (%d, %d)" % self.mouse_pos)
+        self.exit_button.check_if_highlight(self.mouse_pos)
+        if self.local_ph_repair:
+            self.repair_button.check_if_highlight(self.mouse_pos)
+
+    def check_exit_button(self, mouse_pos):
+        mouse_x = mouse_pos[0]
+        mouse_y = mouse_pos[1]
+        mouse_x -= self.pos[0]
+        mouse_y -= self.pos[1]
+        self.mouse_pos = (mouse_x, mouse_y)
+        if self.exit_button.check_if_clicked(self.mouse_pos):
+            self.back_to_shop_dialog()
+            #self.exit_shop()
+
+    def check_repair_button(self, mouse_pos, item_picked):
+        mouse_x = mouse_pos[0]
+        mouse_y = mouse_pos[1]
+        mouse_x -= self.pos[0]
+        mouse_y -= self.pos[1]
+        self.mouse_pos = (mouse_x, mouse_y)
+        if self.repair_button.check_if_clicked(mouse_pos):
+            #print ("Repair..")
+            if not item_picked.owner == "shop":
+                if self.repair_cost <= self.game.player.gold and self.repair_cost > 0:
+                    #print ("Repair" + item_picked.name)
+                    pygame.mixer.Sound.play(smith_snd)
+                    item_picked.repair(100)
+                    self.game.player.gold -= self.repair_cost
+                    self.game.player.update_stats()
+
+    def exit_shop(self):
+        self.local_ph_deactivate()
+        self.clear_image()
+        self.repair_button.deactivate()
+        self.game.ph_buy_and_sell = False
+        self.game.ph_shop = False
+        self.game.ph_repair = False
+        self.repair_cost = 0
+        self.game.back_to_game_and_unpause()
+
+    def back_to_shop_dialog(self):
+        self.local_ph_deactivate()
+        self.clear_image()
+        self.repair_button.deactivate()
+        self.game.ph_buy_and_sell = False
+        self.game.ph_repair = False
+        self.repair_cost = 0
+        self.ph_shop = True
+        self.game.shop_dialog_box.start_conversation(self)
 
 
 

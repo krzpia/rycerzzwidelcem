@@ -168,7 +168,7 @@ class Game:
         self.levelgen = levels.LevelGen(self)
         self.levelgen.load_level_01()
         self.levelgen.load_level_02()
-        self.levelgen.go_to_level("level02", 44, 6)
+        self.levelgen.go_to_level("level02", 18, 5)
         print ("INITIALIZING CAMERA...")
         ##### CAMERA INIT
         self.camera = tilemap.Camera(self.map.width, self.map.height)
@@ -194,14 +194,14 @@ class Game:
                                      ["plate"], 2, 2, 2, 2, 4, 5, ["Haste"])
         ################
         pygame.mixer.music.stop()
-        self.new_game_button = Button(intro_but_img, intro_but_h_img, 128, 32, "New Game", SCREEN_WIDTH / 2 - 64, 270,
+        self.new_game_button = Button(intro_but_img, intro_but_h_img, 128, 32, "New Game", SCREEN_WIDTH / 2 - 64, 370,
                                       20)
-        self.quit_game_button = Button(intro_but_img, intro_but_h_img, 128, 32, "Quit", SCREEN_WIDTH / 2 - 64, 320, 20)
+        self.quit_game_button = Button(intro_but_img, intro_but_h_img, 128, 32, "Quit", SCREEN_WIDTH / 2 - 64, 420, 20)
         self.start_game_button = Button(intro_but_img, intro_but_h_img, 150, 32, "Start Game", SCREEN_WIDTH / 2 - 64,
                                         650, 20)
-        self.knight_class_button = Button(intro_but_img, intro_but_h_img, 128, 32, "Knight", 140, 200, 20)
-        self.wizard_class_button = Button(intro_but_img, intro_but_h_img, 128, 32, "Wizard", 140, 250, 20)
-        self.thief_class_button = Button(intro_but_img, intro_but_h_img, 128, 32, "Thief", 140, 300, 20)
+        self.knight_class_button = Button(intro_but_img, intro_but_h_img, 128, 32, "Knight", 160, 350, 20)
+        self.wizard_class_button = Button(intro_but_img, intro_but_h_img, 128, 32, "Wizard", 160, 400, 20)
+        self.thief_class_button = Button(intro_but_img, intro_but_h_img, 128, 32, "Thief", 160, 450, 20)
         self.intro_buttons = [self.new_game_button, self.quit_game_button]
         self.class_buttons = [self.knight_class_button, self.wizard_class_button, self.thief_class_button,
                               self.start_game_button]
@@ -256,68 +256,64 @@ class Game:
             self.start_game_button.deactivate()
 
     def intro_draw(self):
+        self.credits_text = "Special thanks: My dear wife Monika, Piotr Kopalko, Zuza and Magda for some inspiration and superb sound effects. Chris Bradfield for his amazing tutorials on www.kidscancode.org. Assets used under free licence from www.opengameart: DungeonCrawler, Adrix89, gargargarrick.."
         self.screen.fill(BGCOLOR)
         # self.h_write("GRA RYCERZ Z WIDELCEM",(200,50),"monotype corsiva",40,(200,0,200))
         if self.to_char_chose:
-            self.screen.blit(game_over_img, (0, 0))
-            self.h_write("Choose your character class:", (360, 120), "arial", 26, (WHITE))
+            self.screen.blit(setup_img, (0, 0))
+            self.h_write("ADVENTURE OF THE CORONA",T_POS,"arial",36,(PURPLE))
+            self.h_write("Choose your class:", CTXT, "arial", 24, (PURPLE))
             self.knight_class_button.show_button(self.screen, font)
             self.wizard_class_button.show_button(self.screen, font)
             self.thief_class_button.show_button(self.screen, font)
             self.start_game_button.show_button(self.screen, font)
             if self.class_selected:
                 if self.class_selected == self.knight_class:
-                    self.screen.blit(pygame.transform.scale(self.class_selected.image, (64, 64)), (400, 240))
-                    self.h_write("Knight", (400, 200), "arial", 26, (WHITE))
-                    self.write("Dedicated do melle fight, starts with strength and stamina bonus", (340, 340), (WHITE))
+                    self.screen.blit(self.class_selected.image, TIMGPOS)
+                    self.h_write("Knight", NTXT, "arial", 26, (WHITE))
+                    self.write("Dedicated do melle fight, starts with strength and stamina bonus", (ADTXT), (WHITE))
                 if self.class_selected == self.wizard_class:
-                    self.screen.blit(pygame.transform.scale(self.class_selected.image, (64, 64)), (400, 240))
-                    self.h_write("Wizard", (400, 200), "arial", 26, (WHITE))
-                    self.write("Weak in direct fight, but able to make severe damage by magic powers", (340, 340),
+                    self.screen.blit(self.class_selected.image, TIMGPOS)
+                    self.h_write("Wizard", NTXT, "arial", 26, (WHITE))
+                    self.write("Weak in direct fight, but able to make severe damage by magic powers", (ADTXT),
                                (WHITE))
                 if self.class_selected == self.thief_class:
-                    self.screen.blit(pygame.transform.scale(self.class_selected.image, (64, 64)), (400, 240))
-                    self.h_write("Thief", (400, 200), "arial", 26, (WHITE))
+                    self.screen.blit(self.class_selected.image, TIMGPOS)
+                    self.h_write("Thief", NTXT, "arial", 26, (WHITE))
                     self.write("Fast and able to sneak, powerful with his favourite bow and dagger combination",
-                               (340, 340),
+                               (ADTXT),
                                (WHITE))
-                self.write("Strength: " + str(self.class_selected.str), (500, 160 + 40))
-                self.write("Stamina: " + str(self.class_selected.sta), (500, 160 + 60))
-                self.write("Intellect: " + str(self.class_selected.int), (500, 160 + 80))
-                self.write("Wisdom: " + str(self.class_selected.wis), (500, 160 + 100))
-                self.write("Speed: " + str(self.class_selected.spe), (500, 160 + 120))
-                self.write("Stealth: " + str(self.class_selected.ste), (500, 160 + 140))
-                self.write("Favourite weapons: ", (340, 360), (WHITE))
+                    self.write("Bonus x1.3 Hit Rate with ranged weapons",(ADTXT[0],ADTXT[1]+25), WHITE)
+                self.write("Strength: " + str(self.class_selected.str), (IDX, IDY + 0))
+                self.write("Stamina: " + str(self.class_selected.sta), (IDX, IDY + 20))
+                self.write("Intellect: " + str(self.class_selected.int), (IDX, IDY + 40))
+                self.write("Wisdom: " + str(self.class_selected.wis), (IDX, IDY + 60))
+                self.write("Speed: " + str(self.class_selected.spe), (IDX, IDY + 80))
+                self.write("Stealth: " + str(self.class_selected.ste), (IDX, IDY + 100))
+                self.write("Favourite weapons: ", (IADX,IADY + 0), (WHITE))
                 weapon_txt = ""
                 for weapon in self.class_selected.favourite_weapons:
                     weapon_txt += weapon
                     weapon_txt += ","
-                self.write(weapon_txt, (480, 360), (WHITE))
+                self.write(weapon_txt, (IADX + 120, IADY + 0), (WHITE))
                 armor_txt = ""
-                self.write("Favourite armors: ", (340, 380), (WHITE))
+                self.write("Favourite armors: ", (IADX,IADY + 20), (WHITE))
                 for armor in self.class_selected.favourite_armors:
                     armor_txt += armor
                     armor_txt += ","
-                self.write(armor_txt, (480, 380), (WHITE))
-                self.write("Disliked weapons: ", (340, 400), (WHITE))
+                self.write(armor_txt, (IADX + 120, IADY + 20), (WHITE))
+                self.write("Disliked weapons: ", (IADX,IADY + 40), (WHITE))
                 weapon_txt = ""
                 for weapon in self.class_selected.disliked_weapons:
                     weapon_txt += weapon
                     weapon_txt += ","
-                self.write(weapon_txt, (480, 400), (WHITE))
+                self.write(weapon_txt, (IADX + 120, IADY + 40), (WHITE))
                 armor_txt = ""
-                self.write("Disliked armors: ", (340, 420), (WHITE))
+                self.write("Disliked armors: ", (IADX,IADY + 60), (WHITE))
                 for armor in self.class_selected.disliked_armors:
                     armor_txt += armor
                     armor_txt += ","
-                self.write(armor_txt, (480, 420), (WHITE))
-                self.write("Strength: " + str(self.class_selected.str), (500, 160 + 40))
-                self.write("Stamina: " + str(self.class_selected.sta), (500, 160 + 60))
-                self.write("Intellect: " + str(self.class_selected.int), (500, 160 + 80))
-                self.write("Wisdom: " + str(self.class_selected.wis), (500, 160 + 100))
-                self.write("Speed: " + str(self.class_selected.spe), (500, 160 + 120))
-                self.write("Stealth: " + str(self.class_selected.ste), (500, 160 + 140))
-
+                self.write(armor_txt, (IADX + 120, IADY + 60), (WHITE))
 
         else:
             self.screen.blit(intro_img, (0, 0))
@@ -462,6 +458,7 @@ class Game:
         self.ph_spell_book = False
         self.ph_shop = False
         self.ph_buy_and_sell = False
+        self.ph_repair = False
         self.active_shop = False
         self.ph_quest_book = False
         self.dialog_in_progress = False
@@ -636,6 +633,7 @@ class Game:
             # # # # # # ############################################ # # #
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
+                    self.update_ui_buttons()
                     mouse_pos = pygame.mouse.get_pos()
                     dial_pos_x = DIAL_BOX_POS[0]
                     dial_pos_y = DIAL_BOX_POS[1]
@@ -676,10 +674,10 @@ class Game:
                     self.ad_buttons_check(mouse_pos)
                     ### PICK UP AND DROP ITEMS on INV
                     if self.item_picked:
-                        print(f'{self.item_picked.name} owner = {self.item_picked.owner}')
                         ##################################
                         # GDY MAM PRZEDMIOT PODNIESIONY  #
                         ##################################
+                        # print(f'{self.item_picked.name} owner = {self.item_picked.owner}')
                         # 1. ODKLADAM DO PLECAKA
                         if self.player.inventory.check_if_clicked(mouse_pos):
                             if self.item_picked.owner == "shop":
@@ -720,19 +718,24 @@ class Game:
                                     self.toggle_clean_item_picked = True
                         # 4. ODKLADAM NA POLKE SKLEPU
                         if self.ph_buy_and_sell:
-                            if self.active_shop.inventory.check_if_clicked(shop_mouse_pos):
+                            if self.active_shop.act_inventory.check_if_clicked(shop_mouse_pos):
                                 if self.item_picked.owner == "shop":
-                                    put_item_success_bool = self.active_shop.inventory.put_item_to_inv(shop_mouse_pos, self.item_picked)
+                                    put_item_success_bool = self.active_shop.act_inventory.put_item_to_inv(
+                                        shop_mouse_pos, self.item_picked)
                                     if put_item_success_bool:  # GDY UDALO SIE ODLOZYC WTEDY OCZYSZCzAM ITEM PICKED
                                         self.toggle_clean_item_picked = True
                                 else:
                                     print("SELL ITEM")
                                     if self.active_shop.check_gold(self.item_picked):
-                                        put_item_success_bool = self.active_shop.inventory.put_item_to_inv(shop_mouse_pos, self.item_picked)
+                                        put_item_success_bool = self.active_shop.act_inventory.put_item_to_inv(
+                                            shop_mouse_pos, self.item_picked)
                                         if put_item_success_bool:
                                             pygame.mixer.Sound.play(coin_snd)
                                             self.item_picked.owner = "shop"
                                             self.toggle_clean_item_picked = True
+                        # 5. REPERUJE
+                        if self.ph_repair:
+                            self.active_shop.check_repair_button(shop_mouse_pos, self.item_picked)
                         ## PRZEDMIOTY DO UZYCIA
                         ## UZYCIE ELIKSIROW
                         if self.inv_use_button.check_if_clicked(mouse_pos):
@@ -755,8 +758,8 @@ class Game:
                             self.item_picked = self.player.inventory.pick_item_from_inv(mouse_pos)
                         # 2. PODNIES ITEM Z SHOP
                         if self.ph_buy_and_sell:
-                            if self.active_shop.inventory.check_if_clicked(shop_mouse_pos):
-                                self.item_picked = self.active_shop.inventory.pick_item_from_inv(shop_mouse_pos)
+                            if self.active_shop.act_inventory.check_if_clicked(shop_mouse_pos):
+                                self.item_picked = self.active_shop.act_inventory.pick_item_from_inv(shop_mouse_pos)
                         # 2. PODNIES ITEM Z TREASURE INV
                         if self.treasure_inv:
                             if self.treasure_inv.check_if_clicked(mouse_pos):
@@ -803,11 +806,20 @@ class Game:
                         if self.ph_shop:
                             self.shop_dialog_box.check_buttons(mouse_pos)
                         # 8. PRZYCKISK EXIT SHOP:
-                        if self.ph_buy_and_sell:
+                        if self.ph_buy_and_sell or self.ph_repair:
                             self.active_shop.check_exit_button(mouse_pos)
                         # 6. PRZYCISKI QUEST BOOK
                         if self.ph_quest_book:
                             self.player.quest_book.check_page_buttons(mouse_pos)
+
+    def update_ui_buttons(self):
+        self.quest_book_button.activate()
+        self.spell_book_button.activate()
+        self.pause_button.activate()
+        if self.ph_repair or self.ph_buy_and_sell or self.ph_shop:
+            self.quest_book_button.deactivate()
+            self.spell_book_button.deactivate()
+            self.pause_button.deactivate()
 
     def update(self):
         mouse_pos = pygame.mouse.get_pos()
@@ -831,7 +843,7 @@ class Game:
         if self.ph_quest_book:
             self.player.quest_book.update_buttons(mouse_pos)
         #### HIGHLIGHT CLOSE SHOP BUTTON
-        if self.ph_buy_and_sell:
+        if self.ph_buy_and_sell or self.ph_repair:
             self.active_shop.update(mouse_pos)
         ### ACTIVATE ADD BUTTONS ####
         if self.player.attribute_points > 0:
@@ -1300,7 +1312,8 @@ class Game:
             ### PHASE SHOP
             if self.ph_shop:
                 self.shop_dialog_box.show(self.screen)
-            if self.ph_buy_and_sell:
+            ### PHASE BUY SELL OR REPAIR (ta sama funkcja show)
+            if self.ph_buy_and_sell or self.ph_repair:
                 self.active_shop.show(self.screen)
             ### TREASURE CHEST
             elif self.ph_treasure_inv:
