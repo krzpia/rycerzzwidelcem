@@ -473,6 +473,14 @@ class Treasure_Chest(pygame.sprite.Sprite):
             self.try_unlock()
 
 
+class CollectingSprite(pygame.sprite.Sprite):
+    def __init__(self, game ,x, y, content_type, content_str, content_no,
+                 image, image_empty, hit_rect_width, hit_rect_height):
+        self._layer = FLOOR_LAYER
+        self.groups = game.act_lvl.all_sprites
+        pygame.sprite.Sprite.__init__(self, self.groups)
+
+
 class Fence_Object(pygame.sprite.Sprite):
     def __init__(self, game, x, y, hp, image, hit_rect_width, hit_rect_height):
         self._layer = FLOOR_LAYER
@@ -487,7 +495,6 @@ class Fence_Object(pygame.sprite.Sprite):
         self.hit_rect.center = (x,y)
         self.lava_immune_time = 500
         self.last_damage = 0
-
 
     def update(self):
         hits = pygame.sprite.spritecollide(self,self.game.act_lvl.melle_swing,True,collide_double_hit_rect)
@@ -700,6 +707,7 @@ class Ring:
         self.wis_mod = wis_mod
         self.speed_mod = speed_mod
         self.ste_mod = ste_mod
+        self.barter_mod = 0
         self.armor_mod = armor_mod
         self.damage_mod = damage_mod
         self.arrow_damage_mod = arrow_damage_mod
@@ -725,6 +733,7 @@ class Necklace:
         self.wis_mod = wis_mod
         self.speed_mod = speed_mod
         self.ste_mod = ste_mod
+        self.barter_mod = 0
         self.armor_mod = armor_mod
         self.damage_mod = damage_mod
         self.arrow_damage_mod = arrow_damage_mod
@@ -919,6 +928,7 @@ class Player(pygame.sprite.Sprite):
         self.plate_armor_penalty_reduction = 1
         self.spell_power_bonus = 1
         self.bow_hit_rate_bonus = 1
+        self.barter_bonus = 0
         ##############################
         if self.char_class.name == "Knight":
             self.inventory.put_in_first_free_slot(Potion(self.game, "Red Potion", "Cure", 15, 30, 26, 42))
@@ -944,6 +954,7 @@ class Player(pygame.sprite.Sprite):
                                            15, False, 1, 500, "small",
                                            0, 0, 0, 0, 0, 0,40, 2, 45, 42, 87))
             self.bow_hit_rate_bonus = 0.75
+            self.barter_bonus = 25
         self.active_effects_lib = ActiveEffectsLibrary(self.game)
         self.quest_book = QuestBook(self.game)
         self.spell_book = SpellBook(self.game)
@@ -1171,6 +1182,7 @@ class Player(pygame.sprite.Sprite):
         temp_wis_mod = 0
         temp_speed_mod = 0
         temp_ste_mod = 0
+        temp_barter_bonus = 0
         temp_armor_mod = 0
         temp_hit_rate_mod = 1
         self.hit_radius = "small"
@@ -1294,6 +1306,7 @@ class Player(pygame.sprite.Sprite):
             temp_wis_mod += self.ring1_slot.item.wis_mod
             temp_speed_mod += self.ring1_slot.item.speed_mod
             temp_ste_mod += self.ring1_slot.item.ste_mod
+            temp_barter_bonus += self.ring1_slot.item.barter_mod
         if self.ring2_slot.item:
             temp_hit_damage += self.ring2_slot.item.damage_mod
             temp_arrow_damage += self.ring2_slot.item.arrow_damage_mod
@@ -1305,6 +1318,7 @@ class Player(pygame.sprite.Sprite):
             temp_wis_mod += self.ring2_slot.item.wis_mod
             temp_speed_mod += self.ring2_slot.item.speed_mod
             temp_ste_mod += self.ring2_slot.item.ste_mod
+            temp_barter_bonus += self.ring2_slot.item.barter_mod
         if self.necklace_slot.item:
             temp_hit_damage += self.necklace_slot.item.damage_mod
             temp_arrow_damage += self.necklace_slot.item.arrow_damage_mod
@@ -1316,6 +1330,7 @@ class Player(pygame.sprite.Sprite):
             temp_wis_mod += self.necklace_slot.item.wis_mod
             temp_speed_mod += self.necklace_slot.item.speed_mod
             temp_ste_mod += self.necklace_slot.item.ste_mod
+            temp_barter_bonus += self.necklace_slot.item.barter_mod
         ############ EFEKTY ############
         for effect in self.active_effects_lib.active_effects:
             if effect.name == "stone skin" or effect.name == "iron skin":
@@ -1326,6 +1341,8 @@ class Player(pygame.sprite.Sprite):
                 self.invisible = True
             if effect.name == "heroism":
                 temp_str_mod += effect.strength
+            if effect.name == "barter":
+                temp_barter_bonus += effect.strength
         #########################
         self.strength = self.base_strength + temp_str_mod
         self.stamina = self.base_stamina + temp_sta_mod
@@ -1333,9 +1350,10 @@ class Player(pygame.sprite.Sprite):
         self.wisdom = self.base_wisdom + temp_wis_mod
         self.speed = self.base_speed + temp_speed_mod
         self.stealth = self.base_stealth + temp_ste_mod
+        self.barter_bonus = temp_barter_bonus
         #########################
         self.max_hp = 15 + self.stamina * 5
-        self.max_mana =  max(4, self.wisdom * 8 - 15)
+        self.max_mana = max(4, self.wisdom * 8 - 15)
         self.arrow_damage = self.strength + temp_arrow_damage
         self.hit_dmg = self.strength + temp_hit_damage
         self.armor += temp_armor_mod

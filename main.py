@@ -188,7 +188,7 @@ class Game:
                                       ["plate"], ["robe"], 4, 4, 1, 2, 3, 1, ["Heroism"])
         self.wizard_class = CharClass("Wizard", pl_wizard_image, knight_death_anim, ["staff"], ["sword", "axe", "bow"],
                                       ["robe"],
-                                      ["chain", "plate"], 2, 1, 4, 5, 2, 2, ["Firebolt", "Fireball"])
+                                      ["chain", "plate"], 2, 1, 4, 5, 2, 2, ["Firebolt"])
         self.thief_class = CharClass("Thief", pl_thief_image, knight_death_anim, ["dagger", "bow"], ["axe", "spear"],
                                      ["leather"],
                                      ["plate"], 2, 2, 2, 2, 4, 5, ["Haste"])
@@ -285,7 +285,7 @@ class Game:
                     self.write("Fast and able to sneak, powerful with his favourite bow and dagger combination",
                                (ADTXT),
                                (WHITE))
-                    self.write("Bonus x1.3 Hit Rate with ranged weapons",(ADTXT[0],ADTXT[1]+25), WHITE)
+                    self.write("Bonus x1.3 Hit Rate with ranged weapons, and additional barter bonus",(ADTXT[0],ADTXT[1]+25), WHITE)
                 self.write("Strength: " + str(self.class_selected.str), (IDX, IDY + 0))
                 self.write("Stamina: " + str(self.class_selected.sta), (IDX, IDY + 20))
                 self.write("Intellect: " + str(self.class_selected.int), (IDX, IDY + 40))

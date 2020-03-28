@@ -1726,6 +1726,9 @@ class Shop:
         ##########
         self.subscribe_owner_to_all_items()
 
+    def set_owner_attitude(self, attitude):
+        self.owner_attitude = attitude
+
     def subscribe_owner_to_all_items(self):
         for slot in self.shop_ask1.inventory.item_slots:
             if slot.item:
@@ -1894,16 +1897,29 @@ class Shop:
             self.blit_upper_part()
             self.act_inventory.show_inv(self.image,MAP_TOPLEFT[0] + 60,MAP_TOPLEFT[1]+70)
             self.exit_button.show_button(self.image)
-            self.image.blit(gold_coin,(85,305))
-            self.game.s_write(str(self.owner_gold),self.image,(102,300),YELLOW)
+            self.image.blit(gold_coin,(85,315))
+            self.game.s_write(str(self.owner_gold),self.image,(102,310),YELLOW)
+            self.game.s_write("OWNER GOLD:",self.image,(80,290),YELLOW)
+            if self.game.item_picked:
+                if self.game.item_picked.owner == "shop":
+                    self.image.blit(gold_coin,(315,315))
+                    self.game.s_write("SELL PRICE:",self.image,(310,290),YELLOW)
+                    self.game.s_write(str(self.calculate_sell_to_player_price(self.game.item_picked)),
+                                      self.image,(332,310),YELLOW)
+                else:
+                    self.image.blit(gold_coin, (315, 315))
+                    self.game.s_write("BUY PRICE:",self.image,(310,290),YELLOW)
+                    self.game.s_write(str(self.calculate_buy_from_player_price(self.game.item_picked)),
+                                      self.image,(332,310),YELLOW)
             screen.blit(self.image, (self.pos))
         elif self.local_ph_repair:
             self.clear_image()
             self.blit_upper_part()
             self.exit_button.show_button(self.image)
             self.repair_button.show_button(self.image)
-            self.image.blit(gold_coin, (85, 305))
-            self.game.s_write(str(self.owner_gold), self.image, (102, 300), YELLOW)
+            self.image.blit(gold_coin, (85, 315))
+            self.game.s_write(str(self.owner_gold), self.image, (102, 310), YELLOW)
+            self.game.s_write("OWNER GOLD:",self.image,(80,290),YELLOW)
             if self.game.item_picked:
                 if isinstance(self.game.item_picked, sprites.Armor) or isinstance(self.game.item_picked, sprites.Weapon):
                     item_condition = int(self.game.item_picked.condition)
@@ -1935,8 +1951,8 @@ class Shop:
         elif owner_attitude >200:
             owner_attitude = 200
         ## obliczam:
-        item_cost = 1.5 * item.cost - (owner_attitude / 200 * item.cost) + item.cost * 0.5
-        return item_cost
+        item_cost = round(1.5 * item.cost - (owner_attitude / 200 * item.cost) + item.cost * 0.5, 0)
+        return int(item_cost)
 
     def calculate_buy_from_player_price(self, item):
         owner_attitude = self.calculate_owner_attitude()
@@ -1945,12 +1961,20 @@ class Shop:
             owner_attitude = 0
         elif owner_attitude > 200:
             owner_attitude = 200
-        ## obliczam:
-        ## TODO item_cost = (item.cost * owner_attitude / 100) - item.cost / 2
-        ## return item_cost
+        if owner_attitude == 100:
+            item_cost = 0.5 * item.cost
+        elif 100 < owner_attitude < 200:
+            item_cost = 0.5 * item.cost + (item.cost * (owner_attitude - 100) / 200)
+        elif owner_attitude < 100:
+            item_cost = 0.25 * item.cost + (0.25 * item.cost * owner_attitude / 100)
+        else:
+            print ("ERROR Calc shopping price")
+            return 0.5 * item.cost
+        return int(round(item_cost,0))
 
     def calculate_owner_attitude(self):
-        owner_attitude = self.owner_attitude + 3 * self.game.player.stealth
+        owner_attitude = self.owner_attitude + 5 * self.game.player.stealth + self.game.player.barter_bonus
+        #print ("owner attitude" + str(owner_attitude))
         return owner_attitude
 
     def update(self, mouse_pos):
