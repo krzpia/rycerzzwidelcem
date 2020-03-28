@@ -547,16 +547,16 @@ class SpellBook:
                                       self.image, (x_pos + 80, 85 + counter * i.width), (BLACK))
             if i.type == "offensive":
                 if i.bullet_nr > 1:
-                    self.game.s_write("Damage: " + str(i.bullet_nr) + "x " + str(i.damage + self.game.player.intellect), self.image, (x_pos + 80, 55 + counter * i.width),(BLACK))
+                    self.game.s_write("Damage: " + str(i.bullet_nr) + "x " + str(i.damage + int(self.game.player.intellect * self.game.player.spell_power_bonus)), self.image, (x_pos + 80, 55 + counter * i.width),(BLACK))
                 else:
                     if i.subtype == "poison cloud":
                         self.game.s_write("Damage: 0",
                                           self.image, (x_pos + 80, 55 + counter * i.width), (BLACK))
                     else:
-                        self.game.s_write("Damage: " + str(i.damage + self.game.player.intellect),
+                        self.game.s_write("Damage: " + str(i.damage + int(self.game.player.intellect * self.game.player.spell_power_bonus)),
                                       self.image, (x_pos + 80, 55 + counter * i.width), (BLACK))
                 if i.blow_effect:
-                    self.game.s_write("Blow Dmg: " + str(i.blow_damage + self.game.player.intellect) + "/s",self.image, (x_pos + 180, 55 + counter * i.width),(BLACK))
+                    self.game.s_write("Blow Dmg: " + str(i.blow_damage + self.game.player.intellect * self.game.player.spell_power_bonus) + "/s",self.image, (x_pos + 180, 55 + counter * i.width),(BLACK))
                 if i.freeze_effect:
                     self.game.s_write("Freeze time: " + str(i.freeze_effect + self.game.player.intellect) + "s", self.image,
                                       (x_pos + 180, 55 + counter * i.width), (BLACK))
@@ -1926,6 +1926,32 @@ class Shop:
         repair_cost = (max_cost - (max_cost * condition_percentage)) * durability_factor
         self.repair_cost = int(repair_cost)
         return repair_cost
+
+    def calculate_sell_to_player_price(self, item):
+        owner_attitude = self.calculate_owner_attitude()
+        ## NA WYPADEK BLEDU, owner attitude powinien byc w zakresie (0:200)
+        if owner_attitude <= 0:
+            owner_attitude = 0
+        elif owner_attitude >200:
+            owner_attitude = 200
+        ## obliczam:
+        item_cost = 1.5 * item.cost - (owner_attitude / 200 * item.cost) + item.cost * 0.5
+        return item_cost
+
+    def calculate_buy_from_player_price(self, item):
+        owner_attitude = self.calculate_owner_attitude()
+        ## NA WYPADEK BLEDU, owner attitude powinien byc w zakresie (0:200)
+        if owner_attitude <= 0:
+            owner_attitude = 0
+        elif owner_attitude > 200:
+            owner_attitude = 200
+        ## obliczam:
+        ## TODO item_cost = (item.cost * owner_attitude / 100) - item.cost / 2
+        ## return item_cost
+
+    def calculate_owner_attitude(self):
+        owner_attitude = self.owner_attitude + 3 * self.game.player.stealth
+        return owner_attitude
 
     def update(self, mouse_pos):
         mouse_x = mouse_pos[0]

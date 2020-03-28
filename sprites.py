@@ -110,7 +110,7 @@ class Spell_Bullet(pygame.sprite.Sprite):
         if self.spell.subtype == "poison cloud":
             self.damage = 0
         else:
-            self.damage = self.spell.damage + self.game.player.intellect
+            self.damage = self.spell.damage + int(self.game.player.intellect * self.game.player.spell_power_bonus)
         self.blow_effect = self.spell.blow_effect
         self.blow_radius_sizer = self.spell.blow_radius_sizer
         self.blow_damage = self.spell.blow_damage
@@ -160,7 +160,7 @@ class Blow_Spell(pygame.sprite.Sprite):
         self.groups = game.act_lvl.all_sprites, game.act_lvl.lavas
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.str = str + self.game.player.intellect
+        self.str = str + int(self.game.player.intellect * self.game.player.spell_power_bonus)
         self.radius_sizer = size
         self.duration = duration
         #### CZAS TRWANIA EFEKTU = DURATION + INT
@@ -926,7 +926,7 @@ class Player(pygame.sprite.Sprite):
             self.inventory.put_in_first_free_slot(Weapon(self.game, "Small Sword","weapon","sword",
                                            10,False,2,625,"small",
                                            0,0,0,0,0,0,50,4,45,52,89))
-            self.plate_armor_penalty_reduction = 1.5
+            self.plate_armor_penalty_reduction = 0.75
         if self.char_class.name == "Wizard":
             self.inventory.put_in_first_free_slot(Potion(self.game, "Blue Potion", "Mana",15,30,58,41))
             self.inventory.put_in_first_free_slot(Potion(self.game, "Blue Potion", "Mana", 15, 30, 58, 41))
@@ -943,7 +943,7 @@ class Player(pygame.sprite.Sprite):
             self.inventory.put_in_first_free_slot(Weapon(self.game, "Knife", "weapon","dagger",
                                            15, False, 1, 500, "small",
                                            0, 0, 0, 0, 0, 0,40, 2, 45, 42, 87))
-            self.bow_hit_rate_bonus = 1.33
+            self.bow_hit_rate_bonus = 0.75
         self.active_effects_lib = ActiveEffectsLibrary(self.game)
         self.quest_book = QuestBook(self.game)
         self.spell_book = SpellBook(self.game)
@@ -1131,7 +1131,7 @@ class Player(pygame.sprite.Sprite):
             if now - self.last_shot > self.arrow_rate:
                 self.last_shot = now
                 dir = self.last_dir
-                self.weapon_slot.item.weapon_breakage()
+                self.weapon_slot.item.breakage()
                 Arrow(self.game, self.pos, dir)
                 self.arrows -= 1
 
@@ -1224,7 +1224,11 @@ class Player(pygame.sprite.Sprite):
                 self.active_effects_lib.add_effect(self.game.e_disliked_armor)
             else:
                 temp_armor_mod += self.armor_slot.item.armor
-            temp_hit_rate_mod *= self.armor_slot.item.hit_rate_mod
+            if self.armor_slot.item.type == "plate":
+                print ("Knight bonus aplied")
+                temp_hit_rate_mod *= (self.armor_slot.item.hit_rate_mod * self.plate_armor_penalty_reduction)
+            else:
+                temp_hit_rate_mod *= self.armor_slot.item.hit_rate_mod
             temp_str_mod += self.armor_slot.item.str_mod
             temp_sta_mod += self.armor_slot.item.sta_mod
             temp_int_mod += self.armor_slot.item.int_mod
@@ -1637,9 +1641,11 @@ class Mob(pygame.sprite.Sprite):
         self.lava_immune_time = 500
         self.avoid_radius = 50
         self.sleep_radius = sleep_radius
+        self.updated_sleep_radius = sleep_radius
         self.frozen = False
         self.freeze_moment = 0
         self.freeze_alpha_counter = 0
+        self.attention = 0
         ### DO WYSWIETLENIA EFEKTU GRAFICZNEGO
         self.damaged = False
 
@@ -1684,10 +1690,11 @@ class Mob(pygame.sprite.Sprite):
             print("ACC: " + str(int(self.acc.length())))
 
     def mob_movement_s(self):
+        #### TYP RUCHU POSTACI S (w linii)
         if self.game.dt > 0.1:
             self.game.dt = 0.1
         distance_to_player = (self.game.player.pos - self.pos).length()
-        awake_distance = max(48,self.sleep_radius - (self.game.player.stealth * 3))
+        awake_distance = max(48,self.updated_sleep_radius)
         if self.game.player.invisible:
             awake_distance = 32
         #print ("distance to player: " + str(distance_to_player))
@@ -1736,7 +1743,7 @@ class Mob(pygame.sprite.Sprite):
         if self.game.dt > 0.1:
             self.game.dt = 0.1
         distance_to_player = (self.game.player.pos - self.pos).length()
-        awake_distance = max(48, self.sleep_radius - (self.game.player.stealth * 3))
+        awake_distance = max(48, self.updated_sleep_radius)
         if self.game.player.invisible:
             awake_distance = 32
         # print ("distance to player: " + str(distance_to_player))
@@ -1781,7 +1788,9 @@ class Mob(pygame.sprite.Sprite):
 
     def mob_ranged_attack(self):
         distance_to_player = (self.game.player.pos - self.pos).length()
-        awake_distance = max(48, self.sleep_radius - (self.game.player.stealth * 3))
+        ### ZAWSZE BEDZIE AKTYWNY jezeli podejdziesz blizej niz 48)
+        awake_distance = max(48, self.updated_sleep_radius)
+        ### GDY NIEWIDZIALNY AWAKE DISTANCE = 32 (wielkosc tile).. moze zwieszyc?
         if self.game.player.invisible:
             awake_distance = 32
         if distance_to_player < awake_distance:
@@ -1800,6 +1809,14 @@ class Mob(pygame.sprite.Sprite):
 
     def update(self):
         self.image = self.base_image.copy()
+        #### ADJUSTING SLEEP RADIUS
+        self.updated_sleep_radius = self.sleep_radius - (self.game.player.stealth * 3) + self.attention
+        #### ZMNIEJSZANIE ATTENTION
+        if self.attention > 0:
+            self.attention -= 5 * self.game.unpaused_dt
+            #print (f'attention: {self.attention}')
+            #print (f'sleep radius: {self.sleep_radius}')
+            #print (f'up sl radius: {self.updated_sleep_radius}')
         #### ODMRAZANIE (jesli zamrozony)
         if self.frozen:
             self.deefreeze()
@@ -1827,6 +1844,9 @@ class Mob(pygame.sprite.Sprite):
                 self.damage_alpha = chain(DAMAGE_ALPHA_LIST * 2)
                 self.last_damage = now
                 self.damaged = True
+                if isinstance(hit, Blow_Spell):
+                    self.game.put_txt(f'Spell explosion inflicted {hit.str} damage')
+                    #print ("TO BYL WYBUCH CZARU!")
             #if self.hp <= 0:
             #    self.kill()
         ### OBRAZENIA OD STRZAL INNYCH POTWOROW:

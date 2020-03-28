@@ -188,7 +188,7 @@ class Game:
                                       ["plate"], ["robe"], 4, 4, 1, 2, 3, 1, ["Heroism"])
         self.wizard_class = CharClass("Wizard", pl_wizard_image, knight_death_anim, ["staff"], ["sword", "axe", "bow"],
                                       ["robe"],
-                                      ["chain", "plate"], 2, 1, 4, 5, 2, 2, ["Firebolt"])
+                                      ["chain", "plate"], 2, 1, 4, 5, 2, 2, ["Firebolt", "Fireball"])
         self.thief_class = CharClass("Thief", pl_thief_image, knight_death_anim, ["dagger", "bow"], ["axe", "spear"],
                                      ["leather"],
                                      ["plate"], 2, 2, 2, 2, 4, 5, ["Haste"])
@@ -256,7 +256,7 @@ class Game:
             self.start_game_button.deactivate()
 
     def intro_draw(self):
-        self.credits_text = "Special thanks: My dear wife Monika, Piotr Kopalko, Zuza and Magda for some inspiration and superb sound effects. Chris Bradfield for his amazing tutorials on www.kidscancode.org. Assets used under free licence from www.opengameart: DungeonCrawler, Adrix89, gargargarrick.."
+        self.credits_text = "Special thanks: My dear wife Monika, Piotr Kopalko, Zuza and Magda for some inspiration and superb sound effects. Chris Bradfield for his amazing tutorials on www.kidscancode.org. Thanks to Thorbjørn Lindeijer for TiledMapEditor. Assets used under free licence from www.opengameart: DungeonCrawler, Adrix89, gargargarrick.."
         self.screen.fill(BGCOLOR)
         # self.h_write("GRA RYCERZ Z WIDELCEM",(200,50),"monotype corsiva",40,(200,0,200))
         if self.to_char_chose:
@@ -272,11 +272,13 @@ class Game:
                     self.screen.blit(self.class_selected.image, TIMGPOS)
                     self.h_write("Knight", NTXT, "arial", 26, (WHITE))
                     self.write("Dedicated do melle fight, starts with strength and stamina bonus", (ADTXT), (WHITE))
+                    self.write("No penalty using plate armors", (ADTXT[0], ADTXT[1] + 25), WHITE)
                 if self.class_selected == self.wizard_class:
                     self.screen.blit(self.class_selected.image, TIMGPOS)
                     self.h_write("Wizard", NTXT, "arial", 26, (WHITE))
                     self.write("Weak in direct fight, but able to make severe damage by magic powers", (ADTXT),
                                (WHITE))
+                    self.write("Bonus x1.5 power of offensive spells", (ADTXT[0], ADTXT[1] + 25), WHITE)
                 if self.class_selected == self.thief_class:
                     self.screen.blit(self.class_selected.image, TIMGPOS)
                     self.h_write("Thief", NTXT, "arial", 26, (WHITE))
@@ -962,6 +964,7 @@ class Game:
 
     def player_ranged_attack(self):
         ### STRZALY Z DYSTANSU
+        ### ZWiekszaja attention
         arrow_hits = pygame.sprite.groupcollide(self.act_lvl.mobs, self.act_lvl.arrows, False, True)
         for mob in arrow_hits:
             # print (arrow_hits[mob])
@@ -972,6 +975,7 @@ class Game:
                     txt = str("Magic attack. " + self.player.name + " inflicted: " + (str(arrow.damage)) + " damage.")
                     self.put_txt(txt)
                     self.player.score_off_spell_damage.append(int(arrow.damage))
+                    mob.attention += 48
                     mob.hp -= arrow.damage
                     if self.player.active_spell.blow_effect:
                         Blow_Spell(self, arrow.pos, arrow.spell.blow_anim_img,
@@ -990,6 +994,7 @@ class Game:
                         "Ranged hit. " + self.player.name + " inflicted " + (str(self.player.hit_dmg)) + " damage.")
                     self.put_txt(txt)
                     self.player.score_arrow_enemy_hits.append(int(self.player.arrow_damage))
+                    mob.attention += 48
                     mob.hp -= self.player.arrow_damage
                     mob.damaged = True
                     mob.damage_alpha = chain(DAMAGE_ALPHA_LIST * 2)
@@ -1118,7 +1123,7 @@ class Game:
             if self.player.active_spell.subtype == "poison cloud":
                 damage = "0"
             else:
-                damage = str(self.player.active_spell.damage + self.player.intellect)
+                damage = str(self.player.active_spell.damage + int(self.player.intellect * self.player.spell_power_bonus))
             hit_rate = (1000 / self.player.active_spell.hit_rate)
             hit_rate = str(hit_rate)
             hit_rate = hit_rate[:3]
@@ -1274,9 +1279,15 @@ class Game:
             ### DEBUG MODE
             if self.draw_debug:
                 #### RYSUJEMY TEKST ROBOCZY
-                self.write(str(self.clock.get_fps()), (0, 0))
                 mouse_pos = pygame.mouse.get_pos()
-                self.write(f'(Mouse position: {mouse_pos}',(150,0))
+                mouse_pos = pygame.mouse.get_pos()
+                self.write(f'(Mouse pos: {mouse_pos}', (150, 0))
+                self.write(f'(Player pos: {self.player.pos}', (300, 0))
+                for mob in self.act_lvl.mobs:
+                    mob_rect = self.camera.apply_rect(mob.rect)
+                    mob_center = mob_rect.center
+                    pygame.draw.circle(self.map_surface,SKYBLUE,mob_center,mob.sleep_radius,1)
+                    pygame.draw.circle(self.map_surface,PURPLE,mob_center,int(mob.updated_sleep_radius),1)
                 for wall in self.act_lvl.walls:
                     pygame.draw.rect(self.map_surface, (70, 30, 170), self.camera.apply_rect(wall.rect), 1)
                 for lava in self.act_lvl.lavas:
@@ -1298,13 +1309,14 @@ class Game:
         self.pause_button.show_button(self.screen)
         self.spell_book_button.show_button(self.screen)
         self.quest_book_button.show_button(self.screen)
+        self.write(str(self.clock.get_fps()), (0, 0))
         if self.paused:
             self.screen.blit(dim_screen, (MAP_TOPLEFT))
             if self.draw_debug:
                 #### RYSUJEMY TEKST ROBOCZY
-                self.write(str(self.clock.get_fps()), (0, 0))
                 mouse_pos = pygame.mouse.get_pos()
-                self.write(f'(Mouse position: {mouse_pos}',(150,0))
+                self.write(f'(Mouse pos: {mouse_pos}',(150,0))
+                self.write(f'(Player pos: {self.player.pos}', (300,0))
             #### STANY SPECJALNE
             ### NEXT LEVEL
             if self.player.attribute_points > 0:
