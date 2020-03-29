@@ -30,6 +30,8 @@ class Level:
         self.items = pygame.sprite.LayeredUpdates()
         ### PRZEDMIOTY NA MAPIE DO PODNIESIENIA
         self.items_to_pick = pygame.sprite.LayeredUpdates()
+        ### COLLECTING_SPRITES:
+        self.collecting_sprites = pygame.sprite.LayeredUpdates()
         ### ZLOTE MONETY DO PODNIESIENIA
         self.gold_to_pick = pygame.sprite.LayeredUpdates()
         ### STRZALY DO PODNIESIENIA
@@ -101,19 +103,21 @@ class Game:
         self.map_level_01 = tilemap.TiledMap(path.join(map_folder, 'mapa1.tmx'))
         self.level_02 = Level()
         self.map_level_02 = tilemap.TiledMap(path.join(map_folder, 'mapa2.tmx'))
+        self.level_03 = Level()
+        self.map_level_03 = tilemap.TiledMap(path.join(map_folder, 'mapa3.tmx'))
         #####
         self.levels['level01'] = self.level_01
         self.levels['level02'] = self.level_02
+        self.levels['level03'] = self.level_03
         #####
         self.map_levels['level01'] = self.map_level_01
         self.map_levels['level02'] = self.map_level_02
+        self.map_levels['level03'] = self.map_level_03
         #### CREATE ##########################################
         ### SPRITE GROUPS NALEZACE DO GAME a nie DO LEVEL! ###
         ######################################################
         self.player_group = pygame.sprite.LayeredUpdates()
         self.small_items = pygame.sprite.LayeredUpdates()
-        ### STARTING WITH LEVEL 01 #######
-        self.act_lvl = self.level_01
         ######################
         ### IN GAME OBJECTS #
         #####################
@@ -132,6 +136,7 @@ class Game:
         print ("INITIALIZING USER INTERFACE...")
         ### DIALOG BOX
         self.dialog_box = DialogBox(self)
+        self.message_box  = MessageBox(self)
         self.shop_dialog_box = ShopDialogBox(self)
         ### UI BUTTONS
         self.inv_use_button = RadioButton(rad_use_img, rad_use_h_img,
@@ -168,7 +173,8 @@ class Game:
         self.levelgen = levels.LevelGen(self)
         self.levelgen.load_level_01()
         self.levelgen.load_level_02()
-        self.levelgen.go_to_level("level02", 18, 5)
+        self.levelgen.load_level_03()
+        self.levelgen.go_to_level("level02", 29, 22)
         print ("INITIALIZING CAMERA...")
         ##### CAMERA INIT
         self.camera = tilemap.Camera(self.map.width, self.map.height)
@@ -464,6 +470,7 @@ class Game:
         self.active_shop = False
         self.ph_quest_book = False
         self.dialog_in_progress = False
+        self.message_shown = False
         ##### FLAGI DO OBSLUGI INVENTARZA #######
         self.item_picked = False
         self.toggle_clean_item_picked = False
@@ -480,6 +487,7 @@ class Game:
         ### MUSIC
         pygame.mixer.music.load(path.join(music_folder, 'Winds Of Stories.ogg'))
         pygame.mixer.music.play(loops=-1)
+        pygame.mixer.music.set_volume(0.4)
         while self.playing:
             self.dt = self.clock.tick(FPS) / 1000
             self.events()
@@ -565,6 +573,10 @@ class Game:
                         self.player.active_spell = self.player.selected_spell
                         self.player.update_stats()
                 if event.key == pygame.K_e:
+                    ####### GATHER COLLECT SPRITE
+                    sprites_to_collect = pygame.sprite.spritecollide(self.player, self.act_lvl.collecting_sprites,False,collide_double_hit_rect)
+                    for sprite in sprites_to_collect:
+                        sprite.gather()
                     ####### WEJDZ DO SKLEPU
                     if not self.ph_shop and not self.paused:
                         shop_doors = pygame.sprite.spritecollide(self.player, self.act_lvl.shops,False,collide_hit_rect)
@@ -813,6 +825,9 @@ class Game:
                         # 6. PRZYCISKI QUEST BOOK
                         if self.ph_quest_book:
                             self.player.quest_book.check_page_buttons(mouse_pos)
+                        # 9. PRZYCISK OK MESSAGE BOX
+                        if self.message_shown:
+                            self.message_box.check_button(mouse_pos)
 
     def update_ui_buttons(self):
         self.quest_book_button.activate()
@@ -868,6 +883,9 @@ class Game:
         #### SHOP DIALOG BUTTONS @@@
         if self.ph_shop:
             self.shop_dialog_box.update(mouse_pos)
+        #### MESSAGE BOX BUTTON
+        if self.message_shown:
+            self.message_box.update(mouse_pos)
         #### ACTIVATE INV_USE_BUTTON ####
         if self.item_picked:
             if self.item_picked.type == "potion" or self.item_picked.type == "book":
@@ -1341,6 +1359,9 @@ class Game:
             # DIALOG BOX
             elif self.dialog_in_progress:
                 self.dialog_box.show(self.screen)
+            # MESSAGE BOX
+            elif self.message_shown:
+                self.message_box.show(self.screen)
 
         #### SREDNIA FPS
         # if self.draw_debug:

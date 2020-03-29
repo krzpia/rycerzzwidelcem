@@ -430,7 +430,7 @@ class QuestBook:
             i.active = True
             i.show_quest_icon(self.image,x_pos + 10, 40 + counter * 64)
             self.game.s_write(f'Quest {i.name}', self.image, (x_pos + 80, 40 + counter * 64),(BLACK))
-            self.game.s_write(i.goal_descr, self.image, (x_pos + 80, 55 + counter * 464),(BLACK))
+            self.game.s_write(i.goal_descr, self.image, (x_pos + 80, 55 + counter * 64),(BLACK))
             self.game.s_write(f'Reward {i.reward_xp} XP,  {i.reward_gold} gold.', self.image ,(x_pos + 80, 70 + counter * 64),(BLACK))
             counter += 1
             if counter >= 5:
@@ -988,7 +988,7 @@ class Dialog:
             if not self.game.events_manager.find_thread_read_event(thread_name):
                 if thread_name != "bye":
                     self.game.events_manager.emit(Event(id=f'thread {thread_name} has been read'))
-            ### JEZELI TO QUEST TO SILNIK ROZDZIELI GALEZIE WG Eventów:
+            ### JEZELI TO QUEST TO SILNIK ROZDZIELI GALEZIE WG Eventów WLASCICIEL QUESTA GO DAJE I OCENIA POSTEP:
             if thread_name[:5] == "quest":
                 print ("NEXT THREAD IS A QUEST THREAD, SEARCHING FOR A NEXT BRANCH AND STEP:")
                 if self.game.events_manager.find_got_quest_event(thread_name[6:]):
@@ -1188,6 +1188,90 @@ class ShopDialogBox:
         screen.blit(self.image, self.pos)
 
 
+class MessageBox:
+    def __init__(self, game):
+        self.game = game
+        self.pos = DIAL_BOX_POS
+        self.image = dialogbox_img_2.copy()
+        self.rew_image = scroll_160_img.copy()
+        self.rew_pos = (140,240)
+        self.ok_button = RadioButton(rad_ok_img, rad_ok_h_img, 178, 290)
+        self.rew_scroll_show = False
+        self.ok_button.deactivate()
+
+    def clear(self):
+        self.image = dialogbox_img_2.copy()
+        self.rew_image = scroll_160_img.copy()
+
+    def write(self, txt, ln):
+        self.game.s_write(txt,self.image, (85, 100 + ln * 24), (WHITE))
+
+    def update(self, mouse_pos):
+        mouse_x = mouse_pos[0]
+        mouse_y = mouse_pos[1]
+        mouse_x -= self.pos[0]
+        mouse_y -= self.pos[1]
+        self.mouse_pos = (mouse_x, mouse_y)
+        self.ok_button.activate()
+        self.ok_button.check_if_highlight(self.mouse_pos)
+
+    def check_button(self, mouse_pos):
+        mouse_x = mouse_pos[0]
+        mouse_y = mouse_pos[1]
+        mouse_x -= self.pos[0]
+        mouse_y -= self.pos[1]
+        self.mouse_pos = (mouse_x, mouse_y)
+        if self.ok_button.active:
+            if self.ok_button.check_if_clicked(self.mouse_pos):
+                print ("OK CLICKED - EXIT MESSAGE BOX")
+                self.rew_scroll_show = False
+                self.game.message_shown = False
+                self.ok_button.deactivate()
+                self.game.back_to_game_and_unpause()
+
+    def show_text(self, text):
+        self.game.s_write(text, self.image,DB2_TXT_POS,WHITE)
+        #self.write(text,0)
+
+    def show_button_ok(self):
+        self.ok_button.show_button(self.image)
+
+    def show_reward_image(self, reward_gold, reward_xp, reward_item):
+        self.rew_scroll_show = True
+        print("REW SCROLL SHOW = True")
+        self.game.s_write(f'You have recieved a reward:', self.rew_image, (80, 10), BLACK)
+        g_l_m = 10 * (len(str(reward_gold)) - 1)
+        e_l_m = 10 * (len(str(reward_xp)) - 1)
+        if reward_gold > 0:
+            self.rew_image.blit(gold_coin, (100 + g_l_m, 40))
+            self.game.s_write(f'+ {reward_gold}', self.rew_image, (80, 35), BLACK)
+        if reward_xp > 0:
+            self.rew_image.blit(xp_icon, (100 + e_l_m, 60))
+            self.game.s_write(f'+ {reward_xp}', self.rew_image, (80, 60), BLACK)
+        if reward_item:
+            self.game.s_write(f'You get {reward_item.name}', self.rew_image, (120, 85), BLACK)
+            self.rew_image.blit(reward_item.image, (80, 80))
+
+    def show(self, screen):
+        self.show_button_ok()
+        screen.blit(self.image, self.pos)
+        if self.rew_scroll_show:
+            screen.blit(self.rew_image, self.rew_pos)
+
+    def show_message(self, text):
+        self.clear()
+        self.game.message_shown = True
+        self.game.paused = True
+        self.show_text(text)
+
+    def show_message_quest_reward(self, text, reward_gold, reward_xp, reward_item):
+        self.clear()
+        self.game.message_shown = True
+        self.game.paused = True
+        self.show_text(text)
+        self.show_reward_image(reward_gold, reward_xp, reward_item)
+
+
 class DialogBox:
     def __init__(self, game):
         self.game = game
@@ -1251,7 +1335,7 @@ class DialogBox:
             self.game.s_write(f'+ {quest.reward_gold}',self.rew_image,(80,35),BLACK)
         if quest.reward_xp > 0:
             self.rew_image.blit(xp_icon,(100 + e_l_m,60))
-            self.game.s_write(f'+ {quest.reward_gold}', self.rew_image, (80, 60),BLACK)
+            self.game.s_write(f'+ {quest.reward_xp}', self.rew_image, (80, 60),BLACK)
         if quest.reward_item:
             self.game.s_write(f'You get {quest.reward_item.name}', self.rew_image, (120, 85),BLACK)
             self.rew_image.blit(quest.reward_item.image,(80,80))
@@ -1326,9 +1410,21 @@ class DialogBox:
             if not self.npc.encountered:
                 self.game.events_manager.emit(Event(id=f'{self.npc.name} has been encountered'))
                 self.npc.encountered = True
+                ### SPRAWDZANIE DLA QUESTOW SAMOKONCZACYCH SIE< ZE ODNALEZIONO NPC - czyli auto fulfil and reward quest
+                for quest in self.game.player.quest_book.quests:
+                    if quest.auto_checking:
+                        print("ZNALAZLEM W KSIAZCE QUESTOW quest Z AUTOSPRAWDZENIEM")
+                        if quest.check_if_fulfiled():
+                            self.game.put_txt(f'{quest.name} has been completed')
+                            quest.collect_reward()
+                        else:
+                            print ("ALE NIE WYKONANO WARUNKOW DO SPELNIENIA questu z autosprawdzeniem")
             self.game.dialog_in_progress = False
             self.game.paused = False
             if self.game.player.check_next_level():
+                self.game.paused = True
+            if self.game.message_shown:
+                print ("Message shown = True")
                 self.game.paused = True
 
     def write_actual_text(self):
@@ -1469,7 +1565,7 @@ class Quest:
                  reward_xp, reward_gold, reward_item = False):
         self.game = game
         self.name = name
-        self.image = quest_bcg_img
+        self.image = quest_bcg_img.copy()
         self.rect = self.image.get_rect()
         self.level_req = level_req
         self.goal_descr = goal_descr
@@ -1489,15 +1585,19 @@ class Quest:
         self.in_progress = False
         self.visible = False
         self.start_time = 0
+        self.auto_checking = False
+
+    def put_image(self,image):
+        self.image.blit(image,(16,16))
+
+    def put_image_from_tileset(self, x, y, tileset):
+        self.image.blit(tileset,(16,16),(x*TILE_SIZE, y*TILE_SIZE,TILE_SIZE,TILE_SIZE))
+
+    def set_to_autochecking(self):
+        self.auto_checking = True
 
     def show_quest_icon(self, surface, x, y):
-        self.rect.x = x
-        self.rect.y = y
-        #try:
-        #    self.image.blit(npc_image,(12,12))
-        #except:
-        #    print ("TODO NPC IMAGE TO QUEST BOOK")
-        surface.blit(self.image, (self.rect.x, self.rect.y))
+        surface.blit(self.image, (x, y))
 
     def check_npcs_to_encounter(self) -> bool:
         if len(self.goal.npcs_to_encounter) > 0:
@@ -1564,25 +1664,30 @@ class Quest:
         ### 1. ITEMS
         quest_items_to_remove = self.check_quest_items()
         if quest_items_to_remove:
-            self.game.events_manager.emit(Event(id=f'quest {self.name} has been fulfiled'))
+            self.emit_the_quest_fulfiled_event()
             self.completed = True
+            ### TODO - zrobic zmienna w quest - quest item to remove_?
+            ### czyli czy ma zabierac przedmiot?
             for item in quest_items_to_remove:
                 self.game.player.inventory.remove_item(item)
             return True
         ### 2. NPCs
         npcs_to_encounter = self.check_npcs_to_encounter()
         if npcs_to_encounter:
-            self.game.events_manager.emit(Event(id=f'quest {self.name} has been fulfiled'))
+            self.emit_the_quest_fulfiled_event()
             self.completed = True
             return True
         ### 3. MOBs to kill
         mobs_to_kill = self.check_mobs_to_kill()
         if mobs_to_kill:
-            self.game.events_manager.emit(Event(id=f'quest {self.name} has been fulfiled'))
+            self.emit_the_quest_fulfiled_event()
             self.completed = True
             return True
         ### 4. TODO tile(area) to explore
 
+    def emit_the_quest_fulfiled_event(self):
+        if not self.game.events_manager.search_event(f'quest {self.name} has been fulfiled'):
+            self.game.events_manager.emit(Event(id=f'quest {self.name} has been fulfiled'))
 
     def collect_reward(self):
         if self.completed:
@@ -1596,10 +1701,19 @@ class Quest:
                     # TODO put item on the ground?
             pygame.mixer.Sound.play(coin_snd)
             #### SEND INFO
+            if not self.game.events_manager.search_event(f'quest {self.name} has been completed'):
+                self.game.events_manager.emit(Event(id= f'quest {self.name} has been completed'))
+            if not self.game.events_manager.search_event(f'quest {self.name} has been rewarded'):
+                self.game.events_manager.emit(Event(id= f'quest {self.name} has been rewarded'))
+            pygame.mixer.Sound.play(levelup_snd)
             self.game.put_txt(f'Quest {self.name} finished')
+            if not self.game.dialog_in_progress:
+                self.game.message_box.show_message_quest_reward(f'Quest {self.name} completed!',
+                                                                self.reward_gold, self.reward_xp, self.reward_item)
             self.game.player.completed_quests.append(self)
             self.game.player.quest_book.remove(self)
             print("NAGRODA ODEBRANA i QUEST ZAPISANY JAKO WYKONANY")
+
 
     def get_quest(self):
         if self not in self.game.player.active_quests:
@@ -1952,6 +2066,9 @@ class Shop:
             owner_attitude = 200
         ## obliczam:
         item_cost = round(1.5 * item.cost - (owner_attitude / 200 * item.cost) + item.cost * 0.5, 0)
+        ## zużyte kosztują mniej!
+        if isinstance(item, sprites.Armor) or isinstance(item, sprites.Weapon):
+            item_cost = 0.25 * item_cost + (0.75 * item_cost * item.condition / 100)
         return int(item_cost)
 
     def calculate_buy_from_player_price(self, item):
@@ -1970,6 +2087,9 @@ class Shop:
         else:
             print ("ERROR Calc shopping price")
             return 0.5 * item.cost
+        ## zuzyte kosztuja mniej!
+        if isinstance(item, sprites.Armor) or isinstance(item, sprites.Weapon):
+            item_cost = 0.25 * item_cost + (0.75 * item_cost * item.condition / 100)
         return int(round(item_cost,0))
 
     def calculate_owner_attitude(self):

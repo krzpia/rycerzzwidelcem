@@ -112,6 +112,11 @@ treasure_bcg_img = pygame.image.load(path.join(img_folder, 'treasure_bcg.png')).
 spellbook_bcg_img = pygame.image.load(path.join(img_folder, 'spellbook_bcg.png')).convert_alpha()
 ebroken_armor_img = pygame.image.load(path.join(img_folder, 'ebroken_armor.png')).convert_alpha()
 default_shop_owner_img = pygame.image.load(path.join(img_folder, 'default_shop_owner_img.png')).convert_alpha()
+tomato_empty_img = pygame.image.load(path.join(img_folder, 'tomato_empty.png')).convert_alpha()
+tomato_img = pygame.image.load(path.join(img_folder, 'tomato.png')).convert_alpha()
+paprika_empty_img = pygame.image.load(path.join(img_folder, 'paprika_empty.png')).convert_alpha()
+paprika_img = pygame.image.load(path.join(img_folder, 'paprika.png')).convert_alpha()
+
 ### EFFECTS ICONS
 e_fav_wea_ico = pygame.image.load(path.join(img_folder, 'e_fav_wea.png')).convert_alpha()
 e_dis_wea_ico = pygame.image.load(path.join(img_folder, 'e_dis_wea.png')).convert_alpha()
@@ -192,3 +197,5 @@ pintrap_o_snd = pygame.mixer.Sound(path.join(snd_folder, 'pintrap_open.wav'))
 hurra_snd = pygame.mixer.Sound(path.join(snd_folder, 'hurra.wav'))
 oink_snd = pygame.mixer.Sound(path.join(snd_folder, 'oink.wav'))
 smith_snd = pygame.mixer.Sound(path.join(snd_folder, 'smith.wav'))
+crunch_snd = pygame.mixer.Sound(path.join(snd_folder, 'crunch.wav'))
+levelup_snd = pygame.mixer.Sound(path.join(snd_folder, 'level_up.wav'))

@@ -3,10 +3,9 @@ True;welcome;0;0;Hello;False;False;False;False;False;False;False;False
 False;welcome;0;1;Hello;False;False;False;False;Next;False;False;False
 True;welcome;1;0;Hello again;False;False;False;False;False;False;False;False
 False;welcome;1;1;Hello again;False;False;False;False;Next;False;False;False
-True;intro blue gnom;0;0;I wonder you are asking what are you doing here?;Yes>False>0,1;False;False;False;False;False;False;False
-True;intro blue gnom;0;1;You were send here into the dungeon because of mad king Kabuli. I suppose he would like that you`ll  never get out of here;False;False;False;False;False;False;False;False
-True;intro blue gnom;0;2;But I`think our people of the Enchanted Island of La Palmix needs you!;False;False;False;False;False;False;False;False
-True;intro blue gnom;0;3;Go adventurer and find way out. I`ll help you if  you have questions.;False;False;False;False;Next;False;False;False
+True;intro blue gnom;0;0;Are you ready to experience exciting adventures in the land of Lapalmix? ;Yes>quest Miraflorida>0,1;False;False;False;False;False;False;False
+True;intro blue gnom;0;1;Go then to the castle fo Miraflorida, and learn more about new curse of Corona that affects our kingdom!;False;False;False;False;False;False;False;False
+True;intro blue gnom;0;2;Go adventurer and find way out of this cave. I`ll stay here and help you if  you have questions.;False;False;False;False;Next;False;False;False
 True;explanations blue gnom;0;0;So, If there is something else, you would like to know?;Please help me with controls>False>1,0;Please help me with gameplay>False>2,0;Please tell me about caracter skills>False>3,0;Please help me with this rats!>False>4,0;False;False;False;False
 True;explanations blue gnom;1;0;Use keyboard W S A D keys do move.                Use E key to pick and interact with items or NPC`sUse SPACEBAR to attack.                           To quick change between spell and weapon Use C keyTo pause use P key.;False;False;False;False;Next;False;False;False
 True;explanations blue gnom;2;0;To pick up item form your inventory use mouse.    To open spell book use the blue button on bottom. To open quest book push the yellow button.        To pause game push red PAUSE button.;False;False;False;False;Next;False;False;False

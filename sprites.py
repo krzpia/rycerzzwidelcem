@@ -75,7 +75,7 @@ class Arrow(pygame.sprite.Sprite):
         pygame.mixer.Sound.play(bow_snd)
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.speed = 400
-        self.lifetime = 1000
+        self.lifetime = 800
         self.game = game
         self.pos = vec(pos)
         self.vel = dir * self.speed
@@ -90,8 +90,11 @@ class Arrow(pygame.sprite.Sprite):
     def update(self):
         self.pos += self.vel * self.game.dt
         self.rect.center = self.pos
-        if pygame.sprite.spritecollideany(self,self.game.act_lvl.walls):
-            self.kill()
+        ### KOLIZJA Z MUREM (ale nie wodą!)
+        hits = pygame.sprite.spritecollide(self,self.game.act_lvl.walls,False)
+        for hit in hits:
+            if not hit.water:
+                self.kill()
         now = (int(self.game.player.score_time_played * 1000))
         if now - self.spawn_time > self.lifetime:
             self.kill()
@@ -141,7 +144,8 @@ class Spell_Bullet(pygame.sprite.Sprite):
         #print (wall_hits)
         for wall_hit in wall_hits:
             if isinstance(wall_hit,Obstacle):
-                self.blow()
+                if not wall_hit.water:
+                    self.blow()
 
     def blow(self):
         if self.blow_effect:
@@ -474,11 +478,92 @@ class Treasure_Chest(pygame.sprite.Sprite):
 
 
 class CollectingSprite(pygame.sprite.Sprite):
-    def __init__(self, game ,x, y, content_type, content_str, content_no,
-                 image, image_empty, hit_rect_width, hit_rect_height):
+    def __init__(self, game, name, x, y, content_type, content_str, content_no, hit_rect_width, hit_rect_height):
         self._layer = FLOOR_LAYER
-        self.groups = game.act_lvl.all_sprites
+        self.groups = game.act_lvl.all_sprites, game.act_lvl.collecting_sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.rect = pygame.Rect(0, 0, TILE_SIZE, TILE_SIZE)
+        self.rect.center = (x, y)
+        self.hit_rect = pygame.Rect(0, 0, hit_rect_width, hit_rect_height)
+        self.hit_rect.center = (x, y)
+        self.name = name
+        if name == "tomato":
+            self.image = tomato_img
+            self.empty_image = tomato_empty_img
+            self.sound = crunch_snd
+        elif name == "paprika":
+            self.image = paprika_img
+            self.empty_image = paprika_empty_img
+            self.sound = crunch_snd
+        else:
+            self.image = pygame.Surface((32,32),pygame.HWSURFACE | pygame.SRCALPHA)
+            self.sound = False
+        self.content_type = content_type # HP, MP, QUEST_ITEM, RAND_ITEM
+        self.content_str = content_str # for HP, MP, QUEST_ITEM_NAME, RAND_ITEM_MAXCOST
+        self.content_no = content_no # for HP, MP, ITEMs
+        if self.content_type == "quest item":
+            self.item = self.game.levelgen.gen.generate_quest_item_by_name(self.content_str)
+        elif self.content_type == "random item":
+            self.item = self.game.levelgen.gen.generate_random_item(self.content_str)
+        self.active = True
+        self.depleted = False
+
+    def update(self):
+        if self.content_no <= 0:
+            self.depleted = True
+        if self.depleted:
+            self.image = self.empty_image
+
+    def gather(self):
+        if not self.depleted and self.active:
+            if self.sound:
+                pygame.mixer.Sound.play(self.sound)
+            if self.content_type == "hp":
+                self.game.player.act_hp += self.content_str
+                self.game.put_txt(f'Restored {self.content_str} HP')
+                self.content_no -= 1
+                if self.game.player.act_hp >= self.game.player.max_hp:
+                    self.game.player.act_hp = self.game.player.max_hp
+            elif self.content_type == "mana":
+                self.game.player.act_mana += self.content_str
+                self.game.put_txt(f'Restored {self.content_str} MP')
+                if self.game.player.act_mana >= self.game.player.max_mana:
+                    self.game.player.act_mana = self.game.player.max_mana
+                self.content_no -= 1
+            elif self.content_type == "quest item":
+                self.game.player.inventory.put_in_first_free_slot(self.item)
+                self.content_no -= 1
+                self.game.events_manager.emit(Event(id=f'item {self.item.name} collected'))
+                self.game.put_txt(f'Item {self.item.name} collected')
+            elif self.content_type == "random item":
+                self.game.player.inventory.put_in_first_free_slot(self.item)
+                self.game.put_txt(f'Item {self.item.name} collected')
+                self.content_no -=1
+            else:
+                print ("ERROR Decoding content type in CollectingSprite object!")
+
+
+class InfoSprite(pygame.sprite.Sprite):
+    def __init__(self, game, name, x, y, text, hit_rect_width, hit_rect_height):
+        self._layer = FLOOR_LAYER
+        self.groups = game.act_lvl.collecting_sprites
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.rect = pygame.Rect(0, 0, TILE_SIZE, TILE_SIZE)
+        self.rect.center = (x, y)
+        self.hit_rect = pygame.Rect(0, 0, hit_rect_width, hit_rect_height)
+        self.hit_rect.center = (x, y)
+        self.name = name
+        self.sound = False
+        self.active = True
+        self.text = text
+
+    def gather(self):
+        if self.active:
+            if self.sound:
+                pygame.mixer.Sound.play(self.sound)
+            self.game.put_txt(self.text)
 
 
 class Fence_Object(pygame.sprite.Sprite):
@@ -495,6 +580,7 @@ class Fence_Object(pygame.sprite.Sprite):
         self.hit_rect.center = (x,y)
         self.lava_immune_time = 500
         self.last_damage = 0
+        self.water = False
 
     def update(self):
         hits = pygame.sprite.spritecollide(self,self.game.act_lvl.melle_swing,True,collide_double_hit_rect)
@@ -1456,6 +1542,7 @@ class Player(pygame.sprite.Sprite):
             self.xp_step = 10 * self.level + ((self.level - 1) * self.level)
             self.game.events_manager.emit(Event(id=f'level {self.level} achieved'))
         if self.attribute_points > 0:
+            pygame.mixer.Sound.play(levelup_snd)
             return self.attribute_points
         else:
             return False
@@ -1597,26 +1684,24 @@ class Mob(pygame.sprite.Sprite):
     ### WRACA NA MIEJSCE GDY GRACz SIE ODDALI
     ### UDERZA WRECZ ZA POMICA COLLIDESPRITE
 
-    def __init__(self, game, name, start_x , start_y, s_pos, ranged_parameters, tileset, img_x, img_y, max_speed, min_speed, stun_time, hp, damage, sleep_radius, xp):
+    def __init__(self, game, name, start_x , start_y, image, s_pos,
+                 ranged_parameters, max_speed, min_speed, stun_time, hp, damage, sleep_radius, xp):
         self._layer = MOB_LAYER
         self.groups = game.act_lvl.all_sprites, game.act_lvl.mobs
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.name = name
-        self.tileset = tileset
-        self.img_x = img_x
-        self.img_y = img_y
         self.speed = max_speed
         self.min_speed = min_speed
         self.max_hp = hp
         self.hp = hp
         self.xp = xp
         self.damage = damage
-        self.image = pygame.Surface((TILE_SIZE,TILE_SIZE),pygame.HWSURFACE | pygame.SRCALPHA)
-        #self.non_rotated_image = self.image
-        self.image.blit(tileset,(0,0),(img_x * TILE_SIZE, img_y * TILE_SIZE,TILE_SIZE,TILE_SIZE))
+        if not image:
+            self.image = pygame.Surface((TILE_SIZE, TILE_SIZE), pygame.HWSURFACE | pygame.SRCALPHA)
+        else:
+            self.image = image
         self.base_image = self.image.copy()
-        #self.non_rotated_image.blit(tileset,(0,0),(img_x * TILE_SIZE, img_y * TILE_SIZE,TILE_SIZE,TILE_SIZE))
         self.rect = self.image.get_rect()
         self.hit_rect = pygame.Rect(0, 0, TILE_SIZE - 5,TILE_SIZE -5)
         self.hit_rect.center = self.rect.center
@@ -1666,6 +1751,9 @@ class Mob(pygame.sprite.Sprite):
         self.attention = 0
         ### DO WYSWIETLENIA EFEKTU GRAFICZNEGO
         self.damaged = False
+
+    def load_image_from_tileset(self, tileset, x, y):
+        self.image.blit(tileset, (0, 0), (x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE))
 
     def deefreeze(self):
         ## FUNKCJA POWOLNEGO ODMRAZANIA
@@ -1731,13 +1819,13 @@ class Mob(pygame.sprite.Sprite):
             now = (int(self.game.player.score_time_played * 1000))
             #### JEZELI NIE JEST UDERZONY, WLACZAM  MINIMALNA PREDKOSC!
             if now - self.last_hit_moment > self.hit_stun_time:
-                # print ("APPLY MIN SPEED")
+                #print ("APPLY MIN SPEED")
                 if self.vel.length() <= self.min_speed:
                     if self.speed:
                         self.vel.scale_to_length(self.min_speed)
             else:
                 pass
-                # print ("POZWALAM NA ZMINEJSZENIE PREDKOSCI PONIZEJ MINIMALNEJ")
+                print ("POZWALAM NA ZMINEJSZENIE PREDKOSCI PONIZEJ MINIMALNEJ")
                 # print ("SPEED: " + str(self.vel.length()))
                 # print ("ACC: " + str(self.acc.length()))
         #### JEZELI NIE WIDZI GRACZA WRACA NA SWOJA POZYCJE
@@ -1981,7 +2069,7 @@ class Flesh(pygame.sprite.Sprite):
 
 
 class Obstacle(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, w, h):
+    def __init__(self, game, x, y, w, h, water):
         self.groups = game.act_lvl.walls
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
@@ -1990,6 +2078,7 @@ class Obstacle(pygame.sprite.Sprite):
         self.y = y
         self.rect.x = x
         self.rect.y = y
+        self.water = water
 
 
 class Teleport(pygame.sprite.Sprite):
@@ -2005,6 +2094,7 @@ class Teleport(pygame.sprite.Sprite):
         self.y = y
         self.rect.x = x
         self.rect.y = y
+
 
 class ShopDoor(pygame.sprite.Sprite):
     def __init__(self, game, shop, pos_x, pos_y, x, y, w, h):
@@ -2091,8 +2181,11 @@ class MobArrow(pygame.sprite.Sprite):
         self.rect.center = self.pos
         now = (int(self.game.player.score_time_played * 1000))
         if now - self.spawn_time > 100:
-            if pygame.sprite.spritecollideany(self,self.game.act_lvl.walls):
-                self.kill()
+            ## KOLIZJA Z MUREM (nie wodą!)
+            hits = pygame.sprite.spritecollide(self, self.game.act_lvl.walls, False)
+            for hit in hits:
+                if not hit.water:
+                    self.kill()
         if now - self.spawn_time > self.lifetime:
             self.kill()
         if collide_double_hit_rect(self,self.game.player):
@@ -2126,8 +2219,11 @@ class Dart(pygame.sprite.Sprite):
         self.rect.center = self.pos
         now = (int(self.game.player.score_time_played * 1000))
         if now - self.spawn_time > 100:
-            if pygame.sprite.spritecollideany(self,self.game.act_lvl.walls):
-                self.kill()
+            ## Kolizja z murem (nie wodą!)
+            hits = pygame.sprite.spritecollide(self, self.game.act_lvl.walls, False)
+            for hit in hits:
+                if not hit.water:
+                    self.kill()
         if now - self.spawn_time > self.lifetime:
             self.kill()
         if collide_double_hit_rect(self,self.game.player):
@@ -2328,6 +2424,7 @@ class Animated_Obstacle(pygame.sprite.Sprite):
         self.hit_rect = self.rect
         self.animation_time = 0
         self.last_animation_time = 0
+        self.water = False
 
     def update(self):
         self.animation_time += self.game.dt
@@ -2343,18 +2440,5 @@ class Animated_Obstacle(pygame.sprite.Sprite):
             self.last_animation_time = self.animation_time
 
 
-class Wall(pygame.sprite.Sprite):
-    def __init__(self, game,x,y):
-        self._layer = WALL_LAYER
-        self.groups = game.act_lvl.all_sprites, game.act_lvl.walls
-        pygame.sprite.Sprite.__init__(self, self.groups)
-        self.game = game
-        self.image = pygame.Surface((TILE_SIZE,TILE_SIZE))
-        self.image.blit(game.tileset_image,(0,0),(22*TILE_SIZE,13*TILE_SIZE,TILE_SIZE,TILE_SIZE))
-        self.rect = self.image.get_rect()
-        self.x = x
-        self.y = y
-        self.rect.x = x * TILE_SIZE
-        self.rect.y = y * TILE_SIZE
 
 
