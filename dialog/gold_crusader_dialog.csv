@@ -3,9 +3,8 @@ True;welcome;0;0;Hello;False;False;False;False;False;False;False;False
 False;welcome;0;1;Hello;False;False;False;False;Next;False;False;False
 True;welcome;1;0;Hello again;False;False;False;False;False;False;False;False
 False;welcome;1;1;Hello again;False;False;False;False;Next;False;False;False
-True;intro gold crusader;0;0;You are too weak to speak with me, child.;False;False;False;False;False;False;False;False
 True;quest Holy Grail;0;0;I have a task for you. Will you help me?;Yes>quest Holy Grail>0,1;No>False>0,2;False;False;False;False;False;False
-True;quest Holy Grail;0;1;Thank`s, I`m seeking for a holy Grail.  Look for and bring it to me, I`ll be grateful!;False;False;False;False;Next;False;False;False
+True;quest Holy Grail;0;1;Thank`s, I`m seeking for a Holy Grail.  Look for and bring it to me, I`ll be grateful!;False;False;False;False;Next;False;False;False
 True;quest Holy Grail;0;2;That`s a pity..;False;False;False;False;Next;False;False;False
 False;quest Holy Grail;1;0;Are you still searching?;False;False;False;False;Next;False;False;False
 True;quest Holy Grail;2;0;Wonderful you have made it! Congratulations;False;False;False;False;False;False;False;quest Holy Grail has been completed

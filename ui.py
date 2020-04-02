@@ -764,14 +764,14 @@ class Dialog:
         ## TE KTORE SA DO ODBLOKOWANIA SA PER SE ZABLOKOWANE:
         for thread in self.threads_to_unblock_by_event.values():
             self.add_blocked_thread(thread)
-        ## TE KTORE SA DO ZABLOKOWANIA I MAJA EVENT spelniony:
-        for event, thread in self.threads_to_block_by_event.items():
-            if self.game.events_manager.search_event(event):
-                self.add_blocked_thread(thread)
         ## TE KTORE SA ZABLOKOWANE I MAJA EVENT spelniony ODBLOKOWUJE:
         for event, thread in self.threads_to_unblock_by_event.items():
             if self.game.events_manager.search_event(event):
                 self.remove_blocked_thread(thread)
+        ## TE KTORE SA DO ZABLOKOWANIA I MAJA EVENT spelniony:
+        for event, thread in self.threads_to_block_by_event.items():
+            if self.game.events_manager.search_event(event):
+                self.add_blocked_thread(thread)
         ############
         #print ("BLOCKED THREADS:")
         #print (self.blocked_threads)
@@ -1044,12 +1044,13 @@ class Dialog:
         for text in self.conversation:
             if text.thread not in threads:
                 threads.append(text.thread)
-        print (f'removing blocked Threads...')
-        for thread in threads:
-            if thread in self.blocked_threads:
-                threads.remove(thread)
-        print(f'SEARCHING FOR A NEXT THREAD. AVAIBLE Threads: {threads}')
-        threads = iter(threads)
+        #print (f'found threads: {threads}')
+        blocked_threads = self.blocked_threads.copy()
+        #print (f'removing blocked Threads from list: {blocked_threads}')
+        ## LIST SUBSTACTION you silly kris!
+        result_threads = [i for i in threads if not i in blocked_threads or blocked_threads.remove(i)]
+        #print(f'SEARCHING FOR A NEXT THREAD. AVAIBLE Threads: {result_threads}')
+        threads = iter(result_threads)
         while True:
             try:
                 thread = next(threads)
@@ -1128,6 +1129,7 @@ class ShopDialogBox:
         self.shop = shop
         self.game.put_txt(f'Entering {self.shop.shop_name}')
         self.game.ph_shop = True
+        self.game.update_ui_buttons()
         print("START SPEAKING WITH SHOP OWNER")
         print(f'ph_shop: {self.game.ph_shop}')
         print(f'ph_buy and sell: {self.game.ph_buy_and_sell}')
@@ -1203,9 +1205,6 @@ class MessageBox:
         self.image = dialogbox_img_2.copy()
         self.rew_image = scroll_160_img.copy()
 
-    def write(self, txt, ln):
-        self.game.s_write(txt,self.image, (85, 100 + ln * 24), (WHITE))
-
     def update(self, mouse_pos):
         mouse_x = mouse_pos[0]
         mouse_y = mouse_pos[1]
@@ -1229,8 +1228,12 @@ class MessageBox:
                 self.ok_button.deactivate()
                 self.game.back_to_game_and_unpause()
 
-    def show_text(self, text):
+    def show_title(self, text):
         self.game.s_write(text, self.image,DB2_TXT_POS,WHITE)
+        #self.write(text,0)
+
+    def show_text(self, text):
+        self.game.s_write(text, self.image,(120,150),WHITE)
         #self.write(text,0)
 
     def show_button_ok(self):
@@ -1243,7 +1246,7 @@ class MessageBox:
         g_l_m = 10 * (len(str(reward_gold)) - 1)
         e_l_m = 10 * (len(str(reward_xp)) - 1)
         if reward_gold > 0:
-            self.rew_image.blit(gold_coin, (100 + g_l_m, 40))
+            self.rew_image.blit(gold_coin, (100 + g_l_m, 45))
             self.game.s_write(f'+ {reward_gold}', self.rew_image, (80, 35), BLACK)
         if reward_xp > 0:
             self.rew_image.blit(xp_icon, (100 + e_l_m, 60))
@@ -1258,17 +1261,21 @@ class MessageBox:
         if self.rew_scroll_show:
             screen.blit(self.rew_image, self.rew_pos)
 
-    def show_message(self, text):
+    def show_message(self, title, text):
         self.clear()
         self.game.message_shown = True
         self.game.paused = True
+        self.game.update_ui_buttons()
+        self.show_title(title)
         self.show_text(text)
 
     def show_message_quest_reward(self, text, reward_gold, reward_xp, reward_item):
+        print ("show message quest reward")
         self.clear()
         self.game.message_shown = True
         self.game.paused = True
-        self.show_text(text)
+        self.game.update_ui_buttons()
+        self.show_title(text)
         self.show_reward_image(reward_gold, reward_xp, reward_item)
 
 
@@ -1292,10 +1299,17 @@ class DialogBox:
 
     def start_conversation(self,npc):
         print ("STARTING CONVERSATION")
+        ### WYLACZAM GUZIKI NA MAIN SCREEN
+        self.game.update_ui_buttons()
+        ### SENDING INFO
         self.game.put_txt(f'Speaking with {npc.name}')
+        ### PUT NPC DATA
         self.npc = npc
         self.dialog_data = self.npc.dialog_data
+        ### CLEaR IMAGES
+        self.rew_image = scroll_160_img.copy()
         self.dialog_data.reset()
+        ### BLOKUJE WATKI
         self.dialog_data.setup_blocked_threads()
         #### SZUKAM POCZATKU DIALOGU:
         encounter = self.game.events_manager.find_npc_encounter_event(self.npc.name)
@@ -1331,14 +1345,14 @@ class DialogBox:
         g_l_m = 10 * (len(str(quest.reward_gold)) - 1)
         e_l_m = 10 * (len(str(quest.reward_xp)) - 1)
         if quest.reward_gold > 0:
-            self.rew_image.blit(gold_coin,(100 + g_l_m,40))
+            self.rew_image.blit(gold_coin,(100 + g_l_m,30))
             self.game.s_write(f'+ {quest.reward_gold}',self.rew_image,(80,35),BLACK)
         if quest.reward_xp > 0:
-            self.rew_image.blit(xp_icon,(100 + e_l_m,60))
-            self.game.s_write(f'+ {quest.reward_xp}', self.rew_image, (80, 60),BLACK)
+            self.rew_image.blit(xp_icon,(100 + e_l_m,50))
+            self.game.s_write(f'+ {quest.reward_xp}', self.rew_image, (80, 50),BLACK)
         if quest.reward_item:
-            self.game.s_write(f'You get {quest.reward_item.name}', self.rew_image, (120, 85),BLACK)
-            self.rew_image.blit(quest.reward_item.image,(80,80))
+            self.game.s_write(f'You get {quest.reward_item}', self.rew_image, (80, 70),BLACK)
+            #self.rew_image.blit(quest.reward_item.image,(80,80))
 
     def configure_text(self):
         ################################################################
@@ -1407,6 +1421,10 @@ class DialogBox:
         ### JEZELI NIE MA JUZ AKTULANEGO TESKTU KONCZE DIALOG I ZAPISUJE ZE ODNALEZIONY NPC
         else:
             self.clear()
+            self.game.dialog_in_progress = False
+            self.game.paused = False
+            self.game.update_ui_buttons()
+        ### NA ZAKONCZENIE DIALOGU> zapisuje NPC jako spotkany
             if not self.npc.encountered:
                 self.game.events_manager.emit(Event(id=f'{self.npc.name} has been encountered'))
                 self.npc.encountered = True
@@ -1419,13 +1437,14 @@ class DialogBox:
                             quest.collect_reward()
                         else:
                             print ("ALE NIE WYKONANO WARUNKOW DO SPELNIENIA questu z autosprawdzeniem")
-            self.game.dialog_in_progress = False
-            self.game.paused = False
-            if self.game.player.check_next_level():
-                self.game.paused = True
+            ### wyswietlam wiadomosc po dialogu jezeli zakonczono quest
             if self.game.message_shown:
                 print ("Message shown = True")
                 self.game.paused = True
+            ### jezeli next level, pauzuje gre po dialogu
+            if self.game.player.check_next_level():
+                self.game.paused = True
+
 
     def write_actual_text(self):
         if self.actual_text.ifnpc:
@@ -1558,8 +1577,9 @@ class DialogBox:
 
 
 class Quest:
-    def __init__(self, game, name, goal_descr, level_req, mobs_to_kill,
-                 items_to_collect,
+    def __init__(self, game, name, goal_descr, level_req,
+                 mobs_to_kill,
+                 items_to_collect, item_remove_bool,
                  tiles_to_explore,
                  npcs_to_encounter,
                  reward_xp, reward_gold, reward_item = False):
@@ -1574,18 +1594,27 @@ class Quest:
             self.goal.add_mob_to_kill(i)
         for i in items_to_collect:
             self.goal.add_item_to_collect(i)
+        self.item_remove_bool = item_remove_bool
         for i in tiles_to_explore:
             self.goal.add_tile_to_explore(i)
         for i in npcs_to_encounter:
             self.goal.add_npc_to_encounter(i)
         self.reward_xp = reward_xp
         self.reward_gold = reward_gold
-        self.reward_item = reward_item
+        if reward_item:
+            self.reward_item = reward_item
+        else:
+            self.reward_item = False
         self.completed = False
         self.in_progress = False
         self.visible = False
         self.start_time = 0
+        #### JEZELI MA SPRAWDZIC OD RAZU PO ZDARZENIU, uwaga zrobiona narazie opcja z napotkaniem NPC
+        #### inne (przedmioty, wrogowie, lub miejsca - do zrobienia sprawdzanie warunku podczas zdarzenia
+        #### np po podniesieniu przedmiotu/skrzyni sprawdzam czy nie mam przedmiotów, lub po zabiciu wroga sprawdzam czy nie ma spelnionego questu.
         self.auto_checking = False
+        #### PO WYKONANIU QUESTU automatycznie dostaje kolejny! -> object.
+        self.auto_next_quest = False
 
     def put_image(self,image):
         self.image.blit(image,(16,16))
@@ -1595,6 +1624,9 @@ class Quest:
 
     def set_to_autochecking(self):
         self.auto_checking = True
+
+    def put_auto_next_quest(self, quest):
+        self.auto_next_quest = quest
 
     def show_quest_icon(self, surface, x, y):
         surface.blit(self.image, (x, y))
@@ -1652,6 +1684,10 @@ class Quest:
                         #print (quest_item.name)
                         if quest_item.name == goal_item:
                             quest_items_to_fulfil.append(quest_item)
+                            print (f'Masz: {quest_item} i potzebujesz {quest_item.name}! proba OK!')
+            print (f'- LISTA FULFIL ITEMS: {quest_items_to_fulfil}')
+            print (f'- DLUGOSC LISTY: {len(quest_items_to_fulfil)}')
+            print (f'- DLUGOSC LISTY GOAL {len(self.goal.items_to_collect)}')
             ### JEZELI NA LISCIE SA WSZYSTKIE PRZEDMIOTY dopiero wysyłam listę przedmiotów!
             if len(quest_items_to_fulfil) == len(self.goal.items_to_collect):
                 return quest_items_to_fulfil
@@ -1666,10 +1702,10 @@ class Quest:
         if quest_items_to_remove:
             self.emit_the_quest_fulfiled_event()
             self.completed = True
-            ### TODO - zrobic zmienna w quest - quest item to remove_?
-            ### czyli czy ma zabierac przedmiot?
-            for item in quest_items_to_remove:
-                self.game.player.inventory.remove_item(item)
+            ### ZABIERA PRZEDMIOT GDY MA selfi.item_remove_bool
+            if self.item_remove_bool: ### czyli czy ma zabierac przedmiot!
+                for item in quest_items_to_remove:
+                    self.game.player.inventory.remove_item(item)
             return True
         ### 2. NPCs
         npcs_to_encounter = self.check_npcs_to_encounter()
@@ -1694,12 +1730,20 @@ class Quest:
             #self.game.player.active_quests.remove(self)
             self.game.player.gold += self.reward_gold
             self.game.player.xp += self.reward_xp
+            #### GENERUJE PRZEDMIOTY REWARD
             if self.reward_item:
-                item_collected = self.game.player.inventory.put_in_first_free_slot(self.reward_item)
+                if self.reward_item[-3:] == "Key":
+                    item = self.game.levelgen.gen.g_key(self.reward_item,False)
+                else:
+                    item = self.game.levelgen.gen.generate_quest_item_by_name(self.reward_item)
+                item_collected = self.game.player.inventory.put_in_first_free_slot(item)
                 if not item_collected:
                     print ("QUEST ITEM NOT COLLECTED DUE TO FULL INVENTORY!")
                     # TODO put item on the ground?
             pygame.mixer.Sound.play(coin_snd)
+            ### JEZELI AUTO NEXT QUEST - dodaje nowy quest!
+            if self.auto_next_quest:
+                self.auto_next_quest.get_quest()
             #### SEND INFO
             if not self.game.events_manager.search_event(f'quest {self.name} has been completed'):
                 self.game.events_manager.emit(Event(id= f'quest {self.name} has been completed'))
@@ -1707,9 +1751,11 @@ class Quest:
                 self.game.events_manager.emit(Event(id= f'quest {self.name} has been rewarded'))
             pygame.mixer.Sound.play(levelup_snd)
             self.game.put_txt(f'Quest {self.name} finished')
+            ### JEZELI AUTO-CHECK i nie prowadzisz rozmowy trzeba nadać informację o zakończeniu questa
             if not self.game.dialog_in_progress:
                 self.game.message_box.show_message_quest_reward(f'Quest {self.name} completed!',
                                                                 self.reward_gold, self.reward_xp, self.reward_item)
+            #### USUWAM ZAKONCZONE QUESTY
             self.game.player.completed_quests.append(self)
             self.game.player.quest_book.remove(self)
             print("NAGRODA ODEBRANA i QUEST ZAPISANY JAKO WYKONANY")
@@ -1858,13 +1904,27 @@ class Shop:
                 slot.item.owner = "shop"
 
     def check_gold(self, item) -> bool:
-        if self.owner_gold >= item.cost:
-            ### TO DO TYPES TO BUY!
-            self.game.player.gold += item.cost
-            self.owner_gold -= item.cost
+        price = self.calculate_buy_from_player_price(item)
+        if self.owner_gold >= price:
             return True
         else:
             return False
+
+    def sell_to_player(self, item):
+        price = self.calculate_sell_to_player_price(item)
+        print (price)
+        pygame.mixer.Sound.play(coin_snd)
+        self.owner_gold += price
+        self.game.player.gold -= price
+        item.owner = "player"
+
+    def buy_from_player(self, item):
+        price = self.calculate_buy_from_player_price(item)
+        print(price)
+        pygame.mixer.Sound.play(coin_snd)
+        self.owner_gold -= price
+        self.game.player.gold += price
+        item.owner = "shop"
 
     def local_ph_deactivate(self):
         self.local_ph_buy_and_sell = False
@@ -2098,6 +2158,12 @@ class Shop:
         return owner_attitude
 
     def update(self, mouse_pos):
+        if self.game.item_picked:
+            self.exit_button.deactivate()
+            self.repair_button.activate()
+        else:
+            self.exit_button.activate()
+            self.repair_button.deactivate()
         mouse_x = mouse_pos[0]
         mouse_y = mouse_pos[1]
         mouse_x -= self.pos[0]
@@ -2115,6 +2181,7 @@ class Shop:
         mouse_y -= self.pos[1]
         self.mouse_pos = (mouse_x, mouse_y)
         if self.exit_button.check_if_clicked(self.mouse_pos):
+            print("EXIT SHOP INV CLICKED")
             self.back_to_shop_dialog()
             #self.exit_shop()
 
@@ -2127,12 +2194,20 @@ class Shop:
         if self.repair_button.check_if_clicked(mouse_pos):
             #print ("Repair..")
             if not item_picked.owner == "shop":
-                if self.repair_cost <= self.game.player.gold and self.repair_cost > 0:
-                    #print ("Repair" + item_picked.name)
-                    pygame.mixer.Sound.play(smith_snd)
-                    item_picked.repair(100)
-                    self.game.player.gold -= self.repair_cost
-                    self.game.player.update_stats()
+                if isinstance(item_picked, sprites.Armor) or isinstance(item_picked, sprites.Weapon):
+                    if self.repair_cost <= self.game.player.gold and self.repair_cost > 0:
+                        print ("Repair" + item_picked.name)
+                        self.owner_gold += self.repair_cost
+                        pygame.mixer.Sound.play(smith_snd)
+                        item_picked.repair(100)
+                        self.game.player.gold -= self.repair_cost
+                        self.game.player.update_stats()
+                    else:
+                        print ("NO GOLD on WEAPON IN GOOD SHAPE")
+                else:
+                    print ("BAD ITEM TYPE")
+            else:
+                print ("WEAPON IS NOT YOURS!")
 
     def exit_shop(self):
         self.local_ph_deactivate()

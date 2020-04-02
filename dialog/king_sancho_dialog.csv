@@ -1,0 +1,14 @@
+Npc;Thread;Branch;Step;Text;Ask1;Ask2;Ask3;Ask4;Next_Thread;Goto_Branch;Goto_Step;Event
+True;welcome;0;0;Hello;False;False;False;False;Next;False;False;False
+True;welcome;1;0;Hello again;False;False;False;False;Next;False;False;False
+True;ill;0;0;Don`t bother me.. Ugh ugh.. (badly coughing),;False;False;False;False;Next;False;False;False
+True;quest Speak with the King;0;0;Don`t bother me.. Ugh ugh.. (badly coughing),;False;False;False;False;Next;False;False;False
+True;quest Speak with the King;1;0;Don`t bother me.. Ugh ugh.. (badly coughing),;False;False;False;False;Next;False;False;False
+True;quest Speak with the King;2;0;Ughhh.. Ughhh.. (coughing and breathing heavily) What do you want stranger!;False;False;False;False;False;False;False;False
+False;quest Speak with the King;2;1;Karol gave me this mixture! I think it could help you with your illness..;False;False;False;False;False;False;False;False
+True;quest Speak with the King;2;2;What?... Ughhhh.. Let`s see, first… ugh… who are you? Why are you helping us?...;False;False;False;False;False;False;False;False
+False;quest Speak with the King;2;3;Well, La Palmix is my new home, I have to help us!;False;False;False;False;False;False;False;False
+True;quest Speak with the King;2;4;Okhh. Ok.. (cough). Let me see. I will speak with my phisician Lord Ivan. I`ll give it to him and we`ll see if we can control the epidemic... Blah what I say the curse...;False;False;False;False;False;False;False;quest Speak with the King has been completed
+True;quest Speak with the King;2;5;Take this as my gratefullness;False;False;False;False;False;False;False;quest Speak with the King has been rewarded
+True;quest Speak with the King;3;0;Lord Ivan is working on the cure. We think we`ll spread de Arechinix by the giant ballon over the empire…;False;False;False;False;False;False;False;False
+True;bye;0;0;You may go!;False;False;False;False;False;False;False;False

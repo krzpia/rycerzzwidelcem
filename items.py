@@ -20,6 +20,10 @@ class ItemGenerator:
 
         ######## QUEST ITEMS #######
         self.q_items.append(sprites.Quest_Item(self.game,"Holy Grail",0,23,94))
+        self.q_items.append(sprites.Quest_Item(self.game,"Mad Bat Wing",0,33,94))
+        self.q_items.append(sprites.Quest_Item(self.game, "Gremlin Tooth", 0, 34, 94))
+        self.q_items.append(sprites.Quest_Item(self.game, "Sunset Flower", 0, 35, 94))
+        self.q_items.append(sprites.Quest_Item(self.game, "Elixir Arechinix",0,61,41))
 
         ######## WEAPONS ###########
         self.weapons.append(sprites.Weapon(self.game, "Wooden Club", "weapon","blunt",
@@ -343,21 +347,26 @@ class ItemGenerator:
         self.magic_items = self.potions + self.books + self.rings
         #### ALL ITEMS
         self.all_items = self.weapons + self.armors + self.potions + self.arrows + self.books + self.rings
+        #### ALL ITEMS and QUEST ITEMS (for generate by name only)
+        self.all_item_and_quest_items = self.all_items + self.q_items
 
-    def count(self, id, sd):
-        #### WYLICZA x,y z tilesetu na podstawie ID z TileMap editora
-        self.x = id % 64
-        self.y = math.floor(id / 64)
-        self.sx = sd % 64
-        self.sy = math.floor(sd / 64)
+    #def count(self, id, sd):
+    #    #### WYLICZA x,y z tilesetu na podstawie ID z TileMap editora
+    #    self.x = id % 64
+    #    self.y = math.floor(id / 64)
+    #    self.sx = sd % 64
+    #    self.sy = math.floor(sd / 64)
 
     def g_key(self, name, key):
         ####################################
         # generuje klucze z nazwy i klucza #
         ####################################
         if name == "Key":
-            self.count(2615, 0)
-            return sprites.Key(self.game, "Key", key, self.x, self.y)
+            return sprites.Key(self.game, "Key", key, 55, 40)
+        elif name == "Miraflorida Magic Key":
+            return sprites.Key(self.game, "Miraflorida Key", 41, 55, 40)
+        else:
+            print ("ERROR in KEY CREATING")
 
     def generate_random_item(self, item_type, max_cost = False):
         if item_type == "weapon":
@@ -393,7 +402,7 @@ class ItemGenerator:
             return copy.copy(random.choice(temp_list))
 
     def generate_item_by_name(self, name):
-        for i in self.all_items:
+        for i in self.all_item_and_quest_items:
             if i.name == name:
                 return copy.copy(i)
         print ("ERROR - NO ITEM of NAME: "+ name)

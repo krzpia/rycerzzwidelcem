@@ -263,6 +263,37 @@ class Swing(pygame.sprite.Sprite):
             self.kill()
 
 
+class HiddenItem_to_take(pygame.sprite.Sprite):
+    def __init__(self, game, x, y, item):
+        self._layer = FLOOR_LAYER
+        self.groups = game.act_lvl.items_to_pick
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.item = item
+        self.image = self.item.b_image
+        self.rect = self.image.get_rect()
+        self.hit_rect = pygame.Rect(0, 0, TILE_SIZE - 5, TILE_SIZE - 5)
+        self.pos = vec(x,y)
+        self.rect.center = self.pos
+        self.hit_rect.centerx = self.pos.x
+        self.hit_rect.centery = self.pos.y
+        self.encountered = False
+        self.unlocked = True
+
+    def unlock(self):
+        self.unlocked = True
+
+    def lock(self):
+        self.unlocked = False
+
+    def unhide(self):
+        if not self.encountered and self.unlocked:
+            pygame.mixer.Channel(0).play(item_dig_snd)
+            pygame.mixer.Channel(0).queue(item_found_snd)
+            Item_to_take(self.game,self.pos.x, self.pos.y, self.item)
+            self.encountered = True
+
+
 class Item_to_take(pygame.sprite.Sprite):
     def __init__(self, game, x, y, item):
         self._layer = FLOOR_LAYER
@@ -279,6 +310,37 @@ class Item_to_take(pygame.sprite.Sprite):
         self.hit_rect.centery = self.pos.y
 
 
+class HiddenGold_to_take(pygame.sprite.Sprite):
+    def __init__(self, game, x, y, gold):
+        self._layer = FLOOR_LAYER
+        self.groups = game.act_lvl.items_to_pick
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.gold = gold
+        self.image = gold1_img
+        self.rect = self.image.get_rect()
+        self.hit_rect = pygame.Rect(0, 0, TILE_SIZE - 5, TILE_SIZE - 5)
+        self.pos = vec(x, y)
+        self.rect.center = self.pos
+        self.hit_rect.centerx = self.pos.x
+        self.hit_rect.centery = self.pos.y
+        self.encountered = False
+        self.unlocked = True
+
+    def unlock(self):
+        self.unlocked = True
+
+    def lock(self):
+        self.unlocked = False
+
+    def unhide(self):
+        if not self.encountered and self.unlocked:
+            pygame.mixer.Channel(0).play(item_dig_snd)
+            pygame.mixer.Channel(0).queue(item_found_snd)
+            Gold_to_take(self.game,self.pos.x, self.pos.y, self.gold)
+            self.encountered = True
+
+
 class Gold_to_take(pygame.sprite.Sprite):
     def __init__(self, game, x, y, gold):
         self._layer = FLOOR_LAYER
@@ -286,6 +348,8 @@ class Gold_to_take(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.gold = gold
+        if self.gold == 0:
+            self.gold = random.randint(1,self.game.player.level * 10)
         if 0 < self.gold <= 1:
             self.image = gold1_img
         elif 1 < self.gold <= 9:
@@ -550,6 +614,7 @@ class InfoSprite(pygame.sprite.Sprite):
         self.groups = game.act_lvl.collecting_sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
+        self.name = name
         self.rect = pygame.Rect(0, 0, TILE_SIZE, TILE_SIZE)
         self.rect.center = (x, y)
         self.hit_rect = pygame.Rect(0, 0, hit_rect_width, hit_rect_height)
@@ -563,6 +628,7 @@ class InfoSprite(pygame.sprite.Sprite):
         if self.active:
             if self.sound:
                 pygame.mixer.Sound.play(self.sound)
+            self.game.message_box.show_message(self.name, self.text)
             self.game.put_txt(self.text)
 
 
@@ -684,7 +750,7 @@ class Weapon(pygame.sprite.Sprite):
         self.speed_mod = speed_mod
         self.ste_mod = ste_mod
         self.durability = durability
-        self.condition = 100.0
+        self.condition = 80.0
         self.hit_rate = hit_rate
         self.hit_radius = hit_radius
         self.image = self.s_image
@@ -1039,6 +1105,9 @@ class Player(pygame.sprite.Sprite):
             self.inventory.put_in_first_free_slot(Weapon(self.game, "Knife", "weapon","dagger",
                                            15, False, 1, 500, "small",
                                            0, 0, 0, 0, 0, 0,40, 2, 45, 42, 87))
+            self.inventory.put_in_first_free_slot(sprites.Weapon(self.game, "Wood Bow", "weapon", "bow",
+                           75, True, 3, 1250, False,
+                           0, 0, 0, 0, 0, 0, 25, 38, 49, 26, 87))
             self.bow_hit_rate_bonus = 0.75
             self.barter_bonus = 25
         self.active_effects_lib = ActiveEffectsLibrary(self.game)
@@ -1097,12 +1166,12 @@ class Player(pygame.sprite.Sprite):
         self.act_hp = self.max_hp
         self.max_mana = max(4, self.wisdom * 8 - 15)
         self.act_mana = self.max_mana
-        self.gold = 120
+        self.gold = 20
         self.arrows = 0
         self.xp = 0
         self.attribute_points = 0
         self.level = 1
-        self.xp_step = 10 * self.level + ((self.level - 1) * self.level)
+        self.xp_step = 10 * self.level + ((self.level - 1) * 2 * self.level)
         self.hit_dmg = self.strength
         self.hit_radius = "small"
         self.armor = 0
@@ -1527,19 +1596,18 @@ class Player(pygame.sprite.Sprite):
             return True
 
     def check_gold(self, item, shop) -> bool:
-        if self.gold >= item.cost:
-            shop.owner_gold += item.cost
-            self.gold -= item.cost
+        price = shop.calculate_sell_to_player_price(item)
+        if self.gold >= price:
             return True
         else:
             return False
 
     def check_next_level(self):
-        self.xp_step = 10 * self.level + ((self.level - 1) * self.level)
+        self.xp_step = 10 * self.level + ((self.level - 1) * 2 * self.level)
         while self.xp >= self.xp_step:
             self.level += 1
             self.attribute_points += 1
-            self.xp_step = 10 * self.level + ((self.level - 1) * self.level)
+            self.xp_step = 10 * self.level + ((self.level - 1) * 2 * self.level)
             self.game.events_manager.emit(Event(id=f'level {self.level} achieved'))
         if self.attribute_points > 0:
             pygame.mixer.Sound.play(levelup_snd)
@@ -1569,7 +1637,7 @@ class Player(pygame.sprite.Sprite):
         #### TELEPORT
         teleport_hits = pygame.sprite.spritecollide(self, self.game.act_lvl.teleports, False)
         for tele_hit in teleport_hits:
-            self.go_to_level(tele_hit.destination, tele_hit.pos_x, tele_hit.pos_y)
+            tele_hit.activate_teleport()
         ### OBRAZENIA OD STRZAL INNYCH POTWOROW:
         hits = pygame.sprite.spritecollide(self, self.game.act_lvl.mob_arrows, False)
         for hit in hits:
@@ -1685,7 +1753,8 @@ class Mob(pygame.sprite.Sprite):
     ### UDERZA WRECZ ZA POMICA COLLIDESPRITE
 
     def __init__(self, game, name, start_x , start_y, image, s_pos,
-                 ranged_parameters, max_speed, min_speed, stun_time, hp, damage, sleep_radius, xp):
+                 ranged_parameters, max_speed, min_speed, stun_time,
+                 hp, damage, sleep_radius, xp, item):
         self._layer = MOB_LAYER
         self.groups = game.act_lvl.all_sprites, game.act_lvl.mobs
         pygame.sprite.Sprite.__init__(self, self.groups)
@@ -1697,6 +1766,7 @@ class Mob(pygame.sprite.Sprite):
         self.hp = hp
         self.xp = xp
         self.damage = damage
+        self.item = item
         if not image:
             self.image = pygame.Surface((TILE_SIZE, TILE_SIZE), pygame.HWSURFACE | pygame.SRCALPHA)
         else:
@@ -1718,6 +1788,8 @@ class Mob(pygame.sprite.Sprite):
                 self.bullet_image = bullet_firebolt_image
             elif self.bullet_type == "arrow":
                 self.bullet_image = arrow_img
+            elif self.bullet_type == "rock":
+                self.bullet_image = bullet_rock_image
             else:
                 self.bullet_image = bullet_magic_image
             self.bullet_damage = ranged_parameters[1]
@@ -1825,7 +1897,7 @@ class Mob(pygame.sprite.Sprite):
                         self.vel.scale_to_length(self.min_speed)
             else:
                 pass
-                print ("POZWALAM NA ZMINEJSZENIE PREDKOSCI PONIZEJ MINIMALNEJ")
+                #print ("POZWALAM NA ZMINEJSZENIE PREDKOSCI PONIZEJ MINIMALNEJ")
                 # print ("SPEED: " + str(self.vel.length()))
                 # print ("ACC: " + str(self.acc.length()))
         #### JEZELI NIE WIDZI GRACZA WRACA NA SWOJA POZYCJE
@@ -1913,6 +1985,36 @@ class Mob(pygame.sprite.Sprite):
                 MobArrow(self.game,self,self.pos,dir,self.bullet_damage,self.bullet_speed,self.bullet_image)
                 self.last_bullet = now
 
+    def die(self):
+        self.game.player.xp += self.xp
+        Flesh(self.game, self.pos)
+        ### METODY DO KOLEKCJI INFORMACJI, jedna MOJA, druga COPALCO
+        self.game.player.score_killed_enemies.append(self)
+        self.game.events_manager.emit(Event(id=f'{self.name} has been killed'))
+        ### GDY WYPADA PRZEDMIOT Z MOBA
+        if self.item:
+            if self.item == "gold":
+                print("ENEMY IS DEDAD, GENERATINING GOLD")
+                Gold_to_take(self.game,self.pos.x,self.pos.y,
+                             self.damage)
+            elif self.item == "random":
+                print("ENEMY IS DEDAD, GENERATINING RANDOM ITEM")
+                #### ITEM o MAX COST od 3xHP (min 29)... np. moze HP*DAMAGE?
+                Item_to_take(self.game,self.pos.x, self.pos.y,
+                             self.game.levelgen.gen.generate_random_item("all",max(29,self.max_hp*3)))
+            else:
+                print ("ENEMY IS DEDAD, GENERATINING ITEM by NAME")
+                Item_to_take(self.game,self.pos.x,self.pos.y,
+                             self.game.levelgen.gen.generate_item_by_name(self.item))
+        ### USUWAM SPRITE
+        self.kill()
+        ### DZWIEK
+        pygame.mixer.Sound.play(win_snd)
+        ### SPRAWDZAM NEXT LEVEL
+        if self.game.player.check_next_level():
+            self.game.paused = True
+        ### TODO AUTO SPRAWDZEIE QUESTOW Z mobs_to_kill
+
     def update(self):
         self.image = self.base_image.copy()
         #### ADJUSTING SLEEP RADIUS
@@ -1977,15 +2079,8 @@ class Mob(pygame.sprite.Sprite):
         self.rect.center = self.hit_rect.center
         ### SPRAWDZAM HP i ZABIJAM MOBA, dodaje XP dla gracza
         if self.hp <=0:
-            self.game.player.xp += self.xp
-            Flesh(self.game,self.pos)
-            ### METODY DO KOLEKCJI INFORMACJI, jedna MOJA, druga COPALCO
-            self.game.player.score_killed_enemies.append(self)
-            self.game.events_manager.emit(Event(id=f'{self.name} has been killed'))
-            self.kill()
-            pygame.mixer.Sound.play(win_snd)
-            if self.game.player.check_next_level():
-                self.game.paused = True
+            self.die()
+        ### JEZELI RANNY - ANIMACJA PULSUJACA CZERWIEN
         if self.damaged:
             try:
                 self.image.fill((255, 0, 0, next(self.damage_alpha)),special_flags=pygame.BLEND_RGBA_MULT)
@@ -2079,13 +2174,43 @@ class Obstacle(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         self.water = water
+        self.removable = False
+
+
+class RemObstacle(pygame.sprite.Sprite):
+    def __init__(self, game, x, y, w, h, water, remove_event):
+        self.groups = game.act_lvl.walls
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.rect = pygame.Rect(x, y, w, h)
+        self.x = x
+        self.y = y
+        self.rect.x = x
+        self.rect.y = y
+        self.water = water
+        self.removable = True
+        self.remove_condition = remove_event
+        self.game.rem_objects.append(self)
+
+    def remove(self):
+        if self.removable:
+            self.kill()
+
+    def check_remove_condition(self):
+        print ("Check removable walls")
+        if self.game.events_manager.search_event(self.remove_condition):
+            return True
+        else:
+            print ("No remove condition in events")
+            return False
 
 
 class Teleport(pygame.sprite.Sprite):
-    def __init__(self, game, destination, pos_x, pos_y, x, y, w, h):
+    def __init__(self, game,name, destination, pos_x, pos_y, x, y, w, h):
         self.groups = game.act_lvl.teleports
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
+        self.name = name
         self.destination = destination
         self.pos_x = pos_x
         self.pos_y = pos_y
@@ -2094,6 +2219,12 @@ class Teleport(pygame.sprite.Sprite):
         self.y = y
         self.rect.x = x
         self.rect.y = y
+
+    def activate_teleport(self):
+        self.game.player.go_to_level(self.destination, self.pos_x, self.pos_y)
+        self.game.events_manager.emit(Event(id=f'{self.name} has been used'))
+        self.game.put_txt("Travel to next level...")
+        self.game.update_game_enviroment()
 
 
 class ShopDoor(pygame.sprite.Sprite):

@@ -22,6 +22,8 @@ class LevelGen:
             self.load_level_02()
         elif name == "level03":
             self.load_level_03()
+        elif name == "level04":
+            self.load_level_04()
         else:
             print ("ERROR DECODIN LEVELGEN LOAD LEVEL by NAME")
 
@@ -32,6 +34,45 @@ class LevelGen:
         self.game.map_image = self.game.map.make_map()
         self.game.map_rect = self.game.map_image.get_rect()
         self.game.player.put_in_pos(pos_x, pos_y)
+
+    def load_level_04(self):
+        self.game.act_lvl = self.game.level_04
+        ### ALL SPRITES (BEZ GRACZA!)
+        self.game.level_04.all_sprites = pygame.sprite.LayeredUpdates()
+        ## MURY / tylko odbijanie od obiektu Rect z TMX MAPS
+        self.game.level_04.walls = pygame.sprite.LayeredUpdates()
+        ## PRZESZKODY / odbijaja sie za pomoca hit_rect.
+        self.game.level_04.hr_obstacles = pygame.sprite.LayeredUpdates()
+        ## NIEWIDZIALNE POLE ZABIERAJACE HP
+        self.game.level_04.lavas = pygame.sprite.LayeredUpdates()
+        ## NPCS
+        self.game.level_04.npcs = pygame.sprite.LayeredUpdates()
+        ## PRZECIWNICY
+        self.game.level_04.mobs = pygame.sprite.LayeredUpdates()
+        ## STRZALY PRZECIWNIKOW
+        self.game.level_04.mob_arrows = pygame.sprite.LayeredUpdates()
+        ## STRZALY ranged
+        self.game.level_04.arrows = pygame.sprite.LayeredUpdates()
+        ## Sprite ataku wręcz
+        self.game.level_04.melle_swing = pygame.sprite.LayeredUpdates()
+        ## PRZEDMIOTY NA MAPIE DO PODNIESIENIA
+        self.game.level_04.items_to_pick = pygame.sprite.LayeredUpdates()
+        ## OBIEKTY DO INTERAKCJI (PODNIESIENIA, WYLECZENIA ITP)
+        self.game.level_04.collecting_sprites = pygame.sprite.LayeredUpdates()
+        ## ZLOTE MONETY DO PODNIESIENIA
+        self.game.level_04.gold_to_pick = pygame.sprite.LayeredUpdates()
+        ## STRZALY DO PODNIESIENIA
+        self.game.level_04.arrows_to_pick = pygame.sprite.LayeredUpdates()
+        ## DRZWI
+        self.game.level_04.doors = pygame.sprite.LayeredUpdates()
+        ## SKRZYNIE
+        self.game.level_04.chest_to_open = pygame.sprite.LayeredUpdates()
+        ## TELEPORTS
+        self.game.level_04.teleports = pygame.sprite.LayeredUpdates()
+        ## SHOPS
+        self.game.level_04.shops = pygame.sprite.LayeredUpdates()
+        #### LOAD TILE OBJECTS
+        self.load_objects(self.game.map_level_04.tmxdata.objects)
 
     def load_level_03(self):
         self.game.act_lvl = self.game.level_03
@@ -164,24 +205,27 @@ class LevelGen:
             object_center = vec(tile_object.x + tile_object.width/2, tile_object.y + tile_object.height/2)
             ### ENEMIES NEW
             if tile_object.type == "enemy":
-                self.enemy_gen.generate(tile_object.name,object_center.x,object_center.y, tile_object.image)
+                self.enemy_gen.generate(tile_object.name,object_center.x,object_center.y, tile_object.image, tile_object.item)
             if tile_object.type == "enemy s":
                 self.enemy_gen.generate_s(tile_object.name,object_center.x,object_center.y, tile_object.image,
-                                          tile_object.sx,tile_object.sy)
+                                          tile_object.sx,tile_object.sy, tile_object.item)
             if tile_object.type == "enemy_r":
-                self.enemy_gen.generate_r(tile_object.name,object_center.x,object_center.y,tile_object.image)
+                self.enemy_gen.generate_r(tile_object.name,object_center.x,object_center.y,tile_object.image, tile_object.item)
             ### NPCS
             if tile_object.type == "npc":
                 self.npcs_gen.generate(tile_object.name,tile_object.x,tile_object.y,tile_object.image)
             ### MAP ELEMENTS
             if tile_object.name == "wall":
                 Obstacle(self.game,tile_object.x,tile_object.y,tile_object.width,tile_object.height, water=False)
+            if tile_object.name == "rem_wall":
+                RemObstacle(self.game,tile_object.x,tile_object.y,tile_object.width,
+                            tile_object.height, water=False,remove_event=tile_object.event)
             if tile_object.name == "water":
                 Obstacle(self.game,tile_object.x,tile_object.y,tile_object.width,tile_object.height, water=True)
             if tile_object.name == "lava":
                 Lava(self.game,tile_object.x,tile_object.y,tile_object.width,tile_object.height, 15)
-            if tile_object.name == "teleport":
-                Teleport(self.game, tile_object.destination, tile_object.pos_x, tile_object.pos_y,
+            if tile_object.type == "teleport":
+                Teleport(self.game,tile_object.name, tile_object.destination, tile_object.pos_x, tile_object.pos_y,
                          tile_object.x,tile_object.y,tile_object.width,tile_object.height)
             if tile_object.type == "shop":
                 ShopDoor(self.game,tile_object.name, tile_object.pos_x, tile_object.pos_y,
@@ -222,6 +266,8 @@ class LevelGen:
                                 tile_object.item,tile_object.maxcost,20,20)
             if tile_object.name == "gold":
                 Gold_to_take(self.game,object_center.x,object_center.y,tile_object.gold)
+            if tile_object.name == "hidden gold":
+                HiddenGold_to_take(self.game,object_center.x,object_center.y,tile_object.gold)
             if tile_object.name == "arrow":
                 Arrow_to_take(self.game,object_center.x,object_center.y,tile_object.number)
             if tile_object.name == "treasure chest":
@@ -232,10 +278,16 @@ class LevelGen:
                 #print (f'Generating Quest item name: {tile_object.name}')
                 Item_to_take(self.game,object_center.x,object_center.y,
                              self.gen.generate_quest_item_by_name(tile_object.name))
+            if tile_object.type == "hidden item":
+                HiddenItem_to_take(self.game,object_center.x,object_center.y,
+                                   self.gen.generate_item_by_name(tile_object.name))
             #### KEYS #############
             if tile_object.type == "key":
                 Item_to_take(self.game,object_center.x,object_center.y,
                              self.gen.g_key(tile_object.name, tile_object.key))
+            if tile_object.type == "hidden key":
+                HiddenItem_to_take(self.game,object_center.x,object_center.y,
+                                   self.gen.g_key(tile_object.name, tile_object.key))
             #### WEAPONS ##########
             if tile_object.type == "weapon":
                 Item_to_take(self.game,object_center.x,object_center.y,

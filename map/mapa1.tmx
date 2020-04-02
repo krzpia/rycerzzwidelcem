@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="50" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="15" nextobjectid="315">
+<map version="1.2" tiledversion="1.3.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="50" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="15" nextobjectid="319">
  <tileset firstgid="1" source="terrain_tile_set.tsx"/>
  <tileset firstgid="1025" source="build atlas.tsx"/>
  <tileset firstgid="2049" source="full tileset.tsx"/>
@@ -156,7 +156,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,500,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,532,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,564,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2754,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,564,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2793,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,399,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,431,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -311,29 +311,63 @@
   <object id="276" name="lava" x="1508" y="233" width="21" height="16"/>
  </objectgroup>
  <objectgroup id="10" name="enemies">
-  <object id="291" name="Rat" type="enemy" gid="8408" x="160" y="80" width="32" height="32"/>
+  <object id="291" name="Rat" type="enemy" gid="8408" x="160" y="80" width="32" height="32">
+   <properties>
+    <property name="item" value=""/>
+   </properties>
+  </object>
   <object id="292" name="Rat" type="enemy s" gid="8408" x="48" y="896" width="32" height="32">
    <properties>
+    <property name="item" value=""/>
     <property name="sx" type="int" value="272"/>
     <property name="sy" type="int" value="880"/>
    </properties>
   </object>
-  <object id="293" name="Blue Sline" type="enemy_r" gid="6048" x="1312" y="848" width="32" height="32"/>
+  <object id="293" name="Blue Slime" type="enemy_r" gid="6048" x="1312" y="848" width="32" height="32">
+   <properties>
+    <property name="item" value=""/>
+   </properties>
+  </object>
   <object id="294" name="Rat" type="enemy s" gid="8408" x="416" y="288" width="32" height="32">
    <properties>
+    <property name="item" value=""/>
     <property name="sx" type="int" value="432"/>
     <property name="sy" type="int" value="399"/>
    </properties>
   </object>
-  <object id="295" name="Rat" type="enemy" gid="8408" x="1248" y="504" width="32" height="32"/>
-  <object id="296" name="Brown Rat" type="enemy" gid="6173" x="704" y="912" width="32" height="32"/>
-  <object id="297" name="Brown Rat" type="enemy" gid="6173" x="416" y="128" width="32" height="32"/>
-  <object id="298" name="Red Snake" type="enemy" gid="6219" x="840" y="136" width="32" height="32"/>
-  <object id="299" name="Gigant Spider" type="enemy" gid="6175" x="544" y="144" width="32" height="32"/>
-  <object id="301" name="Gigant Spider" type="enemy" gid="6175" x="1504" y="912" width="32" height="32"/>
+  <object id="295" name="Rat" type="enemy" gid="8408" x="1248" y="504" width="32" height="32">
+   <properties>
+    <property name="item" value=""/>
+   </properties>
+  </object>
+  <object id="296" name="Brown Rat" type="enemy" gid="6173" x="704" y="912" width="32" height="32">
+   <properties>
+    <property name="item" value=""/>
+   </properties>
+  </object>
+  <object id="297" name="Brown Rat" type="enemy" gid="6173" x="416" y="128" width="32" height="32">
+   <properties>
+    <property name="item" value=""/>
+   </properties>
+  </object>
+  <object id="298" name="Red Snake" type="enemy" gid="6219" x="840" y="136" width="32" height="32">
+   <properties>
+    <property name="item" value=""/>
+   </properties>
+  </object>
+  <object id="299" name="Giant Spider" type="enemy" gid="6175" x="544" y="144" width="32" height="32">
+   <properties>
+    <property name="item" value=""/>
+   </properties>
+  </object>
+  <object id="301" name="Giant Spider" type="enemy" gid="6175" x="1504" y="912" width="32" height="32">
+   <properties>
+    <property name="item" value=""/>
+   </properties>
+  </object>
  </objectgroup>
  <objectgroup id="12" name="teleport">
-  <object id="261" name="teleport" x="868" y="438" width="24" height="30">
+  <object id="261" name="teleport 01 cave" type="teleport" x="868" y="438" width="24" height="30">
    <properties>
     <property name="destination" value="level02"/>
     <property name="pos_x" type="int" value="43"/>
@@ -355,7 +389,7 @@
   <object id="152" name="trap1s" x="224" y="560" width="32" height="32"/>
  </objectgroup>
  <objectgroup id="13" name="npcs">
-  <object id="290" name="Gold Crusader" type="npc" gid="6420" x="247" y="753" width="32" height="32"/>
+  <object id="317" name="Gold Crusader" type="npc" gid="6420" x="256" y="768" width="32" height="32"/>
  </objectgroup>
  <objectgroup id="8" name="items">
   <object id="192" name="gold" x="192" y="624">
@@ -487,8 +521,9 @@
   </object>
   <object id="269" name="arrow" x="33" y="529">
    <properties>
-    <property name="number" type="int" value="1"/>
+    <property name="number" type="int" value="10"/>
    </properties>
   </object>
+  <object id="318" name="Blue Gnom" type="npc" gid="5889" x="96" y="48" width="32" height="32"/>
  </objectgroup>
 </map>

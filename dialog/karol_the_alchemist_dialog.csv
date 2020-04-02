@@ -1,0 +1,15 @@
+Npc;Thread;Branch;Step;Text;Ask1;Ask2;Ask3;Ask4;Next_Thread;Goto_Branch;Goto_Step;Event
+True;welcome;0;0;Hello;False;False;False;False;Next;False;False;False
+True;welcome;1;0;Hello again;False;False;False;False;Next;False;False;False
+False;quest Karol the Alchemist;0;0;Hi, how are you?;False;False;False;False;False;False;False;False
+True;quest Karol the Alchemist;0;1;Well, usually I don`t speak with humans� ;False;False;False;False;Next;False;False;False
+False;quest Karol the Alchemist;1;0;Hello.  I`m trying to bring you ingridients� buy I`ve lost them.. I` will come back later;False;False;False;False;Next;False;False;False
+False;quest Karol the Alchemist;2;0;Eveandro told me to gave you these. He seems to bevery ill, and he told me that you might help us   and make an magic cure!;False;False;False;False;False;False;False;False
+True;quest Karol the Alchemist;2;1;Eveandro fallen ill? I heard that he has many     comorbid diseases.. Poor old man, has only 95%    chance to survive...;False;False;False;False;False;False;False;False
+False;quest Karol the Alchemist;2;2;What?;False;False;False;False;False;False;False;False
+True;quest Karol the Alchemist;2;3;Well, nothing� I`ll make you a fine elixir,       one moment�;False;False;False;False;False;False;False;False
+True;quest Karol the Alchemist;2;4;Plusk, plumsk.. (Making potion in his cauldron);False;False;False;False;False;False;False;False
+True;quest Karol the Alchemist;2;5;Ok.. Here you go!. A magic elixir Archechinix.    Go and bring it to our king! Good luck!;False;False;False;False;False;False;False;quest Karol the Alchemist has been completed
+False;quest Karol the Alchemist;2;6;Thanks for your help!;False;False;False;False;Next;False;False;quest Karol the Alchemist has been rewarded
+False;quest Karol the Alchemist;3;0;Well, elixir works good, huh?;False;False;False;False;Next;False;False;False
+True;bye;0;0;Bye;False;False;False;False;False;False;False;False
