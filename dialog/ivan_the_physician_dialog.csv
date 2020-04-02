@@ -1,0 +1,16 @@
+Npc;Thread;Branch;Step;Text;Ask1;Ask2;Ask3;Ask4;Next_Thread;Goto_Branch;Goto_Step;Event
+True;welcome;0;0;Welcome mighty adventurer;False;False;False;False;Next;False;False;False
+True;welcome;1;0;Welcome again, how are you going?;False;False;False;False;Next;False;False;False
+True;ill;0;0;Don`t bother us.. Our king has fallen ill..;False;False;False;False;Next;False;False;False
+True;quest Golden Mask;0;0;King Sancho told me that you brought us the sample of Arechinix. Good, thanks to you it can stop the diesease for a while. But the real danger is moving towards us. The virus is coming more and more agresive. We have to stop it!;False;False;False;False;False;False;False;False
+False;quest Golden Mask;0;1;How can we do it?;False;False;False;False;False;False;False;False
+True;quest Golden Mask;0;2;Maybe there is a better solution. My spies told me that the nest of the virus could be located in dungeons in notrh islands. But to win the battle against the virus we need to prepare ourselves. To face the danger we have to be well protected.;False;False;False;False;False;False;False;False
+False;quest Golden Mask;0;3;Need some protection? What do you mean?;False;False;False;False;False;False;False;False
+True;quest Golden Mask;0;4;An ancient artifact called Golden Mask. Wish you help us to find it?;Yes>quest Golden Mask>0,5;No, I`m quite busy right now>False>0,6;False;False;False;False;False;False
+True;quest Golden Mask;0;5;Ok. Go then and speak with Eveandro, he will tell you where you can start your task;False;False;False;False;Next;False;False;False
+True;quest Golden Mask;0;6;Ok.. We will look after someone brave to complete this task..;False;False;False;False;Next;False;False;False
+True;quest Golden Mask;1;0;Go and find Golden Mask. Look after it in the north lands!;False;False;False;False;Next;False;False;False
+True;quest Golden Mask;2;0;"Holy Crap! You`ve made it! It`s original Golden Mask. Look it has original engraved inscription - FPP3 Made in China It`s very powerfull stuff. Go and give it to our smith Dori. She will know how to use it!";False;False;False;False;False;False;False;quest Golden Mask has been completed
+True;quest Golden Mask;2;1;She will reward you also quite well!;False;False;False;False;Next;False;False;False
+True;quest Golden Mask;3;0;Did you speak with Dori? She will know how to pay you well for it!;False;False;False;False;Next;False;False;False
+True;bye;0;0;You may go!;False;False;False;False;False;False;False;False

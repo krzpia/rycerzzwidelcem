@@ -773,9 +773,9 @@ class Dialog:
             if self.game.events_manager.search_event(event):
                 self.add_blocked_thread(thread)
         ############
-        #print ("BLOCKED THREADS:")
-        #print (self.blocked_threads)
-        #print ("----------------")
+        print ("BLOCKED THREADS:")
+        print (self.blocked_threads)
+        print ("----------------")
 
     def find_branch_in_thread(self, branch_to_find, active_thread):
         for text in self.conversation:
@@ -956,7 +956,7 @@ class Dialog:
         ###NAJPIERW SPRAWDZAM CZY NIE MA ZMIANY WATKU (next_thread = False)
         ## JEZELI NIE TO:
         if not self.text_returned.next_thread:
-            print (self.text_returned.goto)
+            print (f' Text returned.oto: {self.text_returned.goto}')
             if not self.check_goto():
                 next_step = self.text_returned.step + 1
                 for text in self.conversation:
@@ -1345,8 +1345,8 @@ class DialogBox:
         g_l_m = 10 * (len(str(quest.reward_gold)) - 1)
         e_l_m = 10 * (len(str(quest.reward_xp)) - 1)
         if quest.reward_gold > 0:
-            self.rew_image.blit(gold_coin,(100 + g_l_m,30))
-            self.game.s_write(f'+ {quest.reward_gold}',self.rew_image,(80,35),BLACK)
+            self.rew_image.blit(gold_coin,(100 + g_l_m,35))
+            self.game.s_write(f'+ {quest.reward_gold}',self.rew_image,(80,30),BLACK)
         if quest.reward_xp > 0:
             self.rew_image.blit(xp_icon,(100 + e_l_m,50))
             self.game.s_write(f'+ {quest.reward_xp}', self.rew_image, (80, 50),BLACK)
@@ -2192,7 +2192,7 @@ class Shop:
         mouse_y -= self.pos[1]
         self.mouse_pos = (mouse_x, mouse_y)
         if self.repair_button.check_if_clicked(mouse_pos):
-            #print ("Repair..")
+            print ("Repair. button clicked.")
             if not item_picked.owner == "shop":
                 if isinstance(item_picked, sprites.Armor) or isinstance(item_picked, sprites.Weapon):
                     if self.repair_cost <= self.game.player.gold and self.repair_cost > 0:

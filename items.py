@@ -24,6 +24,7 @@ class ItemGenerator:
         self.q_items.append(sprites.Quest_Item(self.game, "Gremlin Tooth", 0, 34, 94))
         self.q_items.append(sprites.Quest_Item(self.game, "Sunset Flower", 0, 35, 94))
         self.q_items.append(sprites.Quest_Item(self.game, "Elixir Arechinix",0,61,41))
+        self.q_items.append(sprites.Quest_Item(self.game, "Golden Mask",0,35,95))
 
         ######## WEAPONS ###########
         self.weapons.append(sprites.Weapon(self.game, "Wooden Club", "weapon","blunt",

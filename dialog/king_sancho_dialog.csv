@@ -10,5 +10,5 @@ True;quest Speak with the King;2;2;What?... Ughhhh.. Let`s see, first… ugh… who 
 False;quest Speak with the King;2;3;Well, La Palmix is my new home, I have to help us!;False;False;False;False;False;False;False;False
 True;quest Speak with the King;2;4;Okhh. Ok.. (cough). Let me see. I will speak with my phisician Lord Ivan. I`ll give it to him and we`ll see if we can control the epidemic... Blah what I say the curse...;False;False;False;False;False;False;False;quest Speak with the King has been completed
 True;quest Speak with the King;2;5;Take this as my gratefullness;False;False;False;False;False;False;False;quest Speak with the King has been rewarded
-True;quest Speak with the King;3;0;Lord Ivan is working on the cure. We think we`ll spread de Arechinix by the giant ballon over the empire…;False;False;False;False;False;False;False;False
+True;quest Speak with the King;3;0;Lord Ivan is working on the cure. We think we`ll spread de Arechinix by the giant ballon over the empire… or something else…;False;False;False;False;False;False;False;False
 True;bye;0;0;You may go!;False;False;False;False;False;False;False;False

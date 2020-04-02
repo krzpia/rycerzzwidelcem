@@ -360,7 +360,7 @@ class Game:
         self.levelgen.load_level_02()
         self.levelgen.load_level_03()
         self.levelgen.load_level_04()
-        self.levelgen.go_to_level("level02", 19,6)
+        self.levelgen.go_to_level("level01", 2,2)
         print ("INITIALIZING CAMERA...")
         ##### CAMERA INIT
         self.camera = tilemap.Camera(self.map.width, self.map.height)
@@ -580,6 +580,27 @@ class Game:
         self.update_ui_buttons()
         self.player.update_stats()
 
+    def print_status(self):
+        print ("PHASE STATUS:")
+        print(f'self.dialog_in_progress = {self.dialog_in_progress}')
+        print(f'self.message_shown = {self.message_shown}')
+        print(f'self.ph_spell_book = {self.ph_spell_book}')
+        print(f'self.ph_quest_book = {self.ph_quest_book}')
+        print(f'self.ph_treasure_inv = {self.ph_treasure_inv}')
+        print(f'self.ph_shop = {self.ph_shop}')
+        print(f'self.ph_buy_and_sell = {self.ph_buy_and_sell}')
+        print(f'self.ph_repair = {self.ph_repair}')
+
+        print(f'self.ph_quest_book = {self.ph_quest_book}')
+        print(f'self.active_shop = {self.active_shop}')
+        if self.active_shop:
+            print(f'ACTIVE SHOP LOCAL PH_REPAIR: {self.active_shop.local_ph_repair}')
+        print(f'self.paused = {self.paused}')
+        print(" FLAGI DO OBSLUGI INVENTARZA ")
+        print(f'self.item_picked = {self.item_picked}')
+        print(f'self.toggle_clean_item_picked = {self.toggle_clean_item_picked}')
+        print("------------- END --------------")
+
     def events(self):
         events = pygame.event.get()
         for event in events:
@@ -599,6 +620,8 @@ class Game:
                         self.treasure_inv = False
                     else:
                         self.paused = True
+                if event.key == pygame.K_F3:
+                    self.print_status()
                 if event.key == pygame.K_F2:
                     print (f' Events at: {self.player.score_time_played}s of game played')
                     for game_event in self.events_manager.history():
@@ -800,7 +823,10 @@ class Game:
                                             self.toggle_clean_item_picked = True
                         # 5. REPERUJE
                         if self.ph_repair:
+                            print(f'self.item_picked before repair: {self.item_picked}')
                             self.active_shop.check_repair_button(shop_mouse_pos, self.item_picked)
+                            print(f'self.item_picked after repair: {self.item_picked}')
+                            #self.print_status()
                         ## PRZEDMIOTY DO UZYCIA
                         ## UZYCIE ELIKSIROW
                         if self.inv_use_button.check_if_clicked(mouse_pos):

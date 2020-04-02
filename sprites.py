@@ -137,8 +137,8 @@ class Spell_Bullet(pygame.sprite.Sprite):
     def update(self):
         self.pos += self.vel * self.game.dt
         self.rect.center = self.pos
-        distance = vec.length(self.pos - self.start_pos)
-        if distance >= self.range:
+        distance = vec.length_squared(self.pos - self.start_pos)
+        if distance >= self.range ** 2:
             self.blow()
         wall_hits = pygame.sprite.spritecollide(self,self.game.act_lvl.walls,False)
         #print (wall_hits)
@@ -750,7 +750,7 @@ class Weapon(pygame.sprite.Sprite):
         self.speed_mod = speed_mod
         self.ste_mod = ste_mod
         self.durability = durability
-        self.condition = 80.0
+        self.condition = 60.0
         self.hit_rate = hit_rate
         self.hit_radius = hit_radius
         self.image = self.s_image
@@ -1001,12 +1001,12 @@ class Key(pygame.sprite.Sprite):
     def update(self):
         for lock in self.game.act_lvl.doors:
             dist = lock.pos - self.game.player.pos
-            if dist.length() < 30:
+            if dist.length_squared() < 30**2:
                 self.lock_is_close = lock
                 return True
         for lock in self.game.act_lvl.chest_to_open:
             dist = lock.pos - self.game.player.pos
-            if dist.length() < 20:
+            if dist.length_squared() < 20**2:
                 self.lock_is_close = lock
                 if self.lock_is_close.closed:
                     return True
@@ -1166,7 +1166,7 @@ class Player(pygame.sprite.Sprite):
         self.act_hp = self.max_hp
         self.max_mana = max(4, self.wisdom * 8 - 15)
         self.act_mana = self.max_mana
-        self.gold = 20
+        self.gold = 110
         self.arrows = 0
         self.xp = 0
         self.attribute_points = 0
@@ -1846,7 +1846,7 @@ class Mob(pygame.sprite.Sprite):
         for mob in self.game.act_lvl.mobs:
             if mob != self:
                 dist = self.pos - mob.pos
-                if 0 < dist.length() < self.avoid_radius:
+                if 0 < dist.length_squared() < self.avoid_radius**2:
                     self.acc += dist.normalize()
 
     def mob_movement_test(self):
@@ -1871,14 +1871,14 @@ class Mob(pygame.sprite.Sprite):
         #### TYP RUCHU POSTACI S (w linii)
         if self.game.dt > 0.1:
             self.game.dt = 0.1
-        distance_to_player = (self.game.player.pos - self.pos).length()
+        distance_to_player = (self.game.player.pos - self.pos).length_squared()
         awake_distance = max(48,self.updated_sleep_radius)
         if self.game.player.invisible:
             awake_distance = 32
         #print ("distance to player: " + str(distance_to_player))
         #print ("awake distance: " + str(awake_distance))
         #### JEZELI DOSTRZEGL GRACZA
-        if distance_to_player < awake_distance:
+        if distance_to_player < awake_distance ** 2:
             self.rot = (self.game.player.pos - self.pos).angle_to(vec(1, 0))
             # jezeli ma rotowac sie w kierunku gracza...
             # self.image = pygame.trasform.rotate(self.non_rotated_image, self.rot)
@@ -1892,7 +1892,7 @@ class Mob(pygame.sprite.Sprite):
             #### JEZELI NIE JEST UDERZONY, WLACZAM  MINIMALNA PREDKOSC!
             if now - self.last_hit_moment > self.hit_stun_time:
                 #print ("APPLY MIN SPEED")
-                if self.vel.length() <= self.min_speed:
+                if self.vel.length_squared() <= self.min_speed ** 2:
                     if self.speed:
                         self.vel.scale_to_length(self.min_speed)
             else:
@@ -1903,7 +1903,7 @@ class Mob(pygame.sprite.Sprite):
         #### JEZELI NIE WIDZI GRACZA WRACA NA SWOJA POZYCJE
         else:
             #### JEZELI GRACz O 60 od SLEEP RADIUS
-            if distance_to_player < awake_distance + 60:
+            if distance_to_player < (awake_distance + 60)**2:
                 self.image.blit(attent_image,(0,0))
             self.rot = (self.destination_position - self.pos).angle_to(vec(1, 0))
             self.acc = vec(1, 0).rotate(-self.rot)
@@ -1911,22 +1911,22 @@ class Mob(pygame.sprite.Sprite):
             self.acc += self.vel * - 2
             self.vel += self.acc * self.game.dt
             ## JEZELI JEST BLISKO SECOND POSITION - IDZIE W KIERUNKU PIERWSZEJ POS
-            if (self.pos - self.second_pos).length() < 5:
+            if (self.pos - self.second_pos).length_squared() < 5**2:
                 self.destination_position = self.spawn_position
-            elif (self.pos - self.spawn_position).length() < 5:
+            elif (self.pos - self.spawn_position).length_squared() < 5**2:
                 self.destination_position = self.second_pos
         self.pos += self.vel * self.game.dt + 0.5 * self.acc * self.game.dt ** 2
 
     def mob_movement1(self):
         if self.game.dt > 0.1:
             self.game.dt = 0.1
-        distance_to_player = (self.game.player.pos - self.pos).length()
+        distance_to_player = (self.game.player.pos - self.pos).length_squared()
         awake_distance = max(48, self.updated_sleep_radius)
         if self.game.player.invisible:
             awake_distance = 32
         # print ("distance to player: " + str(distance_to_player))
         #### JEZELI DOSTRZEGL GRACZA
-        if distance_to_player < awake_distance:
+        if distance_to_player < awake_distance**2:
             self.rot = (self.game.player.pos - self.pos).angle_to(vec(1, 0))
             # jezeli ma rotowac sie w kierunku gracza...
             # self.image = pygame.trasform.rotate(self.non_rotated_image, self.rot)
@@ -1940,7 +1940,7 @@ class Mob(pygame.sprite.Sprite):
             #### JEZELI NIE JEST UDERZONY, WLACZAM  MINIMALNA PREDKOSC!
             if now - self.last_hit_moment > self.hit_stun_time:
                 # print ("APPLY MIN SPEED")
-                if self.vel.length() <= self.min_speed:
+                if self.vel.length_squared() <= self.min_speed**2:
                     if self.speed:
                         self.vel.scale_to_length(self.min_speed)
             else:
@@ -1951,7 +1951,7 @@ class Mob(pygame.sprite.Sprite):
         #### JEZELI NIE WIDZI GRACZA WRACA NA SWOJA POZYCJE
         else:
             #### JEZELI GRACz O 60 od SLEEP RADIUS
-            if distance_to_player < awake_distance + 60:
+            if distance_to_player < (awake_distance + 60)**2:
                 self.image.blit(attent_image,(0,0))
             self.rot = (self.spawn_position - self.pos).angle_to(vec(1, 0))
             self.acc = vec(1, 0).rotate(-self.rot)
@@ -1959,19 +1959,19 @@ class Mob(pygame.sprite.Sprite):
             self.acc += self.vel * - 2
             self.vel += self.acc * self.game.dt
             ## JEZELI JEST BLISKO SPAWN LOC - ZATRZYMUJE SIE
-            if (self.pos - self.spawn_position).length() < 5:
+            if (self.pos - self.spawn_position).length_squared() < 5**2:
                 self.acc = vec(0, 0)
                 self.vel = vec(0, 0)
         self.pos += self.vel * self.game.dt + 0.5 * self.acc * self.game.dt ** 2
 
     def mob_ranged_attack(self):
-        distance_to_player = (self.game.player.pos - self.pos).length()
+        distance_to_player = (self.game.player.pos - self.pos).length_squared()
         ### ZAWSZE BEDZIE AKTYWNY jezeli podejdziesz blizej niz 48)
         awake_distance = max(48, self.updated_sleep_radius)
         ### GDY NIEWIDZIALNY AWAKE DISTANCE = 32 (wielkosc tile).. moze zwieszyc?
         if self.game.player.invisible:
             awake_distance = 32
-        if distance_to_player < awake_distance:
+        if distance_to_player < awake_distance**2:
             mob_rotation_vec = (self.game.player.pos - self.pos)
             dir = vec.normalize(mob_rotation_vec)
             ### STRZAL

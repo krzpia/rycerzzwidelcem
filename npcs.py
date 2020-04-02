@@ -34,6 +34,8 @@ class QuestGenerator:
         self.q_karol_the_alchemist.put_image_from_tileset(1, 59, full_tileset_image)
         self.q_speak_with_the_king = ui.Quest(self.game,"Speak with the King","Find King Sancho and bring the elixir",1,[],["Elixir Arechinix"],True,[],[],25,50,False)
         self.q_speak_with_the_king.put_image_from_tileset(23, 76, full_tileset_image)
+        self.q_golden_mask = ui.Quest(self.game,"Golden Mask","Find Golden Mask",1,[],["Golden Mask"],False,[],[],45,100)
+        self.q_golden_mask.put_image_from_tileset(36,94,full_tileset_image)
 
         ### SPECIAL FACTORS - auto next quest
         self.q_open_the_gates.put_auto_next_quest(self.q_karol_the_alchemist)
@@ -42,7 +44,7 @@ class QuestGenerator:
         ### END........
         ### ALL QUESTS IN LIST
         self.quests = [self.q_holy_grail, self.q_killer_bees, self.q_miraflorida,
-                       self.q_open_the_gates, self.q_karol_the_alchemist, self.q_speak_with_the_king]
+                       self.q_open_the_gates, self.q_karol_the_alchemist, self.q_speak_with_the_king, self.q_golden_mask]
 
     def return_quest_by_name(self, name):
         for quest in self.quests:
@@ -63,6 +65,7 @@ class NpcGenerator:
         self.eveandro_the_druid_csv = csv.DictReader(open(path.join(dialog_folder,'eveandro_the_druid_dialog.csv')),delimiter=';')
         self.king_sancho_csv = csv.DictReader(open(path.join(dialog_folder,'king_sancho_dialog.csv')),delimiter=';')
         self.karol_the_alchemist_csv = csv.DictReader(open(path.join(dialog_folder, 'karol_the_alchemist_dialog.csv')), delimiter=';')
+        self.ivan_the_physician_csv = csv.DictReader(open(path.join(dialog_folder, 'ivan_the_physician_dialog.csv')), delimiter=';')
         #############
 
     def generate(self, name, x, y, image):
@@ -87,6 +90,12 @@ class NpcGenerator:
             piggy.dialog_data.load_text(True,"welcome",0,0,"Oink, oink",False,False,False,False,False,False,False)
             piggy.put_sound(oink_snd)
             return piggy
+
+        if name == "Young Knight":
+            young_kinght = sprites.Npc(self.game, name, x, y, image)
+            young_kinght.dialog_data.load_text(True, "welcome", 0, 0, "Hello, adventurer",
+                                        False, False, False, False, False, False,False)
+            return young_kinght
 
         if name == "George the Guard":
             george_the_guard = sprites.Npc(self.game,name,x,y,image)
@@ -125,3 +134,10 @@ class NpcGenerator:
             karol_the_alchemist.dialog_data.thread_unblock_with_event("quest Karol the Alchemist",['got quest Karol the Alchemist'])
             karol_the_alchemist.dialog_data.thread_block_with_event("intro void",['got quest Karol the Alchemist'])
             return karol_the_alchemist
+
+        if name == "Ivan the Physician":
+            ivan_the_physician = sprites.Npc(self.game,name,x,y,image)
+            ivan_the_physician.dialog_data.load_from_dict(self.ivan_the_physician_csv, self.quest_gen)
+            ivan_the_physician.dialog_data.thread_unblock_with_event("quest Golden Mask",['quest Speak with the King has been completed'])
+            ivan_the_physician.dialog_data.thread_block_with_event("ill",['quest Speak with the King has been completed'])
+            return ivan_the_physician

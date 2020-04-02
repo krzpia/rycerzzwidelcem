@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="50" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="15" nextobjectid="319">
+<map version="1.2" tiledversion="1.3.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="50" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="15" nextobjectid="322">
  <tileset firstgid="1" source="terrain_tile_set.tsx"/>
  <tileset firstgid="1025" source="build atlas.tsx"/>
  <tileset firstgid="2049" source="full tileset.tsx"/>
@@ -309,6 +309,7 @@
   <object id="249" name="torch" type="anim_obs" x="859" y="79"/>
   <object id="250" name="torch" type="anim_obs" x="1104" y="78"/>
   <object id="276" name="lava" x="1508" y="233" width="21" height="16"/>
+  <object id="319" name="darttrape" x="1488" y="624"/>
  </objectgroup>
  <objectgroup id="10" name="enemies">
   <object id="291" name="Rat" type="enemy" gid="8408" x="160" y="80" width="32" height="32">
@@ -387,6 +388,7 @@
   <object id="150" name="trap1e" x="48" y="256" width="32" height="32"/>
   <object id="151" name="trap1n" x="224" y="520" width="32" height="32"/>
   <object id="152" name="trap1s" x="224" y="560" width="32" height="32"/>
+  <object id="320" name="pintrap" x="1040" y="640" width="32" height="32"/>
  </objectgroup>
  <objectgroup id="13" name="npcs">
   <object id="317" name="Gold Crusader" type="npc" gid="6420" x="256" y="768" width="32" height="32"/>
@@ -524,6 +526,6 @@
     <property name="number" type="int" value="10"/>
    </properties>
   </object>
-  <object id="318" name="Blue Gnom" type="npc" gid="5889" x="96" y="48" width="32" height="32"/>
+  <object id="321" name="Blue Gnom" type="npc" gid="5889" x="96" y="48" width="32" height="32"/>
  </objectgroup>
 </map>
