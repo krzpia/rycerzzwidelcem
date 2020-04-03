@@ -596,14 +596,14 @@ class CollectingSprite(pygame.sprite.Sprite):
                     self.game.player.act_mana = self.game.player.max_mana
                 self.content_no -= 1
             elif self.content_type == "quest item":
-                self.game.player.inventory.put_in_first_free_slot(self.item)
-                self.content_no -= 1
-                self.game.events_manager.emit(Event(id=f'item {self.item.name} collected'))
-                self.game.put_txt(f'Item {self.item.name} collected')
+                if self.game.player.inventory.put_in_first_free_slot(self.item):
+                    self.content_no -= 1
+                    self.game.events_manager.emit(Event(id=f'item {self.item.name} collected'))
+                    self.game.put_txt(f'Item {self.item.name} collected')
             elif self.content_type == "random item":
-                self.game.player.inventory.put_in_first_free_slot(self.item)
-                self.game.put_txt(f'Item {self.item.name} collected')
-                self.content_no -=1
+                if self.game.player.inventory.put_in_first_free_slot(self.item):
+                    self.game.put_txt(f'Item {self.item.name} collected')
+                    self.content_no -=1
             else:
                 print ("ERROR Decoding content type in CollectingSprite object!")
 
@@ -1085,6 +1085,8 @@ class Player(pygame.sprite.Sprite):
         if self.char_class.name == "Knight":
             self.inventory.put_in_first_free_slot(Potion(self.game, "Red Potion", "Cure", 15, 30, 26, 42))
             self.inventory.put_in_first_free_slot(Potion(self.game, "Small Red Potion", "Cure",5,15,24,42))
+            self.inventory.put_in_first_free_slot(Potion(self.game, "Small Red Potion", "Cure", 5, 15, 24, 42))
+            self.inventory.put_in_first_free_slot(Potion(self.game, "Small Red Potion", "Cure", 5, 15, 24, 42))
             self.inventory.put_in_first_free_slot(Weapon(self.game, "Small Sword","weapon","sword",
                                            10,False,2,625,"small",
                                            0,0,0,0,0,0,50,4,45,52,89))
@@ -1100,6 +1102,7 @@ class Player(pygame.sprite.Sprite):
             self.spell_power_bonus = 1.5
         if self.char_class.name == "Thief":
             self.inventory.put_in_first_free_slot(Potion(self.game, "Small Blue Potion", "Mana", 5, 15, 23, 42))
+            self.inventory.put_in_first_free_slot(Potion(self.game, "Small Red Potion", "Cure", 5, 15, 24, 42))
             self.inventory.put_in_first_free_slot(Potion(self.game, "Small Red Potion", "Cure", 5, 15, 24, 42))
             self.inventory.put_in_first_free_slot(Potion(self.game, "Red Potion", "Cure", 15, 30, 26, 42))
             self.inventory.put_in_first_free_slot(Weapon(self.game, "Knife", "weapon","dagger",

@@ -1422,7 +1422,7 @@ class Game:
             #### STANY SPECJALNE
             ### NEXT LEVEL
             if self.player.attribute_points > 0:
-                self.h_write("NEXT LEVEL", (MAP_WIDTH / 2 - 100, MAP_HEIGHT / 2 - 10), "gothic", 36, (WHITE))
+                self.screen.blit(scroll_level_up, (MAP_WIDTH / 2 - 160, MAP_HEIGHT / 2 - 60))
             ### PHASE SHOP
             if self.ph_shop:
                 self.shop_dialog_box.show(self.screen)

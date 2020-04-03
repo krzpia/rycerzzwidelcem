@@ -132,7 +132,7 @@ class Inventory:
                     i.put_item(self.item)
                     return True
         else:
-            print ("INV PELNY!")
+            print ("ERROR - INV PELNY!")
             return False
 
     def check_if_clicked(self,pos_cl):
@@ -1745,8 +1745,7 @@ class Quest:
                     item = self.game.levelgen.gen.generate_quest_item_by_name(self.reward_item)
                 item_collected = self.game.player.inventory.put_in_first_free_slot(item)
                 if not item_collected:
-                    print ("QUEST ITEM NOT COLLECTED DUE TO FULL INVENTORY!")
-                    # TODO put item on the ground?
+                    sprites.Item_to_take(self.game,self.game.player.pos.x, self.game.player.pos.y, item)
             pygame.mixer.Sound.play(coin_snd)
             ### JEZELI AUTO NEXT QUEST - dodaje nowy quest!
             if self.auto_next_quest:

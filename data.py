@@ -30,6 +30,7 @@ intro_but_h_img = pygame.image.load(path.join(img_folder, 'button_intro_red_a.pn
 dim_screen = pygame.Surface((MAP_WIDTH,MAP_HEIGHT),pygame.HWSURFACE | pygame.SRCALPHA)
 dim_screen.fill((0,0,0,110))
 scroll_160_img = pygame.image.load(path.join(img_folder, 'scroll_160.png')).convert_alpha()
+scroll_level_up = pygame.image.load(path.join(img_folder, 'scroll_160_level_up.png')).convert_alpha()
 bar = pygame.image.load(path.join(img_folder, 'bar.png')).convert_alpha()
 bar = pygame.transform.scale(bar, (250, 15))
 small_bar = pygame.image.load(path.join(img_folder, 'bar_small.png')).convert_alpha()
