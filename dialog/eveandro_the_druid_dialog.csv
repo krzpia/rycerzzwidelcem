@@ -7,18 +7,18 @@ True;intro void;0;0;Don`t disturb the old Druid please.;False;False;False;False;
 True;intro eveandro;0;0;Anything bothers you?;Yes>False>0,1;No>False>0,2;False;False;False;False;False;False
 True;intro eveandro;0;1;Tell me about it;False;False;False;False;Next;False;False;False
 True;intro eveandro;0;2;Good luck in your journey!;False;False;False;False;bye;False;False;False
-False;quest Open the Gates;0;0;Well, I have to enter the castle, but the guards don`t let me in..;False;False;False;False;False;False;False;False
-True;quest Open the Gates;0;1;Hmmm. Why do you want to enter there? Didn`t you hear about corona curse?;Yes, but I`m not scared..>False>0,2;No, tell me about it..>False>0,5;False;False;False;False;False;False
+False;quest Open the Gates;0;0;Well, I have to enter the castle, but the guards  don`t let me in..;False;False;False;False;False;False;False;False
+True;quest Open the Gates;0;1;Hmmm. Why do you want to enter there?             Didn`t you hear about corona curse?;Yes, but I`m not scared..>False>0,2;No, tell me about it..>False>0,5;False;False;False;False;False;False
 True;quest Open the Gates;0;2;You should be. The king has fallen ill and many his subject also. I can be very contagious. ;False;False;False;False;False;False;False;False
-True;quest Open the Gates;0;3;We are looking after the cure. Would you help me find some ingredients?;Yes>quest Open the Gates>0,4;Well, I dont` have time for it right now.>False>0,9;False;False;False;False;False;False
-True;quest Open the Gates;0;4;Good. Listen carefully I won`t repeat! Bring me: Sunsuet Flower, Mad Bat Wing and Gremlin tooth! Bring them to me and we will see If we can manage a fine cure! Go by the boat southeast of the city to the land of five elements!;False;False;False;False;Next;False;False;False
-True;quest Open the Gates;0;5;Well It`s seems to be a very contagious disease, affects mostly adults and elder ones. Our king has fallen ill a week ago. No one is safe!;False;False;False;False;False;False;False;False
-True;quest Open the Gates;0;6;We are looking after the cure. Would you help me with some ingriedients?;Yes>quest Open the Gates>0,4;Well, I dont` have time for it right now.>False>0,9;False;False;False;False;False;False
-True;quest Open the Gates;0;9;Hmm, come back then later.. If we will be still alive..;False;False;False;False;Next;False;False;False
+True;quest Open the Gates;0;3;We are looking after the cure. Would you help me  find some ingredients?;Yes>quest Open the Gates>0,4;Well, I dont` have time for it right now.>False>0,9;False;False;False;False;False;False
+True;quest Open the Gates;0;4;Good. Listen carefully I won`t repeat! Bring me:  Sunsuet Flower, Mad Bat Wing and Gremlin tooth!   Bring them to me and we will see If we can manage a fine cure! Go by the boat southeast of the city to the land of five elements!;False;False;False;False;Next;False;False;False
+True;quest Open the Gates;0;5;Well It`s seems to be a very contagious disease,  affects mostly adults and elder ones. Our king has fallen ill a week ago. No one is safe!;False;False;False;False;False;False;False;False
+True;quest Open the Gates;0;6;We are looking after the cure.                    Would you help me with some ingredients?;Yes>quest Open the Gates>0,4;Well, I dont` have time for it right now.>False>0,9;False;False;False;False;False;False
+True;quest Open the Gates;0;9;Hmm, come back then later..                       If we will be still alive..;False;False;False;False;Next;False;False;False
 True;quest Open the Gates;1;0;Hmm, come back if you have all of them! Remember: Sunset Flower, Mad Bat Wing and Gremlin tooth.;False;False;False;False;Next;False;False;False
 True;quest Open the Gates;2;0;Argh.. I`m think I`ve fallen the curse... Arghh...(it`s looks like the Druid has fever, cough and   shortness of breathe..) I can`t help you more...  Arghh... Go and find Karol the elf in sacred      land of five elements, then open the magic gate   to castle with this key!... ;False;False;False;False;False;False;False;quest Open the Gates has been completed
 False;quest Open the Gates;2;1;I`ll try!!! Please hold on!;False;False;False;False;Next;False;False;quest Open the Gates has been rewarded
 True;quest Open the Gates;3;0;Argh.... Go... remember.. Karol... Five Elements... Argh... (he looks very poor.);False;False;False;False;Next;False;False;False
-True;cure;0;0;Ok. Thank`s to your help we are something better, but the curse didn`t gone forever. Try to find out from where it`s come from. I`ve heard about the mystery dungeon on the north part of the island. Go there and explore. You will found the boat on the north side of the castle. Good Luck!;False;False;False;False;Next;False;False;False
+True;cure;0;0;Ok. Thank`s to your help we are something better, but the curse didn`t gone forever. Try to find out from where it`s come from. I`ve heard about the  mystery dungeon on the north part of the island.  Go there and explore. You will found the boat on  the north side of the castle. Good Luck!;False;False;False;False;Next;False;False;False
 True;bye;0;0;Goodbye!;False;False;False;False;False;False;False;False
 False;bye;0;1;See you next time!;False;False;False;False;False;False;False;False

@@ -1106,7 +1106,7 @@ class Game:
                     # hit.vel = hit.vel.rotate(180)
 
     def draw_weapon_picked_info(self, item):
-        self.write(("DAMAGE: " + str(item.damage)), (INV_POS[0] + 20, INV_POS[1] + 50))
+        self.write(("DAMAGE: " + str(round(item.damage))), (INV_POS[0] + 20, INV_POS[1] + 50))
         self.screen.blit(item.breakage_surf, (INV_POS[0] + 180, INV_POS[1] + 20))
         self.write(("Cost: " + str(item.cost)), (INV_POS[0] + 20, INV_POS[1] + 70))
         self.screen.blit(gold_coin, (INV_POS[0] + 80, INV_POS[1] + 75))
@@ -1119,7 +1119,7 @@ class Game:
         self.draw_item_special_abilities(item)
 
     def draw_armor_picked_info(self, item):
-        self.write(("ARMOR: " + str(item.armor)), (INV_POS[0] + 20, INV_POS[1] + 50))
+        self.write(("ARMOR: " + str(round(item.armor))), (INV_POS[0] + 20, INV_POS[1] + 50))
         self.screen.blit(item.breakage_surf, (INV_POS[0] + 180, INV_POS[1] + 20))
         self.write(("Cost: " + str(item.cost)), (INV_POS[0] + 20, INV_POS[1] + 70))
         self.screen.blit(gold_coin, (INV_POS[0] + 80, INV_POS[1] + 75))
@@ -1215,9 +1215,9 @@ class Game:
         self.write(str(self.player.gold), (INV_POS[0] + 55, INV_POS[1] + 414), YELLOW)
         self.screen.blit(arrow_icon, (INV_POS[0] + 114, INV_POS[1] + 407))
         self.write(str(self.player.arrows), (INV_POS[0] + 145, INV_POS[1] + 414), YELLOW)
-        self.write("ARMOR: " + str(self.player.armor), (INV_POS[0] + 20, INV_POS[1] + 160))
-        block_chance = str(self.player.block_chance)[:3]
-        hit_red = str(self.player.hit_reduction)[:3]
+        self.write(f'ARMOR: {round(self.player.armor)}', (INV_POS[0] + 20, INV_POS[1] + 160))
+        block_chance = str(round(self.player.block_chance))
+        hit_red = str(round(self.player.hit_reduction))
         self.write("Block: " + block_chance + "%", (INV_POS[0] + 125, INV_POS[1] + 160))
         self.write("Dmg red: " + hit_red + "%", (INV_POS[0] + 225, INV_POS[1] + 160))
         if self.player.attack_type_flag == "magic":
@@ -1229,12 +1229,12 @@ class Game:
             hit_rate = str(hit_rate)
             hit_rate = hit_rate[:3]
         elif self.player.attack_type_flag == "ranged":
-            damage = str(self.player.arrow_damage)
+            damage = str(round(self.player.arrow_damage))
             hit_rate = (1000 / self.player.arrow_rate)
             hit_rate = str(hit_rate)
             hit_rate = hit_rate[:3]
         elif self.player.attack_type_flag == "melle":
-            damage = str(self.player.hit_dmg)
+            damage = str(round(self.player.hit_dmg))
             hit_rate = (1000 / self.player.hit_rate)
             hit_rate = str(hit_rate)
             hit_rate = hit_rate[:3]

@@ -750,7 +750,7 @@ class Weapon(pygame.sprite.Sprite):
         self.speed_mod = speed_mod
         self.ste_mod = ste_mod
         self.durability = durability
-        self.condition = 60.0
+        self.condition = 100.0
         self.hit_rate = hit_rate
         self.hit_radius = hit_radius
         self.image = self.s_image
@@ -1166,7 +1166,7 @@ class Player(pygame.sprite.Sprite):
         self.act_hp = self.max_hp
         self.max_mana = max(4, self.wisdom * 8 - 15)
         self.act_mana = self.max_mana
-        self.gold = 110
+        self.gold = 0
         self.arrows = 0
         self.xp = 0
         self.attribute_points = 0

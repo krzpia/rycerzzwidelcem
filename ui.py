@@ -428,10 +428,17 @@ class QuestBook:
         counter = 0
         for i in pages[self.act_page]:
             i.active = True
-            i.show_quest_icon(self.image,x_pos + 10, 40 + counter * 64)
+            i.show_quest_icon(self.image,x_pos + 6, 40 + counter * 64)
             self.game.s_write(f'Quest {i.name}', self.image, (x_pos + 80, 40 + counter * 64),(BLACK))
-            self.game.s_write(i.goal_descr, self.image, (x_pos + 80, 55 + counter * 64),(BLACK))
-            self.game.s_write(f'Reward {i.reward_xp} XP,  {i.reward_gold} gold.', self.image ,(x_pos + 80, 70 + counter * 64),(BLACK))
+            if len(i.goal_descr) <= 30:
+                text_line_01 = i.goal_descr
+                text_line_02 = ""
+            else:
+                text_line_01 = i.goal_descr[:30]
+                text_line_02 = i.goal_descr[30:]
+            self.game.s_write(text_line_01, self.image, (x_pos + 80, 56 + counter * 64), BLACK)
+            self.game.s_write(text_line_02, self.image, (x_pos + 80, 72 + counter * 64), BLACK)
+            #self.game.s_write(f'Reward {i.reward_xp} XP,  {i.reward_gold} gold.', self.image ,(x_pos + 80, 70 + counter * 64),(BLACK))
             counter += 1
             if counter >= 5:
                 x_pos = 330
