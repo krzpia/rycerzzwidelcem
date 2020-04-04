@@ -55,11 +55,12 @@ class Game:
         #print(pygame.mixer.Channel(1).get_volume())
         ######
         self.clock = pygame.time.Clock()
-        self.font_arial = pygame.font.match_font("arial")
         global font
-        font = pygame.font.Font(self.font_arial, 16)
+        font = font_16
         global font20
-        font20 = pygame.font.Font(self.font_arial, 20)
+        font20 = font_20
+        global font48
+        font48 = font_48
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF)
         self.map_surface = pygame.Surface((MAP_WIDTH, MAP_HEIGHT), pygame.HWSURFACE | pygame.SRCALPHA| pygame.DOUBLEBUF)
         pygame.display.set_caption(TITLE)
@@ -86,13 +87,14 @@ class Game:
     def write(self, text, location, color=(255, 255, 255)):
         self.screen.blit(font.render(text, True, color), location)
 
+    def big_write(self, text, location, color=(255, 255, 255)):
+        self.screen.blit(font20.render(text, True, color), location)
+
+    def title_write(self, text, location, color=(255, 255, 255)):
+        self.screen.blit(font48.render(text, True, color), location)
+
     def s_write(self, text, surface, location, color=(WHITE)):
         surface.blit(font.render(text, True, color), location)
-
-    def h_write(self, text, location, h_font, size, color):
-        h_font_type = pygame.font.match_font(h_font)
-        h_font_r = pygame.font.Font(h_font_type, size)
-        self.screen.blit(h_font_r.render(text, True, color, ), location)
 
     def intro(self):
         self.intro_screen = True
@@ -114,14 +116,12 @@ class Game:
         pygame.mixer.music.stop()
         self.incr_diff_button = RadioButton(rad_add_img,rad_add_h_img,INCR_DIF_BUT[0],INCR_DIF_BUT[1])
         self.decr_diff_button = RadioButton(rad_subs_img, rad_subs_h_img, DECR_DIF_BUT[0], DECR_DIF_BUT[1])
-        self.new_game_button = Button(intro_but_img, intro_but_h_img, 128, 32, "New Game", SCREEN_WIDTH / 2 - 64, 370,
-                                      20)
-        self.quit_game_button = Button(intro_but_img, intro_but_h_img, 128, 32, "Quit", SCREEN_WIDTH / 2 - 64, 420, 20)
-        self.start_game_button = Button(intro_but_img, intro_but_h_img, 150, 32, "Start Game", SCREEN_WIDTH / 2 - 64,
-                                        650, 20)
-        self.knight_class_button = Button(intro_but_img, intro_but_h_img, 128, 32, "Knight", 170, 365, 20)
-        self.wizard_class_button = Button(intro_but_img, intro_but_h_img, 128, 32, "Wizard", 170, 415, 20)
-        self.thief_class_button = Button(intro_but_img, intro_but_h_img, 128, 32, "Thief", 170, 465, 20)
+        self.new_game_button = Button(intro_but_img, intro_but_h_img, 128, 32, "New Game", SCREEN_WIDTH / 2 - 64, 370)
+        self.quit_game_button = Button(intro_but_img, intro_but_h_img, 128, 32, "Quit", SCREEN_WIDTH / 2 - 64, 420)
+        self.start_game_button = Button(intro_but_img, intro_but_h_img, 150, 32, "Start Game", SCREEN_WIDTH / 2 - 64,650)
+        self.knight_class_button = Button(intro_but_img, intro_but_h_img, 128, 32, "Knight", 170, 365)
+        self.wizard_class_button = Button(intro_but_img, intro_but_h_img, 128, 32, "Wizard", 170, 415)
+        self.thief_class_button = Button(intro_but_img, intro_but_h_img, 128, 32, "Thief", 170, 465)
         self.intro_buttons = [self.new_game_button, self.quit_game_button]
         self.class_buttons = [self.knight_class_button, self.wizard_class_button, self.thief_class_button,
                               self.start_game_button]
@@ -187,16 +187,20 @@ class Game:
             self.start_game_button.deactivate()
 
     def intro_draw(self):
-        self.credits_text = "Special thanks: My dear wife Monika, Piotr Kopalko, Zuza and Magda for some inspiration and superb sound effects. Chris Bradfield for his amazing tutorials on www.kidscancode.org. Thanks to Thorbjørn Lindeijer for TiledMapEditor. Assets used under free licence from www.opengameart: DungeonCrawler, Adrix89, gargargarrick.."
+        self.credits_text1 = "My dear wife Monika, Piotr Kopalko, Zuza and Magda for inspiration and superb sound effects"
+        self.credits_text2 = "Chris Bradfield for his amazing tutorials on www.kidscancode.org"
+        self.credits_text3 = "Thanks to Thorbjørn Lindeijer for great tool TiledMapEditor"
+        self.credits_text4 = "Assets used from www.opengameart: DungeonCrawler, Adrix89, gargargarrick and many more.."
+        self.author_text = "Author: K.J.Piatkowski"
         self.screen.fill(BGCOLOR)
         if self.to_char_chose:
             self.screen.blit(setup_img, (0, 0))
-            self.h_write("ADVENTURE OF THE CORONA",T_POS,"arial",36,(PURPLE))
-            self.h_write("Choose your class:", CTXT, "arial", 24, (PURPLE))
-            self.knight_class_button.show_button(self.screen, font)
-            self.wizard_class_button.show_button(self.screen, font)
-            self.thief_class_button.show_button(self.screen, font)
-            self.start_game_button.show_button(self.screen, font)
+            self.title_write(TITLE,T_POS,PURPLE)
+            self.big_write("Choose your class:",CTXT,PURPLE)
+            self.knight_class_button.show_button(self.screen, font20)
+            self.wizard_class_button.show_button(self.screen, font20)
+            self.thief_class_button.show_button(self.screen, font20)
+            self.start_game_button.show_button(self.screen, font20)
             self.incr_diff_button.show_button(self.screen)
             self.decr_diff_button.show_button(self.screen)
             if self.difficulty == DIF_NOR:
@@ -211,27 +215,23 @@ class Game:
                 dif_txt = "Extreme. For super masters!"
             else:
                 print ("ERROR NO DIFF LVL!")
-            self.h_write(f'Difficulty: {dif_txt}', (DECR_DIF_BUT[0]-40, INCR_DIF_BUT[1] - 25), "arial", 18,
-                         (WHITE))
+            self.write(f'Difficulty: {dif_txt}', (DECR_DIF_BUT[0]-40, INCR_DIF_BUT[1] - 25), WHITE)
             self.decr_diff_button.show_button(self.screen)
             if self.class_selected:
                 if self.class_selected == self.knight_class:
                     self.screen.blit(self.class_selected.image, TIMGPOS)
-                    self.h_write("Knight", NTXT, "arial", 26, (WHITE))
-                    self.write("Dedicated do melle fight, starts with strength and stamina bonus", (ADTXT), (WHITE))
+                    self.write("Knight", NTXT, WHITE)
+                    self.write("Dedicated do melle fight, starts with strength and stamina bonus", ADTXT, WHITE)
                     self.write("No penalty using plate armors", (ADTXT[0], ADTXT[1] + 25), WHITE)
                 if self.class_selected == self.wizard_class:
                     self.screen.blit(self.class_selected.image, TIMGPOS)
-                    self.h_write("Wizard", NTXT, "arial", 26, (WHITE))
-                    self.write("Weak in direct fight, but able to make severe damage by magic powers", (ADTXT),
-                               (WHITE))
+                    self.write("Wizard", NTXT, WHITE)
+                    self.write("Weak in direct fight, but able to make severe damage by magic powers", ADTXT, WHITE)
                     self.write("Bonus x1.5 power of offensive spells", (ADTXT[0], ADTXT[1] + 25), WHITE)
                 if self.class_selected == self.thief_class:
                     self.screen.blit(self.class_selected.image, TIMGPOS)
-                    self.h_write("Thief", NTXT, "arial", 26, (WHITE))
-                    self.write("Fast and able to sneak, powerful with his favourite bow and dagger combination",
-                               (ADTXT),
-                               (WHITE))
+                    self.write("Thief", NTXT, WHITE)
+                    self.write("Fast and able to sneak, powerful with bow and dagger combination", ADTXT, WHITE)
                     self.write("Bonus x1.3 Hit Rate with ranged weapons, and additional barter bonus",(ADTXT[0],ADTXT[1]+25), WHITE)
                 self.write("Strength: " + str(self.class_selected.str), (IDX, IDY + 0))
                 self.write("Stamina: " + str(self.class_selected.sta), (IDX, IDY + 20))
@@ -239,35 +239,42 @@ class Game:
                 self.write("Wisdom: " + str(self.class_selected.wis), (IDX, IDY + 60))
                 self.write("Speed: " + str(self.class_selected.spe), (IDX, IDY + 80))
                 self.write("Stealth: " + str(self.class_selected.ste), (IDX, IDY + 100))
-                self.write("Favourite weapons: ", (IADX,IADY + 0), (WHITE))
+                self.write("Favourite weapons: ", (IADX,IADY + 0), WHITE)
                 weapon_txt = ""
                 for weapon in self.class_selected.favourite_weapons:
                     weapon_txt += weapon
                     weapon_txt += ","
-                self.write(weapon_txt, (IADX + 120, IADY + 0), (WHITE))
+                self.write(weapon_txt, (IADX + 120, IADY + 0), WHITE)
                 armor_txt = ""
-                self.write("Favourite armors: ", (IADX,IADY + 20), (WHITE))
+                self.write("Favourite armors: ", (IADX,IADY + 20), WHITE)
                 for armor in self.class_selected.favourite_armors:
                     armor_txt += armor
                     armor_txt += ","
-                self.write(armor_txt, (IADX + 120, IADY + 20), (WHITE))
-                self.write("Disliked weapons: ", (IADX,IADY + 40), (WHITE))
+                self.write(armor_txt, (IADX + 120, IADY + 20), WHITE)
+                self.write("Disliked weapons: ", (IADX,IADY + 40), WHITE)
                 weapon_txt = ""
                 for weapon in self.class_selected.disliked_weapons:
                     weapon_txt += weapon
                     weapon_txt += ","
-                self.write(weapon_txt, (IADX + 120, IADY + 40), (WHITE))
+                self.write(weapon_txt, (IADX + 120, IADY + 40), WHITE)
                 armor_txt = ""
-                self.write("Disliked armors: ", (IADX,IADY + 60), (WHITE))
+                self.write("Disliked armors: ", (IADX,IADY + 60), WHITE)
                 for armor in self.class_selected.disliked_armors:
                     armor_txt += armor
                     armor_txt += ","
-                self.write(armor_txt, (IADX + 120, IADY + 60), (WHITE))
+                self.write(armor_txt, (IADX + 120, IADY + 60), WHITE)
 
         else:
             self.screen.blit(intro_img, (0, 0))
-            self.new_game_button.show_button(self.screen, font)
-            self.quit_game_button.show_button(self.screen, font)
+            self.title_write(TITLE,(280,250),PURPLE)
+            self.write(self.author_text,(200,500),PURPLE)
+            self.write("Special thanks to:",(200,575),PURPLE)
+            self.write(self.credits_text1,(200,600),PURPLE)
+            self.write(self.credits_text2,(200,625),PURPLE)
+            self.write(self.credits_text3,(200,650), PURPLE)
+            self.write(self.credits_text4,(200,675), PURPLE)
+            self.new_game_button.show_button(self.screen, font20)
+            self.quit_game_button.show_button(self.screen, font20)
         self.write(str(self.clock.get_fps()), (0, 0))
         #### FLIP
         pygame.display.flip()
@@ -1242,7 +1249,7 @@ class Game:
             if self.player.hit_radius:
                 self.write("Damage radius: " + str(self.player.hit_radius),
                            (INV_POS[0] + 125, INV_POS[1] + 180))
-        self.write("HIT RATE: " + hit_rate + "\s", (INV_POS[0] + 20, INV_POS[1] + 200))
+        self.write("HIT RATE: " + hit_rate, (INV_POS[0] + 20, INV_POS[1] + 200))
         self.write("HP " + str(int(self.player.act_hp)), (INV_POS[0] + 20, INV_POS[1] + 230))
         self.write("MP " + str(self.player.act_mana), (INV_POS[0] + 20, INV_POS[1] + 250))
         self.screen.blit(bar, (INV_POS[0] + 65, INV_POS[1] + 234))
@@ -1251,8 +1258,8 @@ class Game:
         self.screen.blit(bar, (INV_POS[0] + 65, INV_POS[1] + 254))
         self.screen.blit(blue_line, (INV_POS[0] + 70, INV_POS[1] + 258),
                          (0, 0, 250 * self.player.act_mana / self.player.max_mana, 5))
-        self.screen.blit(small_bar, (INV_POS[0] + 125, INV_POS[1] + 205))
-        self.screen.blit(silver_line, (INV_POS[0] + 125, INV_POS[1] + 205),
+        self.screen.blit(small_bar, (INV_POS[0] + 140, INV_POS[1] + 205))
+        self.screen.blit(silver_line, (INV_POS[0] + 140, INV_POS[1] + 205),
                          (0, 0, 80 * self.player.hit_load_percentage / 100, 5))
 
     def draw_stats(self):

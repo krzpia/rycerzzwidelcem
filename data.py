@@ -18,8 +18,13 @@ map_folder = path.join(game_folder, 'map')
 music_folder = path.join(game_folder, 'music')
 snd_folder = path.join(game_folder, 'sound')
 anim_folder = path.join(game_folder, 'anim')
+###### FONT
+font_16 = pygame.font.Font(path.join(img_folder,'font.ttf'),16)
+font_20 = pygame.font.Font(path.join(img_folder,'font.ttf'),22)
+font_48 = pygame.font.Font(path.join(img_folder,'font.ttf'),48)
+
 ###### INTRP GRPH
-intro_img = pygame.image.load(path.join(img_folder, 'Rycerz z Widelcem Intro Screen.png')).convert_alpha()
+intro_img = pygame.image.load(path.join(img_folder, 'IntroClear.png')).convert_alpha()
 game_over_img = pygame.image.load(path.join(img_folder, 'Rycerz z Widelcem Game Over Screen.png')).convert_alpha()
 game_over_img = pygame.transform.scale(game_over_img, (SCREEN_WIDTH,SCREEN_HEIGHT))
 setup_img = pygame.image.load(path.join(img_folder, 'Setup Screen.png')).convert_alpha()

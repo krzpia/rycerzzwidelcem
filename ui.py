@@ -185,6 +185,7 @@ class Inventory:
                     i.put_item(self.item)
                     return True ## DO EWENTTAULNEGO WYJATKU GDY ZAJETY
 
+
 class RepairInventory:
     def __init__(self, slot_img):
         self.item_slot = Slot(slot_img)
@@ -250,7 +251,6 @@ class RepairInventory:
                 return True ## DO EWENTTAULNEGO WYJATKU GDY ZAJETY
 
 
-
 class RadioButton:
     def __init__(self, img, img_h, x, y):
         self.img = img
@@ -307,7 +307,7 @@ class RadioButton:
 
 
 class Button:
-    def __init__(self, img, img_h, szer, wys, text, x, y, font_size):
+    def __init__(self, img, img_h, szer, wys, text, x, y):
         self.text = text
         self.szer = szer
         self.wys = wys
@@ -316,17 +316,16 @@ class Button:
         self.rect = self.img.get_rect()
         self.active = True
         self.highlighted = False
-        self.font_size = font_size
         self.x = x
         self.y = y
         self.rect.x = x
         self.rect.y = y
 
     def show_button(self,surface, font):
-        self.act_color = (255, 255, 255)
+        self.act_color = (185,185,0)
         self.text_surface = font.render(self.text, True, self.act_color)
         self.text_rect = self.text_surface.get_rect()
-        self.text_rect.topleft = (self.rect.x + 15, self.rect.y + 5)
+        self.text_rect.topleft = (self.rect.x + 20, self.rect.y + 4)
         if not self.highlighted:
             surface.blit(self.img, (self.rect.x, self.rect.y))
             surface.blit(self.text_surface, (self.text_rect.x, self.text_rect.y))

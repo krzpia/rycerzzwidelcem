@@ -750,7 +750,7 @@ class Weapon(pygame.sprite.Sprite):
         self.speed_mod = speed_mod
         self.ste_mod = ste_mod
         self.durability = durability
-        self.condition = 78.0
+        self.condition = 100.0
         self.hit_rate = hit_rate
         self.hit_radius = hit_radius
         self.image = self.s_image
