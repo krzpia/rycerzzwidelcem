@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="50" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="10" nextobjectid="77">
+<map version="1.2" tiledversion="1.3.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="50" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="117">
  <tileset firstgid="1" source="terrain_tile_set.tsx"/>
  <tileset firstgid="1025" source="build atlas.tsx"/>
  <tileset firstgid="2049" source="build2 atlas.tsx"/>
@@ -143,8 +143,8 @@
  </layer>
  <layer id="5" name="Decor" width="50" height="30">
   <data encoding="csv">
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,505,506,507,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,955,0,0,0,0,0,0,987,
-0,0,0,0,0,0,1157,0,0,0,0,0,0,0,0,0,0,1157,0,0,0,537,538,539,0,0,0,0,0,0,0,0,0,955,0,0,0,0,0,0,0,0,987,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,1567,0,0,0,0,0,0,0,0,0,0,505,506,507,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,955,0,0,0,0,0,0,987,
+0,0,0,0,0,0,1157,0,0,0,1599,0,0,0,0,0,0,1157,0,0,0,537,538,539,0,0,0,0,0,0,0,0,0,955,0,0,0,0,0,0,0,0,987,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,569,570,571,0,0,0,0,0,0,0,0,0,987,0,0,0,0,0,0,0,0,0,0,2924,2925,2926,2927,0,0,
 0,0,0,0,0,1256,1257,0,1319,0,0,0,0,0,0,0,1256,1257,0,1319,0,0,0,0,0,0,0,1256,1257,1219,1319,0,4110,391,0,0,0,0,0,955,0,0,0,955,2956,2957,2958,2959,0,0,
 0,0,0,0,0,1288,1289,0,1351,0,0,0,0,0,0,0,1288,1289,0,1351,0,0,0,0,0,0,0,1288,1289,0,1351,0,2212,0,0,0,0,0,0,987,0,0,0,987,0,0,0,0,0,0,
@@ -177,7 +177,7 @@
  </layer>
  <layer id="6" name="Add decor" width="50" height="30">
   <data encoding="csv">
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,1595,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -234,26 +234,35 @@
   <object id="28" name="water" x="1072" y="48" width="528" height="72"/>
   <object id="29" name="water" x="1392" y="0" width="208" height="48"/>
   <object id="37" name="wall" x="1136" y="816" width="16" height="144"/>
- </objectgroup>
- <objectgroup id="7" name="items">
-  <object id="2" name="paprika" type="fruit tree" gid="942" x="1504" y="800" width="32" height="32">
-   <properties>
-    <property name="no" type="int" value="2"/>
-    <property name="strength" type="int" value="5"/>
-   </properties>
-  </object>
-  <object id="3" name="paprika" type="fruit tree" gid="942" x="1440" y="832" width="32" height="32">
-   <properties>
-    <property name="no" type="int" value="2"/>
-    <property name="strength" type="int" value="5"/>
-   </properties>
-  </object>
-  <object id="4" name="paprika" type="fruit tree" gid="942" x="1472" y="704" width="32" height="32">
-   <properties>
-    <property name="no" type="int" value="2"/>
-    <property name="strength" type="int" value="5"/>
-   </properties>
-  </object>
+  <object id="77" name="wall" x="456" y="776" width="144" height="40"/>
+  <object id="78" name="wall" x="456" y="816" width="56" height="32"/>
+  <object id="79" name="wall" x="544" y="816" width="56" height="32"/>
+  <object id="80" name="wall" x="176" y="80" width="40" height="112"/>
+  <object id="81" name="wall" x="144" y="112" width="32" height="80"/>
+  <object id="82" name="wall" x="112" y="144" width="32" height="48"/>
+  <object id="83" name="wall" x="88" y="168" width="24" height="24"/>
+  <object id="84" name="wall" x="216" y="96" width="40" height="96"/>
+  <object id="85" name="wall" x="256" y="136" width="40" height="56"/>
+  <object id="86" name="wall" x="296" y="0" width="16" height="192"/>
+  <object id="87" name="wall" x="72" y="192" width="240" height="176"/>
+  <object id="88" name="wall" x="72" y="368" width="88" height="32"/>
+  <object id="89" name="wall" x="224" y="368" width="88" height="32"/>
+  <object id="90" name="wall" x="0" y="344" width="64" height="24"/>
+  <object id="91" name="wall" x="-8" y="432" width="40" height="528"/>
+  <object id="92" name="wall" x="32" y="520" width="40" height="56"/>
+  <object id="93" name="wall" x="32" y="624" width="16" height="72"/>
+  <object id="94" name="wall" x="32" y="752" width="16" height="88"/>
+  <object id="95" name="wall" x="32" y="904" width="40" height="56"/>
+  <object id="96" name="wall" x="120" y="920" width="744" height="40"/>
+  <object id="97" name="wall" x="72" y="944" width="48" height="16"/>
+  <object id="98" name="wall" x="176" y="896" width="128" height="24"/>
+  <object id="99" name="wall" x="88" y="848" width="16" height="24"/>
+  <object id="100" name="wall" x="416" y="896" width="32" height="24"/>
+  <object id="101" name="wall" x="608" y="752" width="32" height="72"/>
+  <object id="102" name="wall" x="640" y="784" width="32" height="56"/>
+  <object id="103" name="wall" x="664" y="840" width="40" height="80"/>
+  <object id="104" name="wall" x="768" y="872" width="40" height="48"/>
+  <object id="105" name="wall" x="808" y="840" width="24" height="80"/>
   <object id="5" name="wall" x="1248" y="416" width="16" height="240"/>
   <object id="6" name="wall" x="1312" y="416" width="16" height="176"/>
   <object id="30" name="wall" x="1152" y="464" width="32" height="80"/>
@@ -293,18 +302,50 @@
   <object id="66" name="wall" x="664" y="368" width="40" height="40"/>
   <object id="67" name="wall" x="736" y="400" width="32" height="8"/>
   <object id="68" name="wall" x="1024" y="400" width="32" height="8"/>
+  <object id="106" name="wall" x="488" y="752" width="88" height="24"/>
+  <object id="107" name="wall" x="136" y="616" width="272" height="40"/>
+  <object id="108" name="wall" x="168" y="592" width="208" height="24"/>
+  <object id="109" name="wall" x="200" y="576" width="144" height="16"/>
+  <object id="110" name="wall" x="240" y="552" width="64" height="24"/>
+  <object id="111" name="wall" x="136" y="656" width="120" height="40"/>
+  <object id="112" name="wall" x="288" y="656" width="120" height="40"/>
+  <object id="113" name="wall" x="176" y="696" width="64" height="72"/>
+  <object id="114" name="wall" x="440" y="576" width="16" height="104"/>
+  <object id="115" name="water" x="704" y="512" width="32" height="32"/>
+ </objectgroup>
+ <objectgroup id="7" name="items">
+  <object id="2" name="paprika" type="fruit tree" gid="942" x="1504" y="800" width="32" height="32">
+   <properties>
+    <property name="no" type="int" value="2"/>
+    <property name="strength" type="int" value="5"/>
+   </properties>
+  </object>
+  <object id="3" name="paprika" type="fruit tree" gid="942" x="1440" y="832" width="32" height="32">
+   <properties>
+    <property name="no" type="int" value="2"/>
+    <property name="strength" type="int" value="5"/>
+   </properties>
+  </object>
+  <object id="4" name="paprika" type="fruit tree" gid="942" x="1472" y="704" width="32" height="32">
+   <properties>
+    <property name="no" type="int" value="2"/>
+    <property name="strength" type="int" value="5"/>
+   </properties>
+  </object>
+  <object id="116" name="sign" type="sign" x="328" y="8" width="16" height="48">
+   <properties>
+    <property name="text" value="To North Islands"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="10" name="enemies">
   <object id="69" name="Wolf" type="enemy" gid="7676" x="128" y="880" width="32" height="32">
    <properties>
     <property name="item" value=""/>
    </properties>
   </object>
-  <object id="70" name="Brid the Priest" type="npc" gid="7505" x="656" y="536" width="32" height="32"/>
-  <object id="71" gid="3073" x="848" y="840" width="32" height="32"/>
-  <object id="72" gid="3073" x="848" y="840" width="32" height="32"/>
-  <object id="73" gid="3073" x="696" y="840" width="32" height="32"/>
-  <object id="74" gid="3073" x="760" y="808" width="32" height="32"/>
-  <object id="75" gid="3073" x="768" y="816" width="32" height="32"/>
-  <object id="76" gid="3073" x="768" y="816" width="32" height="32"/>
  </objectgroup>
- <objectgroup id="8" name="npcs"/>
+ <objectgroup id="8" name="npcs">
+  <object id="70" name="Brid the Priest" type="npc" gid="7505" x="656" y="536" width="32" height="32"/>
+ </objectgroup>
 </map>

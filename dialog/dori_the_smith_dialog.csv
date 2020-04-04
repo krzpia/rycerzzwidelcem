@@ -1,0 +1,9 @@
+Npc;Thread;Branch;Step;Text;Ask1;Ask2;Ask3;Ask4;Next_Thread;Goto_Branch;Goto_Step;Event
+True;welcome;0;0;Welcome mighty adventurer;False;False;False;False;Next;False;False;False
+True;welcome;1;0;Welcome again, how are you going?;False;False;False;False;Next;False;False;False
+True;ill;0;0;Ough (coughs) I`m sorry I`m not very well. Go to  the tent if you want to boy some armor or weapons.;False;False;False;False;Next;False;False;False
+True;quest Golden Mask;0;0;King Sancho told me that you brought us the sampleof Arechinix. Thanks!;False;False;False;False;Next;False;False;False
+True;quest Golden Mask;1;0;If you are looking for a golden mask go to the    Northlands. The boat will take you to the main    city - Bravendell, then go north trough the woods and hills. Beware the orcs and goblins!;False;False;False;False;Next;False;False;False
+True;quest Golden Mask;2;0;Whoa! This is it! The Original Golden Mask. Yep it has the FPP3 certificate! Give it to me and I`will make you suitable for you!;False;False;False;False;Next;False;False;quest Golden Mask has been rewarded
+True;quest Golden Mask;3;0;Well, now the mask is yours. Wear it with proud.  Go speak with king Sancho, he will tell you when  we are leaving to fight with the corona plague!;False;False;False;False;Next;False;False;False
+True;bye;0;0;Farewell!;False;False;False;False;False;False;False;False

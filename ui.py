@@ -48,7 +48,7 @@ class Slot:
         self.pos_cl = pos_cl
         if self.rect.x + self.szer > self.pos_cl[0] > self.rect.x and (self.rect.y + self.wys > self.pos_cl[1] > self.rect.y):
             if self.item_to_check.type == self.type:
-                print ("TYP ZGODNY")
+                #print ("TYP ZGODNY")
                 return True
 
     def define_type(self,type):
@@ -139,6 +139,7 @@ class Inventory:
         self.pos_cl = pos_cl
         for i in self.item_slots:
             if i.rect.x + i.szer > self.pos_cl[0] > i.rect.x and (i.rect.y + i.wys > self.pos_cl[1] > i.rect.y):
+                #print("ITEM SLOT on INVENTORY")
                 return True
 
     def pick_item_from_inv(self,pos_cl):
@@ -150,19 +151,8 @@ class Inventory:
                 #print (str(i.rect.y))
                 if i.item:
                     self.item_picked = i.pick_item()
+                    #print ("ODKLADASZ PRZEDMIOT")
                     #print (self.item_picked.name)
-                    pygame.mixer.Sound.play(pick_item_snd)
-                    return self.item_picked
-
-    def choose_book_from_inv(self,pos_cl):
-        self.pos_cl = pos_cl
-        for i in self.item_slots:
-            if i.rect.x + i.szer > self.pos_cl[0] > i.rect.x and (i.rect.y + i.wys > self.pos_cl[1] > i.rect.y):
-                #print("NACISKASZ NA BOOK Z INV MAGIC_G")
-                # print (str(i.rect.x))
-                # print (str(i.rect.y))
-                if i.item:
-                    self.item_picked = i.choose_book()
                     pygame.mixer.Sound.play(pick_item_snd)
                     return self.item_picked
 
@@ -322,7 +312,7 @@ class Button:
         self.rect.y = y
 
     def show_button(self,surface, font):
-        self.act_color = (185,185,0)
+        self.act_color = WHITE
         self.text_surface = font.render(self.text, True, self.act_color)
         self.text_rect = self.text_surface.get_rect()
         self.text_rect.topleft = (self.rect.x + 20, self.rect.y + 4)
@@ -500,8 +490,8 @@ class QuestBook:
             else:
                 text_line_01 = i.goal_descr[:30]
                 text_line_02 = i.goal_descr[30:]
-            self.game.s_write(text_line_01, self.image, (x_pos + 80, 56 + counter * 64), BLACK)
-            self.game.s_write(text_line_02, self.image, (x_pos + 80, 72 + counter * 64), BLACK)
+            self.game.s_write(text_line_01, self.image, (x_pos + 80, 58 + counter * 64), BLACK)
+            self.game.s_write(text_line_02, self.image, (x_pos + 80, 76 + counter * 64), BLACK)
             #self.game.s_write(f'Reward {i.reward_xp} XP,  {i.reward_gold} gold.', self.image ,(x_pos + 80, 70 + counter * 64),(BLACK))
             counter += 1
             if counter >= 5:
@@ -1317,11 +1307,11 @@ class MessageBox:
         g_l_m = 10 * (len(str(reward_gold)) - 1)
         e_l_m = 10 * (len(str(reward_xp)) - 1)
         if reward_gold > 0:
-            self.rew_image.blit(gold_coin, (100 + g_l_m, 45))
-            self.game.s_write(f'+ {reward_gold}', self.rew_image, (80, 35), BLACK)
+            self.rew_image.blit(gold_coin, (95 + g_l_m, 45))
+            self.game.s_write(str(reward_gold), self.rew_image, (80, 35), BLACK)
         if reward_xp > 0:
-            self.rew_image.blit(xp_icon, (100 + e_l_m, 60))
-            self.game.s_write(f'+ {reward_xp}', self.rew_image, (80, 60), BLACK)
+            self.rew_image.blit(xp_icon, (95 + e_l_m, 60))
+            self.game.s_write(str(reward_xp), self.rew_image, (80, 60), BLACK)
         if reward_item:
             self.game.s_write(f'You get {reward_item.name}', self.rew_image, (120, 85), BLACK)
             self.rew_image.blit(reward_item.image, (80, 80))
@@ -1416,11 +1406,11 @@ class DialogBox:
         g_l_m = 10 * (len(str(quest.reward_gold)) - 1)
         e_l_m = 10 * (len(str(quest.reward_xp)) - 1)
         if quest.reward_gold > 0:
-            self.rew_image.blit(gold_coin,(100 + g_l_m,35))
-            self.game.s_write(f'+ {quest.reward_gold}',self.rew_image,(80,30),BLACK)
+            self.rew_image.blit(gold_coin,(95 + g_l_m,35))
+            self.game.s_write(str(quest.reward_gold), self.rew_image,(80,30),BLACK)
         if quest.reward_xp > 0:
-            self.rew_image.blit(xp_icon,(100 + e_l_m,50))
-            self.game.s_write(f'+ {quest.reward_xp}', self.rew_image, (80, 50),BLACK)
+            self.rew_image.blit(xp_icon,(95 + e_l_m,50))
+            self.game.s_write(str(quest.reward_xp), self.rew_image, (80, 50),BLACK)
         if quest.reward_item:
             self.game.s_write(f'You get {quest.reward_item}', self.rew_image, (80, 70),BLACK)
             #self.rew_image.blit(quest.reward_item.image,(80,80))
@@ -1897,6 +1887,7 @@ class ShopAsk:
     def configure_activity(self, activity):
         self.activity = activity
 
+
 class Shop:
     def __init__(self, game, name, shop_type, quality, owner_gold, owner_name, owner_image=default_shop_owner_img):
         self.game = game
@@ -2167,7 +2158,7 @@ class Shop:
             self.exit_button.show_button(self.image)
             self.image.blit(gold_coin,(85,315))
             self.game.s_write(str(self.owner_gold),self.image,(102,310),YELLOW)
-            self.game.s_write("OWNER GOLD:",self.image,(80,290),YELLOW)
+            self.game.s_write("OWNER GOLD:",self.image,(75,290),YELLOW)
             if self.game.item_picked:
                 if self.game.item_picked.owner == "shop":
                     self.image.blit(gold_coin,(315,315))
@@ -2188,7 +2179,7 @@ class Shop:
             self.repair_button.show_button(self.image)
             self.image.blit(gold_coin, (85, 315))
             self.game.s_write(str(self.owner_gold), self.image, (102, 310), YELLOW)
-            self.game.s_write("OWNER GOLD:",self.image,(80,290),YELLOW)
+            self.game.s_write("OWNER GOLD:",self.image,(75,290),YELLOW)
             self.game.s_write("PUT ITEM HERE:",self.image,(130,100),WHITE)
             if not self.act_inventory.check_free():
                 if isinstance(self.act_inventory.item_slot.item, sprites.Armor) or\
@@ -2262,9 +2253,12 @@ class Shop:
         mouse_x -= self.pos[0]
         mouse_y -= self.pos[1]
         self.mouse_pos = (mouse_x, mouse_y)
-        #if self.game.item_picked:
-        #    self.exit_button.deactivate()
-        #    self.repair_button.deactivate()
+        if self.game.item_picked:
+            self.exit_button.deactivate()
+            self.repair_button.deactivate()
+        else:
+            self.exit_button.activate()
+            self.repair_button.activate()
         if self.game.ph_repair:
             if self.act_inventory.item_slot.item:
                 self.repair_button.activate()

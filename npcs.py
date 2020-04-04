@@ -24,6 +24,8 @@ class QuestGenerator:
         self.q_holy_grail.put_image_from_tileset(23,94,full_tileset_image)
         self.q_killer_bees = ui.Quest(self.game,"Killer Bees","Kill 3 giant bees             from the John`s filed",1,["Killer Bee", "Killer Bee", "Killer Bee"],[],False,[],[],15,10)
         self.q_killer_bees.put_image_from_tileset(5,65,full_tileset_image)
+        self.q_mieszko_ring = ui.Quest(self.game, "Mieszko Family Signet", "Find Mieszko`s father family signet", 1, [],["Mieszko Family Signet"], True, [], [], 12, 120)
+        self.q_mieszko_ring.put_image_from_tileset(17, 43, full_tileset_image)
         self.q_miraflorida = ui.Quest(self.game,"Miraflorida","Find castle of Miraflorida",1,[],[],False,[],["George the Guard"],6,0)
         self.q_miraflorida.set_to_autochecking()
         self.q_miraflorida.put_image_from_tileset(0,60,full_tileset_image)
@@ -42,7 +44,7 @@ class QuestGenerator:
 
         ### END........
         ### ALL QUESTS IN LIST
-        self.quests = [self.q_holy_grail, self.q_killer_bees, self.q_miraflorida,
+        self.quests = [self.q_holy_grail, self.q_killer_bees, self.q_mieszko_ring, self.q_miraflorida,
                        self.q_open_the_gates, self.q_karol_the_alchemist, self.q_speak_with_the_king, self.q_golden_mask]
 
     def return_quest_by_name(self, name):
@@ -60,11 +62,13 @@ class NpcGenerator:
         self.gold_crusader_csv = csv.DictReader(open(path.join(dialog_folder, 'gold_crusader_dialog.csv')),delimiter=';')
         self.blue_gnom_csv = csv.DictReader(open(path.join(dialog_folder,'blue_gnom_dialog.csv')),delimiter=';')
         self.john_the_farmer_csv = csv.DictReader(open(path.join(dialog_folder, 'john_the_farmer_dialog.csv')), delimiter=';')
+        self.mieszko_the_knight_csv = csv.DictReader(open(path.join(dialog_folder,'mieszko_the_knight_dialog.csv')), delimiter=';')
         self.george_the_guard_csv = csv.DictReader(open(path.join(dialog_folder,'george_the_guard_dialog.csv')),delimiter=';')
         self.eveandro_the_druid_csv = csv.DictReader(open(path.join(dialog_folder,'eveandro_the_druid_dialog.csv')),delimiter=';')
         self.king_sancho_csv = csv.DictReader(open(path.join(dialog_folder,'king_sancho_dialog.csv')),delimiter=';')
         self.karol_the_alchemist_csv = csv.DictReader(open(path.join(dialog_folder, 'karol_the_alchemist_dialog.csv')), delimiter=';')
         self.ivan_the_physician_csv = csv.DictReader(open(path.join(dialog_folder, 'ivan_the_physician_dialog.csv')), delimiter=';')
+        self.dori_the_smith_csv = csv.DictReader(open(path.join(dialog_folder,'dori_the_smith_dialog.csv')), delimiter=';')
         #############
 
     def generate(self, name, x, y, image):
@@ -83,6 +87,11 @@ class NpcGenerator:
             john_the_farmer = sprites.Npc(self.game,name,x,y,image)
             john_the_farmer.dialog_data.load_from_dict(self.john_the_farmer_csv, self.quest_gen)
             return john_the_farmer
+
+        if name == "Mieszko the Knight":
+            mieszko_the_knight = sprites.Npc(self.game,name,x,y,image)
+            mieszko_the_knight.dialog_data.load_from_dict(self.mieszko_the_knight_csv, self.quest_gen)
+            return mieszko_the_knight
 
         if name == "Piggy":
             piggy = sprites.Npc(self.game,name,x,y,image)
@@ -140,3 +149,10 @@ class NpcGenerator:
             ivan_the_physician.dialog_data.thread_unblock_with_event("quest Golden Mask",['quest Speak with the King has been completed'])
             ivan_the_physician.dialog_data.thread_block_with_event("ill",['quest Speak with the King has been completed'])
             return ivan_the_physician
+
+        if name == "Dori the Smith":
+            dori_the_smith = sprites.Npc(self.game,name,x,y,image)
+            dori_the_smith.dialog_data.load_from_dict(self.dori_the_smith_csv, self.quest_gen)
+            dori_the_smith.dialog_data.thread_unblock_with_event("quest Golden Mask",['got quest Golden Mask'])
+            dori_the_smith.dialog_data.thread_block_with_event("ill",['got quest Golden Mask'])
+            return dori_the_smith

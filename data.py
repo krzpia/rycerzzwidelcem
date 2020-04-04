@@ -130,7 +130,13 @@ tomato_empty_img = pygame.image.load(path.join(img_folder, 'tomato_empty.png')).
 tomato_img = pygame.image.load(path.join(img_folder, 'tomato.png')).convert_alpha()
 paprika_empty_img = pygame.image.load(path.join(img_folder, 'paprika_empty.png')).convert_alpha()
 paprika_img = pygame.image.load(path.join(img_folder, 'paprika.png')).convert_alpha()
-
+### INV ICONS
+i_str_ico = pygame.image.load(path.join(img_folder, 'str_ico.png')).convert_alpha()
+i_sta_ico = pygame.image.load(path.join(img_folder, 'sta_ico.png')).convert_alpha()
+i_int_ico = pygame.image.load(path.join(img_folder, 'int_ico.png')).convert_alpha()
+i_wis_ico = pygame.image.load(path.join(img_folder, 'wis_ico.png')).convert_alpha()
+i_spe_ico = pygame.image.load(path.join(img_folder, 'spe_ico.png')).convert_alpha()
+i_ste_ico = pygame.image.load(path.join(img_folder, 'ste_ico.png')).convert_alpha()
 ### EFFECTS ICONS
 e_fav_wea_ico = pygame.image.load(path.join(img_folder, 'e_fav_wea.png')).convert_alpha()
 e_dis_wea_ico = pygame.image.load(path.join(img_folder, 'e_dis_wea.png')).convert_alpha()

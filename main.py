@@ -220,17 +220,17 @@ class Game:
             if self.class_selected:
                 if self.class_selected == self.knight_class:
                     self.screen.blit(self.class_selected.image, TIMGPOS)
-                    self.write("Knight", NTXT, WHITE)
+                    self.big_write("Knight", NTXT, WHITE)
                     self.write("Dedicated do melle fight, starts with strength and stamina bonus", ADTXT, WHITE)
                     self.write("No penalty using plate armors", (ADTXT[0], ADTXT[1] + 25), WHITE)
                 if self.class_selected == self.wizard_class:
                     self.screen.blit(self.class_selected.image, TIMGPOS)
-                    self.write("Wizard", NTXT, WHITE)
+                    self.big_write("Wizard", NTXT, WHITE)
                     self.write("Weak in direct fight, but able to make severe damage by magic powers", ADTXT, WHITE)
                     self.write("Bonus x1.5 power of offensive spells", (ADTXT[0], ADTXT[1] + 25), WHITE)
                 if self.class_selected == self.thief_class:
                     self.screen.blit(self.class_selected.image, TIMGPOS)
-                    self.write("Thief", NTXT, WHITE)
+                    self.big_write("Thief", NTXT, WHITE)
                     self.write("Fast and able to sneak, powerful with bow and dagger combination", ADTXT, WHITE)
                     self.write("Bonus x1.3 Hit Rate with ranged weapons, and additional barter bonus",(ADTXT[0],ADTXT[1]+25), WHITE)
                 self.write("Strength: " + str(self.class_selected.str), (IDX, IDY + 0))
@@ -366,7 +366,7 @@ class Game:
         self.levelgen.load_level_02()
         self.levelgen.load_level_03()
         self.levelgen.load_level_04()
-        self.levelgen.go_to_level("level02", 19,7)
+        self.levelgen.go_to_level("level02", 21,9)
         print ("INITIALIZING CAMERA...")
         ##### CAMERA INIT
         self.camera = tilemap.Camera(self.map.width, self.map.height)
@@ -458,26 +458,26 @@ class Game:
         x_pos = 100
         self.screen.fill(BGCOLOR)
         self.screen.blit(game_over_img, (0, 0))
-        self.write("GAME OVER", (SCREEN_WIDTH / 2 - 120, 60))
-        self.write("Press Enter to go to Main Menu", (SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT - 100))
-        self.write("Czas gry: " + str(self.time_played) + " sekund", (x_pos + 60, y_pos + 50))
-        self.write("Posiadane złoto: " + str(self.player.gold), (x_pos + 60, y_pos + 70))
-        self.write("Zabici przeciwnicy: " + str(self.killed_enemies), (x_pos + 60, y_pos + 90))
+        self.big_write("GAME OVER", (SCREEN_WIDTH / 2 - 120, 60))
+        self.big_write("Press Enter to go to Main Menu", (SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT - 100))
+        self.big_write("Game time: " + str(self.time_played) + " sec.", (x_pos + 60, y_pos + 50))
+        self.big_write("Gold: " + str(self.player.gold), (x_pos + 60, y_pos + 70))
+        self.big_write("Killed enemies: " + str(self.killed_enemies), (x_pos + 60, y_pos + 90))
         if self.most_powerful_enemy:
-            self.write("Najpotężniejszy przeciwnik: " + str(self.most_powerful_enemy.name), (x_pos + 60, y_pos + 110))
-        self.write("Wartość zadanych obrażeń wręcz: " + str(self.overall_melle_hits), (x_pos + 60, y_pos + 140))
-        self.write("Celność ciosów wręcz: " + str(self.melle_accuracy) + "%", (x_pos + 60, y_pos + 160))
-        self.write("Wartość zadanych obrażeń z łuku: " + str(self.overall_arrow_hits), (x_pos + 60, y_pos + 190))
-        self.write("Celność z łuku: " + str(self.arrow_accuracy) + "%", (x_pos + 60, y_pos + 210))
-        self.write("Wartość obrażeń magicznych: " + str(self.overall_spell_hits), (x_pos + 60, y_pos + 240))
-        self.write("Celność magii: " + str(self.spell_accuracy) + "%", (x_pos + 60, y_pos + 260))
-        self.write("Otrzymane obrażenia: " + str(self.inflicted_damage), (x_pos + 60, y_pos + 290))
-        self.write("Bloki: " + str(self.player.score_blocks), (x_pos + 60, y_pos + 310))
-        self.write("Efektywność bloków: " + str(self.block_efficiency) + "%", (x_pos + 60, y_pos + 330))
-        self.write("Otworzone skrzynie: " + str(self.player.score_chest_opened), (x_pos + 60, y_pos + 360))
-        self.write("Zniszczone beczki: " + str(self.player.score_barrels_destroyed), (x_pos + 60, y_pos + 380))
-        self.write("PUNKTY :" + str(self.points), (x_pos + 60, y_pos + 420))
-        self.write(str(self.clock.get_fps()), (0, 0))
+            self.big_write("Most powerful enemy: " + str(self.most_powerful_enemy.name), (x_pos + 60, y_pos + 110))
+        self.big_write("Melle damage: " + str(self.overall_melle_hits), (x_pos + 60, y_pos + 140))
+        self.big_write("Melle accuracy: " + str(self.melle_accuracy) + "%", (x_pos + 60, y_pos + 160))
+        self.big_write("Ranged damage: " + str(self.overall_arrow_hits), (x_pos + 60, y_pos + 190))
+        self.big_write("Ranged accuracy: " + str(self.arrow_accuracy) + "%", (x_pos + 60, y_pos + 210))
+        self.big_write("Magic damage: " + str(self.overall_spell_hits), (x_pos + 60, y_pos + 240))
+        self.big_write("Magic accuracy: " + str(self.spell_accuracy) + "%", (x_pos + 60, y_pos + 260))
+        self.big_write("Damage recieved: " + str(self.inflicted_damage), (x_pos + 60, y_pos + 290))
+        self.big_write("Blocks: " + str(self.player.score_blocks), (x_pos + 60, y_pos + 310))
+        self.big_write("Blocks efficiency: " + str(self.block_efficiency) + "%", (x_pos + 60, y_pos + 330))
+        self.big_write("Chest opened: " + str(self.player.score_chest_opened), (x_pos + 60, y_pos + 360))
+        self.big_write("Barrels destroyed: " + str(self.player.score_barrels_destroyed), (x_pos + 60, y_pos + 380))
+        self.big_write("TOTAL POINTS :" + str(self.points), (x_pos + 60, y_pos + 420))
+        self.big_write(str(self.clock.get_fps()), (0, 0))
         #### FLIP
         pygame.display.flip()
 
@@ -755,7 +755,7 @@ class Game:
                         # 5. ODKLADAM NA REPAIR SLOT:
                         if self.ph_repair:
                             if self.active_shop.act_inventory.check_if_clicked(shop_mouse_pos):
-                                print ("KLIK REPAIR")
+                                #print ("KLIK REPAIR")
                                 if isinstance(self.item_picked,sprites.Armor) or isinstance(self.item_picked,sprites.Weapon):
                                     put_item_success_bool = self.active_shop.act_inventory.put_item_to_inv(shop_mouse_pos,
                                                                                                            self.item_picked)
@@ -769,7 +769,7 @@ class Game:
                                     put_item_success_bool = self.player.inventory.put_item_to_inv(mouse_pos,
                                                                                               self.item_picked)
                                     if put_item_success_bool:
-                                        print ("KUPUJE!")
+                                        #print ("KUPUJE!")
                                         self.active_shop.sell_to_player(self.item_picked)
                                         self.toggle_clean_item_picked = True
                                 else:
@@ -782,9 +782,11 @@ class Game:
                                     self.toggle_clean_item_picked = True
                         # 2. 0DKLADAM NA AKTYWNY SLOT
                         if not self.ph_buy_and_sell:
+                            #print ("PROBUJE ODLOZYC PRZEDMIOT NA AKTYWNY SLOT")
                             for slot in self.player.active_slots:
                                 if slot.check_itemslot_to_item_corr(mouse_pos, self.item_picked):
                                     if slot.occ == False:
+                                        #print("ODKLADAM PRZEDMIOT NA AKTYWNY SLOT")
                                         self.toggle_clean_item_picked = True
                                     ### POLOZ PRZEDMIOT NA AKTYWNYM SLOCIE i UPDATE STATISTICS
                                     pygame.mixer.Sound.play(wear_item_snd)
@@ -794,8 +796,9 @@ class Game:
                                             self.player_group.add(self.item_picked)
                                     self.player.update_stats()
                         # 3. ODKLADAM NA TREASURE
-                        if self.treasure_inv:
+                        if self.ph_treasure_inv:
                             if self.treasure_inv.check_if_clicked(mouse_pos):
+                                #print ("ODKLADAM NA SKRZYNIE")
                                 put_item_success_bool = self.treasure_inv.put_item_to_inv(mouse_pos,
                                                                                           self.item_picked)
                                 if put_item_success_bool:  # GDY UDALO SIE ODLOZYC WTEDY OCZYSZCzAM ITEM PICKED
@@ -811,12 +814,12 @@ class Game:
                                         self.toggle_clean_item_picked = True
                                 ## SPRZEDAJE
                                 else:
-                                    print("SELL ITEM")
+                                    #print("SELL ITEM")
                                     if self.active_shop.check_gold(self.item_picked):
                                         put_item_success_bool = self.active_shop.act_inventory.put_item_to_inv(
                                             shop_mouse_pos, self.item_picked)
                                         if put_item_success_bool:
-                                            print("SPRZEDAJE!")
+                                            #print("SPRZEDAJE!")
                                             self.active_shop.buy_from_player(self.item_picked)
                                             self.toggle_clean_item_picked = True
                         ## PRZEDMIOTY DO UZYCIA
@@ -838,14 +841,17 @@ class Game:
                         ########################################
                         # 1. PODNIES ITEM Z INV
                         if self.player.inventory.check_if_clicked(mouse_pos):
+                            #print ("KLIKAM PLAYER INVENTORY - podnosze przedmiot")
                             self.item_picked = self.player.inventory.pick_item_from_inv(mouse_pos)
                         # 2. PODNIES ITEM Z SHOP
                         if self.ph_buy_and_sell:
                             if self.active_shop.act_inventory.check_if_clicked(shop_mouse_pos):
+                                #print ("KLIKAM SHOP INVENTORY - podnosze przedmiot")
                                 self.item_picked = self.active_shop.act_inventory.pick_item_from_inv(shop_mouse_pos)
                         # 2. PODNIES ITEM Z TREASURE INV
-                        if self.treasure_inv:
+                        if self.ph_treasure_inv:
                             if self.treasure_inv.check_if_clicked(mouse_pos):
+                                #print("### PODNOSZE ITEM Z TREASURE INV ###")
                                 self.item_picked = self.treasure_inv.pick_item_from_inv(mouse_pos)
                                 ## wyjątek dla złorych monet
                                 if self.item_picked:
@@ -861,13 +867,14 @@ class Game:
                         for slot in self.player.active_slots:
                             if slot.check_if_clicked(mouse_pos):
                                 if slot.item:
-                                    ### PODNIES PRZEDMIOT Z AKTYWNEGO SLOTU i UPDATE STATYSTYK
+                                    #print("### PODNIES PRZEDMIOT Z AKTYWNEGO SLOTU i UPDATE STATYSTYK")
                                     self.player_group.remove(slot.item)
                                     self.item_picked = slot.pick_item()
                                     self.player.update_stats()
                         # 4. REPAIR:
                         if self.ph_repair:
                             if self.active_shop.act_inventory.check_if_clicked(shop_mouse_pos):
+                                #print ("REPERUJE PRZEDMIOT")
                                 self.item_picked = self.active_shop.act_inventory.pick_item_from_inv(shop_mouse_pos)
                         # 4. ZAZNACZ lub ODZNACZ CZAR:
                         if self.ph_spell_book:
@@ -918,7 +925,7 @@ class Game:
     def update_game_enviroment(self):
         for rem_obj in self.rem_objects:
             if rem_obj.check_remove_condition():
-                print ("Removing sprite")
+                #print ("Removing sprite")
                 rem_obj.kill()
 
     def update(self):
@@ -1091,8 +1098,7 @@ class Game:
                     rot = (self.player.pos - mob.pos).angle_to(vec(-1, 0))
                     mob.pos += vec(5, 0).rotate(-rot)
                 elif self.player.attack_type_flag == "ranged":
-                    txt = str(
-                        "Ranged hit. " + self.player.name + " inflicted " + (str(self.player.arrow_damage)) + " damage.")
+                    txt = f'Ranged hit. {self.player.name} inflicted  {int(self.player.arrow_damage)} damage.'
                     self.put_txt(txt)
                     self.player.score_arrow_enemy_hits.append(int(self.player.arrow_damage))
                     mob.attention += 48
@@ -1264,15 +1270,22 @@ class Game:
 
     def draw_stats(self):
         self.write("Name :" + self.player.name, (ST_POS[0] + ST_WIDTH / 2 - 40, ST_POS[1] + 10))
-        self.write("Strength: " + str(self.player.strength), (ST_POS[0] + 25, ST_POS[1] + 40))
-        self.write("Stamina: " + str(self.player.stamina), (ST_POS[0] + 25, ST_POS[1] + 60))
-        self.write("Intellect: " + str(self.player.intellect), (ST_POS[0] + 25, ST_POS[1] + 80))
-        self.write("Wisdom: " + str(self.player.wisdom), (ST_POS[0] + 25, ST_POS[1] + 100))
-        self.write("Speed: " + str(self.player.speed), (ST_POS[0] + 25, ST_POS[1] + 120))
-        self.write("Stealth: " + str(self.player.stealth), (ST_POS[0] + 25, ST_POS[1] + 140))
-        self.write("CLASS :" + str(self.player.char_class.name), (ST_POS[0] + ST_WIDTH - 220, ST_POS[1] + 40))
-        self.write("Lvl: " + str(self.player.level), (ST_POS[0] + ST_WIDTH - 220, ST_POS[1] + 60))
-        self.write("XP: " + str(self.player.xp), (ST_POS[0] + ST_WIDTH - 160, ST_POS[1] + 60))
+        self.write("Skills:", (ST_POS[0] + 10, ST_POS[1] + 10))
+        self.write(str(self.player.strength), (ST_POS[0] + 50, ST_POS[1] + 40))
+        self.screen.blit(i_str_ico,(ST_POS[0] + 30, ST_POS[1] + 40))
+        self.write(str(self.player.stamina), (ST_POS[0] + 50, ST_POS[1] + 60))
+        self.screen.blit(i_sta_ico, (ST_POS[0] + 30, ST_POS[1] + 60))
+        self.write(str(self.player.intellect), (ST_POS[0] + 50, ST_POS[1] + 80))
+        self.screen.blit(i_int_ico, (ST_POS[0] + 30, ST_POS[1] + 80))
+        self.write(str(self.player.wisdom), (ST_POS[0] + 50, ST_POS[1] + 100))
+        self.screen.blit(i_wis_ico, (ST_POS[0] + 30, ST_POS[1] + 100))
+        self.write(str(self.player.speed), (ST_POS[0] + 50, ST_POS[1] + 120))
+        self.screen.blit(i_spe_ico, (ST_POS[0] + 30, ST_POS[1] + 120))
+        self.write(str(self.player.stealth), (ST_POS[0] + 50, ST_POS[1] + 140))
+        self.screen.blit(i_ste_ico, (ST_POS[0] + 30, ST_POS[1] + 140))
+        self.write("CLASS :" + str(self.player.char_class.name), (ST_POS[0] + ST_WIDTH - 250, ST_POS[1] + 40))
+        self.write("LEVEL " + str(self.player.level), (ST_POS[0] + ST_WIDTH - 250, ST_POS[1] + 60))
+        self.write("XP: " + str(self.player.xp), (ST_POS[0] + ST_WIDTH - 150, ST_POS[1] + 60))
         if self.player.attribute_points > 0:
             self.write("Points to spend :" + str(self.player.attribute_points), (ST_POS[0] + 10, ST_POS[1] + 10))
             self.str_ad_button.show_button(self.screen)
@@ -1300,14 +1313,14 @@ class Game:
                          (0, 0, 80 * xp_ratio_c, 5))
         ####################
         mov_sp = str(self.player.movement_speed / 100)
-        self.write("Active Spell :", (ST_POS[0] + ST_WIDTH - 220, ST_POS[1] + 80))
+        self.write("Active Spell :", (ST_POS[0] + ST_WIDTH - 250, ST_POS[1] + 80))
         if self.player.active_spell:
-            self.write(self.player.active_spell.name, (ST_POS[0] + ST_WIDTH - 140, ST_POS[1] + 80))
-        self.write("Active Effects :", (ST_POS[0] + ST_WIDTH - 220, ST_POS[1] + 100))
-        self.player.active_effects_lib.show(self.screen, (ST_POS[0] + ST_WIDTH - 120, ST_POS[1] + 100))
-        self.write("Movement :" + mov_sp, (ST_POS[0] + ST_WIDTH - 220, ST_POS[1] + 120))
+            self.write(self.player.active_spell.name, (ST_POS[0] + ST_WIDTH - 170, ST_POS[1] + 80))
+        self.write("Active Effects :", (ST_POS[0] + ST_WIDTH - 250, ST_POS[1] + 100))
+        self.player.active_effects_lib.show(self.screen, (ST_POS[0] + ST_WIDTH - 150, ST_POS[1] + 100))
+        self.write("Movement :" + mov_sp, (ST_POS[0] + ST_WIDTH - 250, ST_POS[1] + 120))
         self.write("Avoid mod : " + str(self.player.stealth * 3) + " pix",
-                   (ST_POS[0] + ST_WIDTH - 220, ST_POS[1] + 140))
+                   (ST_POS[0] + ST_WIDTH - 250, ST_POS[1] + 140))
 
     def draw_info(self):
         lot = 0

@@ -770,7 +770,7 @@ class Weapon(pygame.sprite.Sprite):
         if self.condition <=0:
             self.condition = 0
         self.damage = round((0.4 * self.base_damage) + (0.6 * self.base_damage * self.condition / 100), 0)
-        print (f'{self.name} condition: {self.condition}')
+        #print (f'{self.name} condition: {self.condition}')
         self.breakage_surf.fill((255 - (int(2.5 * self.condition)),(int(2.5* self.condition)),0))
         self.breakage_surf.blit(self.breakage_icon,(0,0))
 
@@ -1169,7 +1169,7 @@ class Player(pygame.sprite.Sprite):
         self.act_hp = self.max_hp
         self.max_mana = max(4, self.wisdom * 8 - 15)
         self.act_mana = self.max_mana
-        self.gold = 110
+        self.gold = 0
         self.arrows = 0
         self.xp = 0
         self.attribute_points = 0
@@ -1394,8 +1394,8 @@ class Player(pygame.sprite.Sprite):
                 self.active_effects_lib.add_effect(self.game.e_disliked_armor)
             else:
                 temp_armor_mod += self.armor_slot.item.armor
-            if self.armor_slot.item.type == "plate":
-                print ("Knight bonus aplied")
+            if self.armor_slot.item.subtype == "plate":
+                #print ("Knight bonus aplied")
                 temp_hit_rate_mod *= (self.armor_slot.item.hit_rate_mod * self.plate_armor_penalty_reduction)
             else:
                 temp_hit_rate_mod *= self.armor_slot.item.hit_rate_mod
@@ -1574,7 +1574,7 @@ class Player(pygame.sprite.Sprite):
         return block_ratio
 
     def calculate_movement_speed(self,x):
-        result = 80 + (10 * math.log2(x * x / 3))
+        result = 80 + (10 * math.log2(x * x / 4))
         result = max(80, int(result))
         return result
 
@@ -1614,6 +1614,8 @@ class Player(pygame.sprite.Sprite):
             self.game.events_manager.emit(Event(id=f'level {self.level} achieved'))
         if self.attribute_points > 0:
             pygame.mixer.Sound.play(levelup_snd)
+            self.act_hp = self.max_hp
+            self.act_mana = self.max_mana
             return self.attribute_points
         else:
             return False
