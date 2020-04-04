@@ -609,15 +609,15 @@ class CollectingSprite(pygame.sprite.Sprite):
 
 
 class InfoSprite(pygame.sprite.Sprite):
-    def __init__(self, game, name, x, y, text, hit_rect_width, hit_rect_height):
+    def __init__(self, game, name, x, y,w,h, text):
         self._layer = FLOOR_LAYER
         self.groups = game.act_lvl.collecting_sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.name = name
-        self.rect = pygame.Rect(0, 0, TILE_SIZE, TILE_SIZE)
+        self.rect = pygame.Rect(0, 0, w, h)
         self.rect.center = (x, y)
-        self.hit_rect = pygame.Rect(0, 0, hit_rect_width, hit_rect_height)
+        self.hit_rect = self.rect
         self.hit_rect.center = (x, y)
         self.name = name
         self.sound = False
@@ -750,7 +750,7 @@ class Weapon(pygame.sprite.Sprite):
         self.speed_mod = speed_mod
         self.ste_mod = ste_mod
         self.durability = durability
-        self.condition = 100.0
+        self.condition = 78.0
         self.hit_rate = hit_rate
         self.hit_radius = hit_radius
         self.image = self.s_image
@@ -1169,7 +1169,7 @@ class Player(pygame.sprite.Sprite):
         self.act_hp = self.max_hp
         self.max_mana = max(4, self.wisdom * 8 - 15)
         self.act_mana = self.max_mana
-        self.gold = 0
+        self.gold = 110
         self.arrows = 0
         self.xp = 0
         self.attribute_points = 0

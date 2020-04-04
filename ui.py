@@ -185,6 +185,71 @@ class Inventory:
                     i.put_item(self.item)
                     return True ## DO EWENTTAULNEGO WYJATKU GDY ZAJETY
 
+class RepairInventory:
+    def __init__(self, slot_img):
+        self.item_slot = Slot(slot_img)
+
+    def show_inv(self, surface, start_x_pos = 600, start_y_pos = 400):
+        self.start_x_pos = start_x_pos
+        self.start_y_pos = start_y_pos
+        self.surface = surface
+        self.item_slot.show_slot(self.surface,self.start_x_pos, self.start_y_pos)
+
+    def return_item(self):
+        if self.item_slot.item:
+            return self.item_slot.item
+
+    def check_free(self):
+        if self.item_slot.item:
+            #print ("Check free: False")
+            return False
+        else:
+            #print("Check free: True")
+            return True
+
+    def put_in_slot(self, item):
+        if self.check_free():
+            self.item_slot.put_item(item)
+            return True
+        else:
+            print ("ERROR - REPAIR SLOT PELNY!")
+            return False
+
+    def check_if_clicked(self,pos_cl):
+        self.pos_cl = pos_cl
+        if self.item_slot.rect.x + self.item_slot.szer > self.pos_cl[0] > self.item_slot.rect.x and (self.item_slot.rect.y + self.item_slot.wys > self.pos_cl[1] > self.item_slot.rect.y):
+            return True
+
+    def pick_item_from_inv(self,pos_cl):
+        self.pos_cl = pos_cl
+        if self.item_slot.rect.x + self.item_slot.szer > self.pos_cl[0] > self.item_slot.rect.x and (self.item_slot.rect.y + self.item_slot.wys > self.pos_cl[1] > self.item_slot.rect.y):
+            #print ("NACISKASZ NA ITEM_SLOT z REPAIR INV")
+            #print (str(i.rect.x))
+            #print (str(i.rect.y))
+            if self.item_slot.item:
+                self.item_picked = self.item_slot.pick_item()
+                #print (self.item_picked.name)
+                pygame.mixer.Sound.play(pick_item_snd)
+                return self.item_picked
+
+    def remove_item(self,item):
+        if self.item_slot.item == item:
+            print ("USUWAM DANY PRZEDMIOT ZE SLOTU REPAIR")
+            self.item_slot.item = False
+            self.item_slot.occ = False
+
+    def put_item_to_inv(self,pos_cl,item):
+        self.pos_cl = pos_cl
+        self.item = item
+        if self.item_slot.rect.x + self.item_slot.szer > self.pos_cl[0] > self.item_slot.rect.x and (self.item_slot.rect.y + self.item_slot.wys > self.pos_cl[1] > self.item_slot.rect.y):
+            if self.item_slot.occ == False:
+                print("ODKLADASZ ITEM na SLOT REPAIR")
+                self.item.status = 0
+                pygame.mixer.Sound.play(pick_item_snd)
+                self.item_slot.put_item(self.item)
+                return True ## DO EWENTTAULNEGO WYJATKU GDY ZAJETY
+
+
 
 class RadioButton:
     def __init__(self, img, img_h, x, y):
@@ -1103,7 +1168,7 @@ class ShopDialogBox:
         self.shop = False
         self.pos = DIAL_BOX_POS
         self.image = dialogbox_img_2.copy()
-        self.ok_button = RadioButton(rad_ok_img, rad_ok_h_img, 178, 290)
+        self.ok_button = RadioButton(rad_exit_img, rad_exit_h_img, 178, 290)
         self.resp_but_1 = RadioButton(rad_but_img, rad_but_h_img, 55, 150)
         self.resp_but_2 = RadioButton(rad_but_img, rad_but_h_img, 55, 175)
         self.resp_but_3 = RadioButton(rad_but_img, rad_but_h_img, 55, 200)
@@ -1819,14 +1884,19 @@ class ShopAsk:
         self.shop_type = shop_type
         self.text = ""
         self.activity = False
-        self.inventory = Inventory(slot_img,10,6)
+        self.inventory = False
+
+    def put_inventory(self,x,y):
+        self.inventory = Inventory(slot_img,x,y)
+
+    def put_repair_inv(self):
+        self.inventory = RepairInventory(slot_img)
 
     def put_text(self, text):
         self.text = text
 
     def configure_activity(self, activity):
         self.activity = activity
-
 
 class Shop:
     def __init__(self, game, name, shop_type, quality, owner_gold, owner_name, owner_image=default_shop_owner_img):
@@ -1856,12 +1926,15 @@ class Shop:
         if self.shop_type == "magic":
             self.shop_ask1.put_text("Can I see your potions?")
             self.shop_ask1.configure_activity("buy and sell")
+            self.shop_ask1.put_inventory(10,6)
             self.generate_new_potions(self.shop_ask1.inventory)
             self.shop_ask2.put_text("Can I see your books?")
             self.shop_ask2.configure_activity("buy and sell")
+            self.shop_ask2.put_inventory(10, 6)
             self.generate_new_books(self.shop_ask2.inventory)
             self.shop_ask3.put_text("I`d like to see your magic items for sale")
             self.shop_ask3.configure_activity("buy and sell")
+            self.shop_ask3.put_inventory(10, 6)
             self.generate_new_magic_items(self.shop_ask3.inventory)
             # W II Czesci gry beda rozdzki...
             #self.shop_ask4.put_text("Please recharge my wand")
@@ -1869,12 +1942,15 @@ class Shop:
         elif self.shop_type == "smith":
             self.shop_ask1.put_text("Can I see your armors?")
             self.shop_ask1.configure_activity("buy and sell")
+            self.shop_ask1.put_inventory(10, 6)
             self.generate_new_items("armor",self.shop_ask1.inventory)
             self.shop_ask2.put_text("Can I see yout weapons?")
             self.shop_ask2.configure_activity("buy and sell")
+            self.shop_ask2.put_inventory(10, 6)
             self.generate_new_items("weapon",self.shop_ask2.inventory)
             self.shop_ask3.put_text("Please reapir my item")
             self.shop_ask3.configure_activity("repair")
+            self.shop_ask3.put_repair_inv()
             self.shop_ask4.put_text("I`d like to buy some arrows (10 arrows for 5 gold)")
             self.shop_ask4.configure_activity("arrows")
         else:
@@ -1887,7 +1963,7 @@ class Shop:
         self.local_ph_charge_wands = False
         self.local_ph_arrows = False
         #### EXIT BUTTON
-        self.exit_button = RadioButton(rad_ok_img, rad_ok_h_img, 178,290)
+        self.exit_button = RadioButton(rad_back_img, rad_back_h_img, 178,290)
         self.repair_button = RadioButton(repb_img, repb_h_img,345,145)
         ##########
         self.subscribe_owner_to_all_items()
@@ -1896,18 +1972,26 @@ class Shop:
         self.owner_attitude = attitude
 
     def subscribe_owner_to_all_items(self):
-        for slot in self.shop_ask1.inventory.item_slots:
-            if slot.item:
-                slot.item.owner = "shop"
-        for slot in self.shop_ask2.inventory.item_slots:
-            if slot.item:
-                slot.item.owner = "shop"
-        for slot in self.shop_ask3.inventory.item_slots:
-            if slot.item:
-                slot.item.owner = "shop"
-        for slot in self.shop_ask4.inventory.item_slots:
-            if slot.item:
-                slot.item.owner = "shop"
+        if self.shop_ask1.inventory:
+            if isinstance(self.shop_ask1.inventory, Inventory):
+                for slot in self.shop_ask1.inventory.item_slots:
+                    if slot.item:
+                        slot.item.owner = "shop"
+        if self.shop_ask2.inventory:
+            if isinstance(self.shop_ask2.inventory, Inventory):
+                for slot in self.shop_ask2.inventory.item_slots:
+                    if slot.item:
+                        slot.item.owner = "shop"
+        if self.shop_ask3.inventory:
+            if isinstance(self.shop_ask3.inventory, Inventory):
+                for slot in self.shop_ask3.inventory.item_slots:
+                    if slot.item:
+                        slot.item.owner = "shop"
+        if self.shop_ask4.inventory:
+            if isinstance(self.shop_ask4.inventory, Inventory):
+                for slot in self.shop_ask4.inventory.item_slots:
+                    if slot.item:
+                        slot.item.owner = "shop"
 
     def check_gold(self, item) -> bool:
         price = self.calculate_buy_from_player_price(item)
@@ -1938,9 +2022,10 @@ class Shop:
         self.local_ph_charge_wands = False
         self.local_ph_arrows = False
         self.act_inventory = False
-        self.exit_button.deactivate()
+        #self.exit_button.deactivate()
 
     def activate_ask(self, ask):
+        print ("Function activate ask with ask.activity: " + ask.activity)
         if ask.activity == "buy and sell":
             self.game.ph_shop = False
             self.game.ph_buy_and_sell = True
@@ -1948,7 +2033,7 @@ class Shop:
         elif ask.activity == "repair":
             self.game.ph_shop = False
             self.game.ph_repair = True
-            self.activate_repair()
+            self.activate_repair(ask.inventory)
         elif ask.activity == "recharge wand":
             pass
             ## TODO
@@ -1967,8 +2052,10 @@ class Shop:
             pygame.mixer.Sound.play(empty_spell_snd)
         self.back_to_shop_dialog()
 
-    def activate_repair(self):
+    def activate_repair(self, inventory):
+        self.act_inventory = inventory
         self.local_ph_repair = True
+        self.local_ph_buy_and_sell = False
         self.blit_upper_part()
         self.exit_button.activate()
         self.repair_button.activate()
@@ -1977,9 +2064,11 @@ class Shop:
         print ("ENTERING INVENTORY (ph buy_and_sell")
         ### ENTER THE SHOP`S INVENTRORY
         self.act_inventory = inventory
+        self.local_ph_repair = False
         self.local_ph_buy_and_sell = True
         self.blit_upper_part()
         self.exit_button.activate()
+        self.repair_button.deactivate()
 
     def generate_new_items(self,item_type,inventory):
         items_no = 0
@@ -2095,21 +2184,26 @@ class Shop:
         elif self.local_ph_repair:
             self.clear_image()
             self.blit_upper_part()
+            self.act_inventory.show_inv(self.image,160,125)
             self.exit_button.show_button(self.image)
             self.repair_button.show_button(self.image)
             self.image.blit(gold_coin, (85, 315))
             self.game.s_write(str(self.owner_gold), self.image, (102, 310), YELLOW)
             self.game.s_write("OWNER GOLD:",self.image,(80,290),YELLOW)
+            self.game.s_write("PUT ITEM HERE:",self.image,(130,100),WHITE)
+            if not self.act_inventory.check_free():
+                if isinstance(self.act_inventory.item_slot.item, sprites.Armor) or\
+                        isinstance(self.act_inventory.item_slot.item, sprites.Weapon):
+                    item_condition = int(self.act_inventory.item_slot.item.condition)
+                    item_repair_cost = int(self.calculate_repair_cost(self.act_inventory.item_slot.item))
+                    self.game.s_write(self.act_inventory.item_slot.item.name,self.image, (195,130))
+                    self.game.s_write(f'Item condition: {item_condition}',self.image,(160,170),WHITE)
+                    self.game.s_write(f'Item durability: {self.act_inventory.item_slot.item.durability}',self.image,(160,195),WHITE)
+                    self.game.s_write(f'COST TO REPAIR: {item_repair_cost}',self.image,(160,220),WHITE)
             if self.game.item_picked:
-                if isinstance(self.game.item_picked, sprites.Armor) or isinstance(self.game.item_picked, sprites.Weapon):
-                    item_condition = int(self.game.item_picked.condition)
-                    item_repair_cost = int(self.calculate_repair_cost(self.game.item_picked))
-                    self.image.blit(slot_img, (50,85))
-                    self.image.blit(self.game.item_picked.b_image, (50,85))
-                    self.game.s_write(self.game.item_picked.name,self.image, (90,90))
-                    self.game.s_write(f'Item condition: {item_condition}',self.image,(50,130),WHITE)
-                    self.game.s_write(f'Item durability: {self.game.item_picked.durability}',self.image,(50,155),WHITE)
-                    self.game.s_write(f'COST TO REPAIR: {item_repair_cost}',self.image,(50,180),WHITE)
+                if isinstance (self.game.item_picked, sprites.Weapon) or isinstance(self.game.item_picked, sprites.Armor):
+                    # TODO jaks strzalke wskazujaca gdzie polozyc
+                    pygame.draw.rect(self.image,RED,(160,125,32,32),3)
             screen.blit(self.image, (self.pos))
         else:
             print ("ERROR DONT KNOW WHAT ACTIVITY OF THE SHOP I HAVE TO SHOW")
@@ -2164,21 +2258,25 @@ class Shop:
         return owner_attitude
 
     def update(self, mouse_pos):
-        if self.game.item_picked:
-            self.exit_button.deactivate()
-            self.repair_button.activate()
-        else:
-            self.exit_button.activate()
-            self.repair_button.deactivate()
         mouse_x = mouse_pos[0]
         mouse_y = mouse_pos[1]
         mouse_x -= self.pos[0]
         mouse_y -= self.pos[1]
         self.mouse_pos = (mouse_x, mouse_y)
+        #if self.game.item_picked:
+        #    self.exit_button.deactivate()
+        #    self.repair_button.deactivate()
+        if self.game.ph_repair:
+            if self.act_inventory.item_slot.item:
+                self.repair_button.activate()
+                self.repair_button.check_if_highlight(self.mouse_pos)
+                self.exit_button.deactivate()
+            else:
+                self.exit_button.activate()
+                self.repair_button.deactivate()
         # print ("mod_mouse a (%d, %d)" % self.mouse_pos)
         self.exit_button.check_if_highlight(self.mouse_pos)
-        if self.local_ph_repair:
-            self.repair_button.check_if_highlight(self.mouse_pos)
+
 
     def check_exit_button(self, mouse_pos):
         mouse_x = mouse_pos[0]
@@ -2191,29 +2289,26 @@ class Shop:
             self.back_to_shop_dialog()
             #self.exit_shop()
 
-    def check_repair_button(self, mouse_pos, item_picked):
+    def check_repair_button(self, mouse_pos):
         mouse_x = mouse_pos[0]
         mouse_y = mouse_pos[1]
         mouse_x -= self.pos[0]
         mouse_y -= self.pos[1]
         self.mouse_pos = (mouse_x, mouse_y)
-        if self.repair_button.check_if_clicked(mouse_pos):
-            print ("Repair. button clicked.")
-            if not item_picked.owner == "shop":
-                if isinstance(item_picked, sprites.Armor) or isinstance(item_picked, sprites.Weapon):
-                    if self.repair_cost <= self.game.player.gold and self.repair_cost > 0:
-                        print ("Repair" + item_picked.name)
-                        self.owner_gold += self.repair_cost
-                        pygame.mixer.Sound.play(smith_snd)
-                        item_picked.repair(100)
-                        self.game.player.gold -= self.repair_cost
-                        self.game.player.update_stats()
-                    else:
-                        print ("NO GOLD on WEAPON IN GOOD SHAPE")
+        if not self.act_inventory.check_free():
+            if self.repair_button.check_if_clicked(mouse_pos):
+                print ("Repair. button clicked.")
+                if self.repair_cost <= self.game.player.gold and self.repair_cost > 0:
+                    print ("Repair" + self.act_inventory.item_slot.item.name)
+                    self.owner_gold += self.repair_cost
+                    pygame.mixer.Sound.play(smith_snd)
+                    self.act_inventory.item_slot.item.repair(100)
+                    self.game.player.gold -= self.repair_cost
+                    self.game.player.update_stats()
                 else:
-                    print ("BAD ITEM TYPE")
-            else:
-                print ("WEAPON IS NOT YOURS!")
+                    print ("NO GOLD on WEAPON IN GOOD SHAPE")
+        else:
+            print ("NO ITEM ON REPAIR SLOT")
 
     def exit_shop(self):
         self.local_ph_deactivate()

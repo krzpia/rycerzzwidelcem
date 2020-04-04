@@ -258,7 +258,8 @@ class LevelGen:
                 Fence_Object(self.game,object_center.x,object_center.y,10,tile_object.image,32,32)
             #### TREASURES AND INTERACTIVE SPRITES ########
             if tile_object.name == "sign":
-                InfoSprite(self.game,tile_object.name,object_center.x,object_center.y,tile_object.text,5,25)
+                InfoSprite(self.game,tile_object.name,object_center.x,object_center.y,
+                           tile_object.width,tile_object.height,tile_object.text)
             if tile_object.type == "fruit tree":
                 CollectingSprite(self.game,tile_object.name,object_center.x,object_center.y,"hp",tile_object.strength,tile_object.no,12,20)
             if tile_object.name == "barrel":

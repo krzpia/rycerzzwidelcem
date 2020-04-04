@@ -189,7 +189,6 @@ class Game:
     def intro_draw(self):
         self.credits_text = "Special thanks: My dear wife Monika, Piotr Kopalko, Zuza and Magda for some inspiration and superb sound effects. Chris Bradfield for his amazing tutorials on www.kidscancode.org. Thanks to Thorbjørn Lindeijer for TiledMapEditor. Assets used under free licence from www.opengameart: DungeonCrawler, Adrix89, gargargarrick.."
         self.screen.fill(BGCOLOR)
-        # self.h_write("GRA RYCERZ Z WIDELCEM",(200,50),"monotype corsiva",40,(200,0,200))
         if self.to_char_chose:
             self.screen.blit(setup_img, (0, 0))
             self.h_write("ADVENTURE OF THE CORONA",T_POS,"arial",36,(PURPLE))
@@ -360,7 +359,7 @@ class Game:
         self.levelgen.load_level_02()
         self.levelgen.load_level_03()
         self.levelgen.load_level_04()
-        self.levelgen.go_to_level("level01", 2,2)
+        self.levelgen.go_to_level("level02", 19,7)
         print ("INITIALIZING CAMERA...")
         ##### CAMERA INIT
         self.camera = tilemap.Camera(self.map.width, self.map.height)
@@ -452,43 +451,25 @@ class Game:
         x_pos = 100
         self.screen.fill(BGCOLOR)
         self.screen.blit(game_over_img, (0, 0))
-        self.h_write("GAME OVER", (SCREEN_WIDTH / 2 - 120, 60), "monotype corsiva", 42, (WHITE))
-        self.h_write("Press Enter to go to Main Menu", (SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT - 100),
-                     "monotype corsiva", 32, (WHITE))
-        self.h_write("Czas gry: " + str(self.time_played) + " sekund", (x_pos + 60, y_pos + 50), "monotype corsiva", 20,
-                     (WHITE))
-        self.h_write("Posiadane złoto: " + str(self.player.gold), (x_pos + 60, y_pos + 70), "monotype corsiva", 20,
-                     (WHITE))
-        self.h_write("Zabici przeciwnicy: " + str(self.killed_enemies), (x_pos + 60, y_pos + 90), "monotype corsiva",
-                     20, (WHITE))
+        self.write("GAME OVER", (SCREEN_WIDTH / 2 - 120, 60))
+        self.write("Press Enter to go to Main Menu", (SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT - 100))
+        self.write("Czas gry: " + str(self.time_played) + " sekund", (x_pos + 60, y_pos + 50))
+        self.write("Posiadane złoto: " + str(self.player.gold), (x_pos + 60, y_pos + 70))
+        self.write("Zabici przeciwnicy: " + str(self.killed_enemies), (x_pos + 60, y_pos + 90))
         if self.most_powerful_enemy:
-            self.h_write("Najpotężniejszy przeciwnik: " + str(self.most_powerful_enemy.name), (x_pos + 60, y_pos + 110),
-                         "monotype corsiva", 20, (WHITE))
-        self.h_write("Wartość zadanych obrażeń wręcz: " + str(self.overall_melle_hits), (x_pos + 60, y_pos + 140),
-                     "monotype corsiva", 20, (WHITE))
-        self.h_write("Celność ciosów wręcz: " + str(self.melle_accuracy) + "%", (x_pos + 60, y_pos + 160),
-                     "monotype corsiva", 20, (WHITE))
-        self.h_write("Wartość zadanych obrażeń z łuku: " + str(self.overall_arrow_hits), (x_pos + 60, y_pos + 190),
-                     "monotype corsiva", 20,
-                     (WHITE))
-        self.h_write("Celność z łuku: " + str(self.arrow_accuracy) + "%", (x_pos + 60, y_pos + 210), "monotype corsiva",
-                     20, (WHITE))
-        self.h_write("Wartość obrażeń magicznych: " + str(self.overall_spell_hits), (x_pos + 60, y_pos + 240),
-                     "monotype corsiva", 20,
-                     (WHITE))
-        self.h_write("Celność magii: " + str(self.spell_accuracy) + "%", (x_pos + 60, y_pos + 260), "monotype corsiva",
-                     20, (WHITE))
-        self.h_write("Otrzymane obrażenia: " + str(self.inflicted_damage), (x_pos + 60, y_pos + 290),
-                     "monotype corsiva", 20, (WHITE))
-        self.h_write("Bloki: " + str(self.player.score_blocks), (x_pos + 60, y_pos + 310), "monotype corsiva", 20,
-                     (WHITE))
-        self.h_write("Efektywność bloków: " + str(self.block_efficiency) + "%", (x_pos + 60, y_pos + 330),
-                     "monotype corsiva", 20, (WHITE))
-        self.h_write("Otworzone skrzynie: " + str(self.player.score_chest_opened), (x_pos + 60, y_pos + 360),
-                     "monotype corsiva", 20, (WHITE))
-        self.h_write("Zniszczone beczki: " + str(self.player.score_barrels_destroyed), (x_pos + 60, y_pos + 380),
-                     "monotype corsiva", 20, (WHITE))
-        self.h_write("PUNKTY :" + str(self.points), (x_pos + 60, y_pos + 420), "monotype corsiva", 26, (WHITE))
+            self.write("Najpotężniejszy przeciwnik: " + str(self.most_powerful_enemy.name), (x_pos + 60, y_pos + 110))
+        self.write("Wartość zadanych obrażeń wręcz: " + str(self.overall_melle_hits), (x_pos + 60, y_pos + 140))
+        self.write("Celność ciosów wręcz: " + str(self.melle_accuracy) + "%", (x_pos + 60, y_pos + 160))
+        self.write("Wartość zadanych obrażeń z łuku: " + str(self.overall_arrow_hits), (x_pos + 60, y_pos + 190))
+        self.write("Celność z łuku: " + str(self.arrow_accuracy) + "%", (x_pos + 60, y_pos + 210))
+        self.write("Wartość obrażeń magicznych: " + str(self.overall_spell_hits), (x_pos + 60, y_pos + 240))
+        self.write("Celność magii: " + str(self.spell_accuracy) + "%", (x_pos + 60, y_pos + 260))
+        self.write("Otrzymane obrażenia: " + str(self.inflicted_damage), (x_pos + 60, y_pos + 290))
+        self.write("Bloki: " + str(self.player.score_blocks), (x_pos + 60, y_pos + 310))
+        self.write("Efektywność bloków: " + str(self.block_efficiency) + "%", (x_pos + 60, y_pos + 330))
+        self.write("Otworzone skrzynie: " + str(self.player.score_chest_opened), (x_pos + 60, y_pos + 360))
+        self.write("Zniszczone beczki: " + str(self.player.score_barrels_destroyed), (x_pos + 60, y_pos + 380))
+        self.write("PUNKTY :" + str(self.points), (x_pos + 60, y_pos + 420))
         self.write(str(self.clock.get_fps()), (0, 0))
         #### FLIP
         pygame.display.flip()
@@ -575,6 +556,7 @@ class Game:
         self.ph_treasure_inv = False
         self.ph_shop = False
         self.ph_buy_and_sell = False
+        self.ph_repair = False
         self.active_shop = False
         self.paused = False
         self.update_ui_buttons()
@@ -763,6 +745,15 @@ class Game:
                         # GDY MAM PRZEDMIOT PODNIESIONY  #
                         ##################################
                         # print(f'{self.item_picked.name} owner = {self.item_picked.owner}')
+                        # 5. ODKLADAM NA REPAIR SLOT:
+                        if self.ph_repair:
+                            if self.active_shop.act_inventory.check_if_clicked(shop_mouse_pos):
+                                print ("KLIK REPAIR")
+                                if isinstance(self.item_picked,sprites.Armor) or isinstance(self.item_picked,sprites.Weapon):
+                                    put_item_success_bool = self.active_shop.act_inventory.put_item_to_inv(shop_mouse_pos,
+                                                                                                           self.item_picked)
+                                    if put_item_success_bool:
+                                        self.toggle_clean_item_picked = True
                         # 1. ODKLADAM DO PLECAKA
                         if self.player.inventory.check_if_clicked(mouse_pos):
                             ## PRZEDMIOTY ZE SKLEPU:
@@ -821,12 +812,6 @@ class Game:
                                             print("SPRZEDAJE!")
                                             self.active_shop.buy_from_player(self.item_picked)
                                             self.toggle_clean_item_picked = True
-                        # 5. REPERUJE
-                        if self.ph_repair:
-                            print(f'self.item_picked before repair: {self.item_picked}')
-                            self.active_shop.check_repair_button(shop_mouse_pos, self.item_picked)
-                            print(f'self.item_picked after repair: {self.item_picked}')
-                            #self.print_status()
                         ## PRZEDMIOTY DO UZYCIA
                         ## UZYCIE ELIKSIROW
                         if self.inv_use_button.check_if_clicked(mouse_pos):
@@ -873,6 +858,10 @@ class Game:
                                     self.player_group.remove(slot.item)
                                     self.item_picked = slot.pick_item()
                                     self.player.update_stats()
+                        # 4. REPAIR:
+                        if self.ph_repair:
+                            if self.active_shop.act_inventory.check_if_clicked(shop_mouse_pos):
+                                self.item_picked = self.active_shop.act_inventory.pick_item_from_inv(shop_mouse_pos)
                         # 4. ZAZNACZ lub ODZNACZ CZAR:
                         if self.ph_spell_book:
                             self.player.spell_book.check_page_buttons(mouse_pos)
@@ -897,12 +886,16 @@ class Game:
                         if self.ph_shop:
                             self.shop_dialog_box.check_buttons(mouse_pos)
                         # 8. PRZYCKISK EXIT SHOP:
-                        if self.ph_buy_and_sell or self.ph_repair:
+                        if self.ph_buy_and_sell:
                             self.active_shop.check_exit_button(mouse_pos)
-                        # 6. PRZYCISKI QUEST BOOK
+                        # 6. PRZYCISK REPAIR
+                        if self.ph_repair:
+                            self.active_shop.check_repair_button(shop_mouse_pos)
+                            self.active_shop.check_exit_button(mouse_pos)
+                        # 9. PRZYCISKI QUEST BOOK
                         if self.ph_quest_book:
                             self.player.quest_book.check_page_buttons(mouse_pos)
-                        # 9. PRZYCISK OK MESSAGE BOX
+                        # 10. PRZYCISK OK MESSAGE BOX
                         if self.message_shown:
                             self.message_box.check_button(mouse_pos)
 
@@ -1397,6 +1390,8 @@ class Game:
                 for player in self.player_group:
                     if isinstance(player, Player):
                         pygame.draw.rect(self.map_surface, (100, 255, 100), self.camera.apply_rect(player.hit_rect), 1)
+                for coll_sprite in self.act_lvl.collecting_sprites:
+                    pygame.draw.rect(self.map_surface,(180,210,10),self.camera.apply_rect(coll_sprite.rect), 1)
             self.screen.blit(self.map_surface, MAP_TOPLEFT)
         else:
             pygame.draw.rect(self.screen, (200, 240, 120),
