@@ -27,6 +27,8 @@ class LevelGen:
             self.load_level_03()
         elif name == "level04":
             self.load_level_04()
+        elif name == "level05":
+            self.load_level_05()
         else:
             print ("ERROR DECODIN LEVELGEN LOAD LEVEL by NAME")
 
@@ -37,6 +39,45 @@ class LevelGen:
         self.game.map_image = self.game.map.make_map()
         self.game.map_rect = self.game.map_image.get_rect()
         self.game.player.put_in_pos(pos_x, pos_y)
+
+    def load_level_05(self):
+        self.game.act_lvl = self.game.level_05
+        ### ALL SPRITES (BEZ GRACZA!)
+        self.game.level_05.all_sprites = pygame.sprite.LayeredUpdates()
+        ## MURY / tylko odbijanie od obiektu Rect z TMX MAPS
+        self.game.level_05.walls = pygame.sprite.LayeredUpdates()
+        ## PRZESZKODY / odbijaja sie za pomoca hit_rect.
+        self.game.level_05.hr_obstacles = pygame.sprite.LayeredUpdates()
+        ## NIEWIDZIALNE POLE ZABIERAJACE HP
+        self.game.level_05.lavas = pygame.sprite.LayeredUpdates()
+        ## NPCS
+        self.game.level_05.npcs = pygame.sprite.LayeredUpdates()
+        ## PRZECIWNICY
+        self.game.level_05.mobs = pygame.sprite.LayeredUpdates()
+        ## STRZALY PRZECIWNIKOW
+        self.game.level_05.mob_arrows = pygame.sprite.LayeredUpdates()
+        ## STRZALY ranged
+        self.game.level_05.arrows = pygame.sprite.LayeredUpdates()
+        ## Sprite ataku wręcz
+        self.game.level_05.melle_swing = pygame.sprite.LayeredUpdates()
+        ## PRZEDMIOTY NA MAPIE DO PODNIESIENIA
+        self.game.level_05.items_to_pick = pygame.sprite.LayeredUpdates()
+        ## OBIEKTY DO INTERAKCJI (PODNIESIENIA, WYLECZENIA ITP)
+        self.game.level_05.collecting_sprites = pygame.sprite.LayeredUpdates()
+        ## ZLOTE MONETY DO PODNIESIENIA
+        self.game.level_05.gold_to_pick = pygame.sprite.LayeredUpdates()
+        ## STRZALY DO PODNIESIENIA
+        self.game.level_05.arrows_to_pick = pygame.sprite.LayeredUpdates()
+        ## DRZWI
+        self.game.level_05.doors = pygame.sprite.LayeredUpdates()
+        ## SKRZYNIE
+        self.game.level_05.chest_to_open = pygame.sprite.LayeredUpdates()
+        ## TELEPORTS
+        self.game.level_05.teleports = pygame.sprite.LayeredUpdates()
+        ## SHOPS
+        self.game.level_05.shops = pygame.sprite.LayeredUpdates()
+        #### LOAD TILE OBJECTS
+        self.load_objects(self.game.map_level_05.tmxdata.objects)
 
     def load_level_04(self):
         self.game.act_lvl = self.game.level_04

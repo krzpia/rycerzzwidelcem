@@ -368,7 +368,7 @@
   </object>
  </objectgroup>
  <objectgroup id="12" name="teleport">
-  <object id="261" name="teleport 01 cave" type="teleport" x="868" y="438" width="24" height="30">
+  <object id="261" name="Miraflorida City" type="teleport" x="868" y="438" width="24" height="30">
    <properties>
     <property name="destination" value="level02"/>
     <property name="pos_x" type="int" value="43"/>

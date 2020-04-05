@@ -312,7 +312,7 @@ class Button:
         self.rect.y = y
 
     def show_button(self,surface, font):
-        self.act_color = WHITE
+        self.act_color = BLACK
         self.text_surface = font.render(self.text, True, self.act_color)
         self.text_rect = self.text_surface.get_rect()
         self.text_rect.topleft = (self.rect.x + 20, self.rect.y + 4)
@@ -1345,6 +1345,81 @@ class MessageBox:
         self.show_reward_image(reward_gold, reward_xp, reward_item)
 
 
+class QuestionBox:
+    def __init__(self, game):
+        self.game = game
+        self.pos = DIAL_BOX_POS
+        self.image = dialogbox_img_2.copy()
+        self.ok_button = RadioButton(rad_ok_img, rad_ok_h_img, 100, 290)
+        self.back_button = RadioButton(rad_back_img,rad_back_h_img,240,290)
+        self.text = ""
+
+    def update(self, mouse_pos):
+        mouse_x = mouse_pos[0]
+        mouse_y = mouse_pos[1]
+        mouse_x -= self.pos[0]
+        mouse_y -= self.pos[1]
+        self.mouse_pos = (mouse_x, mouse_y)
+        self.ok_button.check_if_highlight(self.mouse_pos)
+        self.back_button.check_if_highlight(self.mouse_pos)
+
+    def check_button(self, mouse_pos):
+        mouse_x = mouse_pos[0]
+        mouse_y = mouse_pos[1]
+        mouse_x -= self.pos[0]
+        mouse_y -= self.pos[1]
+        self.mouse_pos = (mouse_x, mouse_y)
+        if self.ok_button.check_if_clicked(self.mouse_pos):
+            print ("OK CLICKED - Q BOX")
+            self.ok_function()
+            self.game.qbox_shown = False
+            self.game.paused = False
+            self.ok_button.deactivate()
+            self.back_button.deactivate()
+            self.game.update_ui_buttons()
+            return True
+        if self.back_button.check_if_clicked(self.mouse_pos):
+            print ("BACK CLICKED QBOX")
+            self.game.qbox_shown = False
+            self.game.paused = False
+            self.ok_button.deactivate()
+            self.back_button.deactivate()
+            self.game.update_ui_buttons()
+            return False
+
+    ## MOZNA ZROBIC TYPY PYTAN - narazie 1 o podróż.
+    def ask_travel(self, teleport):
+        self.image = dialogbox_img_2.copy()
+        self.game.paused = True
+        self.game.qbox_shown = True
+        self.ok_button.activate()
+        self.back_button.activate()
+        self.game.update_ui_buttons()
+        self.show_text(f'Are you sure you want to travel to {teleport.name}?')
+        self.show_title("Travel")
+        self.ok_function = teleport.activate_teleport
+
+    def show_title(self, text):
+        self.game.s_write(text, self.image,DB2_TXT_POS,WHITE)
+        #self.write(text,0)
+
+    def show_text(self, text):
+        self.game.s_write(text, self.image,(40,150),WHITE)
+        #self.write(text,0)
+
+    def show_buttons(self):
+        self.ok_button.show_button(self.image)
+        self.back_button.show_button(self.image)
+
+    def show(self, screen):
+        self.show_buttons()
+        screen.blit(self.image, self.pos)
+
+
+
+
+
+
 class DialogBox:
     def __init__(self, game):
         self.game = game
@@ -1801,7 +1876,7 @@ class Quest:
                 if self.reward_item[-3:] == "Key":
                     item = self.game.levelgen.gen.g_key(self.reward_item,False)
                 else:
-                    item = self.game.levelgen.gen.generate_quest_item_by_name(self.reward_item)
+                    item = self.game.levelgen.gen.generate_item_by_name(self.reward_item)
                 item_collected = self.game.player.inventory.put_in_first_free_slot(item)
                 if not item_collected:
                     sprites.Item_to_take(self.game,self.game.player.pos.x, self.game.player.pos.y, item)

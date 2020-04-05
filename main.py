@@ -190,7 +190,8 @@ class Game:
         self.credits_text1 = "My dear wife Monika, Piotr Kopalko, Zuza and Magda for inspiration and superb sound effects"
         self.credits_text2 = "Chris Bradfield for his amazing tutorials on www.kidscancode.org"
         self.credits_text3 = "Thanks to Thorbjørn Lindeijer for great tool TiledMapEditor"
-        self.credits_text4 = "www.opengameart.org: DungeonCrawler,Lorc, Adrix89, gargargarrick and many more"
+        self.credits_text4 = "Music by: HorrorPen, Alexandr Zhelanov. Font by Dieter Steffmann"
+        self.credits_text5 = "www.opengameart.org: DungeonCrawler, Lorc, Adrix89, gargargarrick and many more"
         self.author_text = "Author: K.J.Piatkowski"
         self.screen.fill(BGCOLOR)
         if self.to_char_chose:
@@ -233,6 +234,12 @@ class Game:
                     self.big_write("Thief", NTXT, WHITE)
                     self.write("Fast and able to sneak, powerful with bow and dagger combination", ADTXT, WHITE)
                     self.write("Bonus x1.3 Hit Rate with ranged weapons, and additional barter bonus",(ADTXT[0],ADTXT[1]+25), WHITE)
+                self.screen.blit(i_str_ico, (IDX - 30, IDY + 0))
+                self.screen.blit(i_sta_ico, (IDX - 30, IDY + 20))
+                self.screen.blit(i_int_ico, (IDX - 30, IDY + 40))
+                self.screen.blit(i_wis_ico, (IDX - 30, IDY + 60))
+                self.screen.blit(i_spe_ico, (IDX - 30, IDY + 80))
+                self.screen.blit(i_ste_ico, (IDX - 30, IDY + 100))
                 self.write("Strength: " + str(self.class_selected.str), (IDX, IDY + 0))
                 self.write("Stamina: " + str(self.class_selected.sta), (IDX, IDY + 20))
                 self.write("Intellect: " + str(self.class_selected.int), (IDX, IDY + 40))
@@ -267,12 +274,13 @@ class Game:
         else:
             self.screen.blit(intro_img, (0, 0))
             self.title_write(TITLE,(280,250),PURPLE)
-            self.write(self.author_text,(200,500),PURPLE)
+            self.big_write(self.author_text,(200,500),PURPLE)
             self.write("Special thanks to:",(200,575),PURPLE)
             self.write(self.credits_text1,(200,600),PURPLE)
-            self.write(self.credits_text2,(200,625),PURPLE)
-            self.write(self.credits_text3,(200,650), PURPLE)
-            self.write(self.credits_text4,(200,675), PURPLE)
+            self.write(self.credits_text2,(200,620),PURPLE)
+            self.write(self.credits_text3,(200,640), PURPLE)
+            self.write(self.credits_text4,(200,660), PURPLE)
+            self.write(self.credits_text5, (200, 680), PURPLE)
             self.new_game_button.show_button(self.screen, font20)
             self.quit_game_button.show_button(self.screen, font20)
         self.write(str(self.clock.get_fps()), (0, 0))
@@ -294,16 +302,20 @@ class Game:
         self.map_level_03 = tilemap.TiledMap(path.join(map_folder, 'mapa3.tmx'))
         self.level_04 = Level()
         self.map_level_04 = tilemap.TiledMap(path.join(map_folder, 'mapa4.tmx'))
+        self.level_05 = Level()
+        self.map_level_05 = tilemap.TiledMap(path.join(map_folder, 'mapa5.tmx'))
         #####
         self.levels['level01'] = self.level_01
         self.levels['level02'] = self.level_02
         self.levels['level03'] = self.level_03
         self.levels['level04'] = self.level_04
+        self.levels['level05'] = self.level_05
         #####
         self.map_levels['level01'] = self.map_level_01
         self.map_levels['level02'] = self.map_level_02
         self.map_levels['level03'] = self.map_level_03
         self.map_levels['level04'] = self.map_level_04
+        self.map_levels['level05'] = self.map_level_05
         #### CREATE ##########################################
         ### SPRITE GROUPS NALEZACE DO GAME a nie DO LEVEL! ###
         ######################################################
@@ -328,6 +340,7 @@ class Game:
         ### DIALOG BOX
         self.dialog_box = DialogBox(self)
         self.message_box  = MessageBox(self)
+        self.q_box = QuestionBox(self)
         self.shop_dialog_box = ShopDialogBox(self)
         ### UI BUTTONS
         self.inv_use_button = RadioButton(rad_use_img, rad_use_h_img,
@@ -366,6 +379,7 @@ class Game:
         self.levelgen.load_level_02()
         self.levelgen.load_level_03()
         self.levelgen.load_level_04()
+        self.levelgen.load_level_05()
         self.levelgen.go_to_level("level01", 2, 2)
         print ("INITIALIZING CAMERA...")
         ##### CAMERA INIT
@@ -498,6 +512,7 @@ class Game:
         self.ph_quest_book = False
         self.dialog_in_progress = False
         self.message_shown = False
+        self.qbox_shown = False
         ##### FLAGI DO OBSLUGI INVENTARZA #######
         self.item_picked = False
         self.toggle_clean_item_picked = False
@@ -625,6 +640,10 @@ class Game:
                         self.player.active_spell = self.player.selected_spell
                         self.player.update_stats()
                 if event.key == pygame.K_e:
+                    ####### USE TELEPORT ########
+                    teleport_hits = pygame.sprite.spritecollide(self.player, self.act_lvl.teleports, False)
+                    for tele_hit in teleport_hits:
+                        self.q_box.ask_travel(tele_hit)
                     ####### GATHER COLLECT SPRITE
                     sprites_to_collect = pygame.sprite.spritecollide(self.player, self.act_lvl.collecting_sprites,False,collide_double_hit_rect)
                     for sprite in sprites_to_collect:
@@ -876,48 +895,53 @@ class Game:
                             if self.active_shop.act_inventory.check_if_clicked(shop_mouse_pos):
                                 #print ("REPERUJE PRZEDMIOT")
                                 self.item_picked = self.active_shop.act_inventory.pick_item_from_inv(shop_mouse_pos)
-                        # 4. ZAZNACZ lub ODZNACZ CZAR:
-                        if self.ph_spell_book:
-                            self.player.spell_book.check_page_buttons(mouse_pos)
-                            ## Zaznaczm tylko gdy NIE naciskam guziku cast i spellbook (zeby nie odhaczac bez sensu
-                            if not self.spell_book_button.check_if_clicked(
-                                    mouse_pos) and not self.cast_button.check_if_clicked_even_inactive(mouse_pos):
-                                # print ("zaznaczam nowe wskazanie")
-                                self.player.active_spell = self.player.spell_book.check_spell(mouse_pos)
-                                self.player.selected_spell = self.player.active_spell
-                                if self.player.active_spell:
-                                    if self.player.active_spell.min_int > self.player.intellect:
-                                        self.player.active_spell = False
-                                        self.player.selected_spell = False
-                                self.player.update_stats()
-                                # 5. CZAR DEFENSYWNY
-                            if self.cast_button.check_if_clicked(mouse_pos):
-                                self.player.active_spell.cast(self.player)
-                        # 5. PRZYCISKI DIALOG BOX
-                        if self.dialog_in_progress:
-                            self.dialog_box.check_buttons(mouse_pos)
-                        # 7. PRZYCISKI SHOP DIALOG BOX
-                        if self.ph_shop:
-                            self.shop_dialog_box.check_buttons(mouse_pos)
-                        # 8. PRZYCKISK EXIT SHOP:
-                        if self.ph_buy_and_sell:
-                            self.active_shop.check_exit_button(mouse_pos)
-                        # 6. PRZYCISK REPAIR
-                        if self.ph_repair:
-                            self.active_shop.check_repair_button(shop_mouse_pos)
-                            self.active_shop.check_exit_button(mouse_pos)
-                        # 9. PRZYCISKI QUEST BOOK
-                        if self.ph_quest_book:
-                            self.player.quest_book.check_page_buttons(mouse_pos)
-                        # 10. PRZYCISK OK MESSAGE BOX
-                        if self.message_shown:
-                            self.message_box.check_button(mouse_pos)
+                    ############################
+                    # UI BUTTONS HANDLONG ######
+                    ############################
+                    # 1. ZAZNACZ lub ODZNACZ CZAR:
+                    if self.ph_spell_book:
+                        self.player.spell_book.check_page_buttons(mouse_pos)
+                        ## Zaznaczm tylko gdy NIE naciskam guziku cast i spellbook (zeby nie odhaczac bez sensu
+                        if not self.spell_book_button.check_if_clicked(mouse_pos) and not self.cast_button.check_if_clicked_even_inactive(mouse_pos):
+                            # print ("zaznaczam nowe wskazanie")
+                            self.player.active_spell = self.player.spell_book.check_spell(mouse_pos)
+                            self.player.selected_spell = self.player.active_spell
+                            if self.player.active_spell:
+                                if self.player.active_spell.min_int > self.player.intellect:
+                                    self.player.active_spell = False
+                                    self.player.selected_spell = False
+                            self.player.update_stats()
+                            # 1a. CZAR DEFENSYWNY
+                        if self.cast_button.check_if_clicked(mouse_pos):
+                            self.player.active_spell.cast(self.player)
+                    # 2. PRZYCISKI DIALOG BOX
+                    if self.dialog_in_progress:
+                        self.dialog_box.check_buttons(mouse_pos)
+                    # 3. PRZYCISKI SHOP DIALOG BOX
+                    if self.ph_shop:
+                        self.shop_dialog_box.check_buttons(mouse_pos)
+                    # 4. PRZYCKISK EXIT SHOP:
+                    if self.ph_buy_and_sell:
+                        self.active_shop.check_exit_button(mouse_pos)
+                    # 5. PRZYCISK REPAIR
+                    if self.ph_repair:
+                        self.active_shop.check_repair_button(shop_mouse_pos)
+                        self.active_shop.check_exit_button(mouse_pos)
+                    # 6. PRZYCISKI QUEST BOOK
+                    if self.ph_quest_book:
+                        self.player.quest_book.check_page_buttons(mouse_pos)
+                    # 7. PRZYCISK OK MESSAGE BOX
+                    if self.message_shown:
+                        self.message_box.check_button(mouse_pos)
+                    # 8. PRZYCISKI QBOX
+                    if self.qbox_shown:
+                        self.q_box.check_button(mouse_pos)
 
     def update_ui_buttons(self):
         self.quest_book_button.activate()
         self.spell_book_button.activate()
         self.pause_button.activate()
-        if self.ph_repair or self.ph_buy_and_sell or self.ph_shop or self.dialog_in_progress or self.message_shown:
+        if self.ph_repair or self.ph_buy_and_sell or self.ph_shop or self.dialog_in_progress or self.message_shown or self.qbox_shown:
             self.quest_book_button.deactivate()
             self.spell_book_button.deactivate()
             self.pause_button.deactivate()
@@ -952,6 +976,9 @@ class Game:
         #### HIGHLIGHT CLOSE SHOP BUTTON
         if self.ph_buy_and_sell or self.ph_repair:
             self.active_shop.update(mouse_pos)
+        #### HIGHLIGHT QBOX BUTTONS
+        if self.qbox_shown:
+            self.q_box.update(mouse_pos)
         ### ACTIVATE ADD BUTTONS ####
         if self.player.attribute_points > 0:
             for button in self.att_buttons:
@@ -1461,6 +1488,9 @@ class Game:
             # MESSAGE BOX
             elif self.message_shown:
                 self.message_box.show(self.screen)
+            # QBOX
+            elif self.qbox_shown:
+                self.q_box.show(self.screen)
 
         #### SREDNIA FPS
         # if self.draw_debug:

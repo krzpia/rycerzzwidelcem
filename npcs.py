@@ -26,6 +26,8 @@ class QuestGenerator:
         self.q_killer_bees.put_image_from_tileset(5,65,full_tileset_image)
         self.q_mieszko_ring = ui.Quest(self.game, "Mieszko Family Signet", "Find Mieszko`s father family signet", 1, [],["Mieszko Family Signet"], True, [], [], 12, 120)
         self.q_mieszko_ring.put_image_from_tileset(17, 43, full_tileset_image)
+        self.q_mad_cow = ui.Quest(self.game,"Mad Cow","Try to cure the Mad Cow",1,["Mad Bull"],[],False,[],[],10,0,"Wilfredo`s Lasso")
+        self.q_mad_cow.put_image_from_tileset(15,63,full_tileset_image)
         self.q_miraflorida = ui.Quest(self.game,"Miraflorida","Find castle of Miraflorida",1,[],[],False,[],["George the Guard"],6,0)
         self.q_miraflorida.set_to_autochecking()
         self.q_miraflorida.put_image_from_tileset(0,60,full_tileset_image)
@@ -44,7 +46,7 @@ class QuestGenerator:
 
         ### END........
         ### ALL QUESTS IN LIST
-        self.quests = [self.q_holy_grail, self.q_killer_bees, self.q_mieszko_ring, self.q_miraflorida,
+        self.quests = [self.q_holy_grail, self.q_killer_bees, self.q_mieszko_ring, self.q_mad_cow, self.q_miraflorida,
                        self.q_open_the_gates, self.q_karol_the_alchemist, self.q_speak_with_the_king, self.q_golden_mask]
 
     def return_quest_by_name(self, name):
@@ -69,6 +71,7 @@ class NpcGenerator:
         self.karol_the_alchemist_csv = csv.DictReader(open(path.join(dialog_folder, 'karol_the_alchemist_dialog.csv')), delimiter=';')
         self.ivan_the_physician_csv = csv.DictReader(open(path.join(dialog_folder, 'ivan_the_physician_dialog.csv')), delimiter=';')
         self.dori_the_smith_csv = csv.DictReader(open(path.join(dialog_folder,'dori_the_smith_dialog.csv')), delimiter=';')
+        self.wilfredo_the_cowboy_csv = csv.DictReader(open(path.join(dialog_folder,'wilfredo_the_cowboy_dialog.csv')), delimiter=';')
         #############
 
     def generate(self, name, x, y, image):
@@ -156,3 +159,8 @@ class NpcGenerator:
             dori_the_smith.dialog_data.thread_unblock_with_event("quest Golden Mask",['got quest Golden Mask'])
             dori_the_smith.dialog_data.thread_block_with_event("ill",['got quest Golden Mask'])
             return dori_the_smith
+
+        if name == "Wilfredo the Cowboy":
+            wilfredo_the_cowboy = sprites.Npc(self.game,name,x,y,image)
+            wilfredo_the_cowboy.dialog_data.load_from_dict(self.wilfredo_the_cowboy_csv, self.quest_gen)
+            return wilfredo_the_cowboy

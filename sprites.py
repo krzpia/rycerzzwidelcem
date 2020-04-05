@@ -1127,17 +1127,17 @@ class Player(pygame.sprite.Sprite):
         if self.char_class.spells:
             for spell in self.char_class.spells:
                 self.spell_book.add_spell_by_name(spell)
-                self.spell_book.add_spell_by_name("Fireball")
-           #self.spell_book.add_spell_by_name("Tricebolt")
-           #self.spell_book.add_spell_by_name("Iron Skin")
-           #self.spell_book.add_spell_by_name("Cure")
-           #self.spell_book.add_spell_by_name("Freeze")
-           #self.spell_book.add_spell_by_name("Invisibility")
-           #self.spell_book.add_spell_by_name("Icebolt")
-           #self.spell_book.add_spell_by_name("Haste")
-           #self.spell_book.add_spell_by_name("Poison Cloud")
-           #self.spell_book.add_spell_by_name("Stone Skin")
-           #self.spell_book.add_spell_by_name("Heroism")
+            self.spell_book.add_spell_by_name("Fireball")
+            self.spell_book.add_spell_by_name("Tricebolt")
+            self.spell_book.add_spell_by_name("Iron Skin")
+            self.spell_book.add_spell_by_name("Cure")
+            self.spell_book.add_spell_by_name("Freeze")
+            self.spell_book.add_spell_by_name("Invisibility")
+            self.spell_book.add_spell_by_name("Icebolt")
+            self.spell_book.add_spell_by_name("Haste")
+            self.spell_book.add_spell_by_name("Poison Cloud")
+            self.spell_book.add_spell_by_name("Stone Skin")
+            self.spell_book.add_spell_by_name("Heroism")
         self.active_spell = False
         self.selected_spell = False
         self.active_quests = []
@@ -1643,7 +1643,7 @@ class Player(pygame.sprite.Sprite):
 
     def go_to_level(self, destination, pos_x, pos_y):
         self.game.levelgen.go_to_level(destination, pos_x, pos_y)
-        self.wait_key_pressed = True
+        #self.wait_key_pressed = True
 
     def update(self):
         ######## OPOZNIAM ROZPOCZECIE CZYTANIA KLAWISZY
@@ -1660,10 +1660,6 @@ class Player(pygame.sprite.Sprite):
         #self.rect = self.image.get_rect()
         self.pos += self.vel * self.game.dt
         self.rect.center = self.pos
-        #### TELEPORT
-        teleport_hits = pygame.sprite.spritecollide(self, self.game.act_lvl.teleports, False)
-        for tele_hit in teleport_hits:
-            tele_hit.activate_teleport()
         ### OBRAZENIA OD STRZAL INNYCH POTWOROW:
         hits = pygame.sprite.spritecollide(self, self.game.act_lvl.mob_arrows, False)
         for hit in hits:
@@ -2041,7 +2037,13 @@ class Mob(pygame.sprite.Sprite):
 
     def die(self):
         self.game.player.xp += self.xp
-        Flesh(self.game, self.pos)
+        ### TWORZE obiekt Flesh
+        if self.name == "Mad Bull":
+            other_image = pygame.Surface((32,32), pygame.HWSURFACE | pygame.SRCALPHA)
+            other_image.blit(full_tileset_image,(0,0),(37*TILE_SIZE, 94*TILE_SIZE,TILE_SIZE,TILE_SIZE))
+            Flesh(self.game, self.pos, other_image)
+        else:
+            Flesh(self.game, self.pos, False)
         ### METODY DO KOLEKCJI INFORMACJI, jedna MOJA, druga COPALCO
         self.game.player.score_killed_enemies.append(self)
         self.game.events_manager.emit(Event(id=f'{self.name} has been killed'))
@@ -2207,13 +2209,16 @@ class Mob_Hit_Splash(pygame.sprite.Sprite):
 
 
 class Flesh(pygame.sprite.Sprite):
-    def __init__(self, game, pos):
+    def __init__(self, game, pos, other_image):
         self._layer = FLOOR_LAYER
         self.groups = game.act_lvl.all_sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
         #pygame.mixer.Sound.play(win_snd)
         self.game = game
-        self.image = flesh_image
+        if other_image:
+            self.image = other_image
+        else:
+            self.image = flesh_image
         self.rect = self.image.get_rect()
         self.hit_rect = self.rect
         self.pos = pos
@@ -2270,7 +2275,7 @@ class RemObstacle(pygame.sprite.Sprite):
 
 
 class Teleport(pygame.sprite.Sprite):
-    def __init__(self, game,name, destination, pos_x, pos_y, x, y, w, h):
+    def __init__(self, game, name, destination, pos_x, pos_y, x, y, w, h):
         self.groups = game.act_lvl.teleports
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
@@ -2286,8 +2291,8 @@ class Teleport(pygame.sprite.Sprite):
 
     def activate_teleport(self):
         self.game.player.go_to_level(self.destination, self.pos_x, self.pos_y)
-        self.game.events_manager.emit(Event(id=f'{self.name} has been used'))
-        self.game.put_txt("Travel to next level...")
+        self.game.events_manager.emit(Event(id=f'{self.name} has been visited'))
+        self.game.put_txt(f'Travel to {self.name}')
         self.game.update_game_enviroment()
 
 

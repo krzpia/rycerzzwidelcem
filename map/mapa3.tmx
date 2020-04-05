@@ -330,7 +330,7 @@
   </object>
  </objectgroup>
  <objectgroup id="7" name="teleport">
-  <object id="2" name="teleport 03 castle" type="teleport" x="800" y="937" width="64" height="22">
+  <object id="2" name="Miraflorida City" type="teleport" x="800" y="937" width="64" height="22">
    <properties>
     <property name="destination" value="level02"/>
     <property name="pos_x" type="int" value="11"/>

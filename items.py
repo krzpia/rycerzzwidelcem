@@ -26,6 +26,8 @@ class ItemGenerator:
         self.q_items.append(sprites.Quest_Item(self.game, "Elixir Arechinix",0,61,41))
         self.q_items.append(sprites.Quest_Item(self.game, "Golden Mask",0,35,95))
         self.q_items.append(sprites.Quest_Item(self.game, "Mieszko Family Signet",100,17,43))
+        self.q_items.append(sprites.Weapon(self.game,"Wilfredo`s Lasso","weapon","blunt",5,False,5,550,"big",
+                                           0,0,0,0,0,0,50,48,44,35,90))
 
         ######## WEAPONS ###########
         self.weapons.append(sprites.Weapon(self.game, "Wooden Club", "weapon","blunt",
@@ -290,18 +292,18 @@ class ItemGenerator:
         self.arrows.append(sprites.Arrow_Item(self.game,"Arrows",25,25))
 
         #### BOOKS ######
-        self.books.append(sprites.Book(self.game,"Firebolt",200,2,40,39))
-        self.books.append(sprites.Book(self.game, "Fireball", 350,4, 41, 39))
-        self.books.append(sprites.Book(self.game, "Icebolt", 260,2, 15,39))
-        self.books.append(sprites.Book(self.game, "Tricebolt", 325,3, 3, 39))
-        self.books.append(sprites.Book(self.game, "Freeze", 400,5, 0, 39))
-        self.books.append(sprites.Book(self.game, "Cure", 275,3, 12, 39))
-        self.books.append(sprites.Book(self.game, "Poison Cloud", 475,4, 63, 39))
-        self.books.append(sprites.Book(self.game, "Stone Skin", 145,1, 55,38))
-        self.books.append(sprites.Book(self.game, "Haste", 200, 3, 49, 39))
-        self.books.append(sprites.Book(self.game, "Invisibility", 625, 4, 47,39))
-        self.books.append(sprites.Book(self.game, "Iron Skin", 275, 2,7, 39))
-        self.books.append(sprites.Book(self.game, "Heroism",200,1,56,39))
+        self.books.append(sprites.Book(self.game,"Firebolt",100,2,40,39))
+        self.books.append(sprites.Book(self.game, "Fireball", 250,4, 41, 39))
+        self.books.append(sprites.Book(self.game, "Icebolt", 160,2, 15,39))
+        self.books.append(sprites.Book(self.game, "Tricebolt", 225,3, 3, 39))
+        self.books.append(sprites.Book(self.game, "Freeze", 200,5, 0, 39))
+        self.books.append(sprites.Book(self.game, "Cure", 175,3, 12, 39))
+        self.books.append(sprites.Book(self.game, "Poison Cloud", 290,4, 63, 39))
+        self.books.append(sprites.Book(self.game, "Stone Skin", 120,1, 55,38))
+        self.books.append(sprites.Book(self.game, "Haste", 100, 3, 49, 39))
+        self.books.append(sprites.Book(self.game, "Invisibility", 325, 4, 47,39))
+        self.books.append(sprites.Book(self.game, "Iron Skin", 175, 2,7, 39))
+        self.books.append(sprites.Book(self.game, "Heroism",125,1,56,39))
 
         #### RINGS #####
         self.rings.append(sprites.Ring(self.game,"Green Ring",100,0,1,0,0,0,0,0,0,0,1,34,42))
