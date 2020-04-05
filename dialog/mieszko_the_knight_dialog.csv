@@ -1,14 +1,14 @@
 Npc;Thread;Branch;Step;Text;Ask1;Ask2;Ask3;Ask4;Next_Thread;Goto_Branch;Goto_Step;Event
 True;welcome;0;0;Hello;False;False;False;False;Next;False;False;False
 True;welcome;1;0;Hello again;False;False;False;False;Next;False;False;False
-False;quest Mieszko Family Signet;0;0;You looks sad, what`s going on?;False;False;False;False;False;False;False;False
-True;quest Mieszko Family Signet;0;1;Yes, that`s correct. Our lord King Sancho want`s  me to abandon kingdom, because he doesn`t belive  my nobility. I tried to prove it bringing him my  father`s signet, but I can`t find it. Please help me with it, I`ll pay you well!;False;False;False;False;False;False;False;False
-True;quest Mieszko Family Signet;0;2;Will you help me? Its has to be somewhere in the Miraflorida city;Yes>quest Mieszko Family Signet>0,3;No>False>0,4;False;False;False;False;False;False
+False;quest Mieszko Family Signet;0;0;You look sad, what`s going on?;False;False;False;False;False;False;False;False
+True;quest Mieszko Family Signet;0;1;Yes, that`s correct. Our lord King Sancho wants   me to abandon kingdom, because he doesn`t belive  my nobility. I tried to prove it bringing him my  father`s signet, but I can`t find it. Please help me with it, I`ll pay you well!;False;False;False;False;False;False;False;False
+True;quest Mieszko Family Signet;0;2;Will you help me? It has to be somewhere in the   Miraflorida city;Yes>quest Mieszko Family Signet>0,3;No>False>0,4;False;False;False;False;False;False
 True;quest Mieszko Family Signet;0;3;Thanks! Look for it. My father`s grave is in the  island on the northwest, I think you can find someclue there.. But beware the cementery, people saysit`s cursed!;False;False;False;False;Next;False;False;False
 True;quest Mieszko Family Signet;0;4;Oh no? Well I`ll have to look for it myself;False;False;False;False;Next;False;False;False
 True;quest Mieszko Family Signet;1;0;Go, look for it, try to search in the cementery!!;False;False;False;False;Next;False;False;False
-True;quest Mieszko Family Signet;2;0;Good bless you! have made it!;False;False;False;False;False;False;False;quest Mieszko Family Signet has been completed
-True;quest Mieszko Family Signet;2;1;Please take the reward, I think you deserved it well! Now I can back to the castle!;False;False;False;False;Next;False;False;quest Mieszko Family Signet has been rewarded
+True;quest Mieszko Family Signet;2;0;God bless you! You have made it!;False;False;False;False;False;False;False;quest Mieszko Family Signet has been completed
+True;quest Mieszko Family Signet;2;1;Please take the reward, I think you deserved it   well! Now I can go back to the castle!;False;False;False;False;Next;False;False;quest Mieszko Family Signet has been rewarded
 True;quest Mieszko Family Signet;3;0;Thanks for your help. Now I`m again one of the    king`s cavaliers! We will ride the north island tofind the cure for the curse;False;False;False;False;Next;False;False;False
 True;bye;0;0;Goodbye!;False;False;False;False;False;False;False;False
 False;bye;0;1;See you next time!;False;False;False;False;False;False;False;False

@@ -730,11 +730,13 @@ class ActiveEffect:
     def update_effect(self, unpaused_dt):
         ### JEZELI EFFEKT MA OGRANICZONY CZAS:
         if self.duration:
+            #print (f' Efekt {self.name} duration: {self.duration}')
             self.effect_time += unpaused_dt
-            #print (self.effect_time)
+            #print (f' Czas efektu: {self.effect_time}')
             if self.effect_time >= self.duration:
+                #print ("KONIEC TRWANIA EFEKTU")
+                self.effect_time = 0
                 return True
-
 
 class ActiveEffectsLibrary:
     def __init__(self, game):
@@ -759,8 +761,11 @@ class ActiveEffectsLibrary:
     def add_effect(self, effect):
         for act_effect in self.active_effects:
             if act_effect.name == effect.name:
+                #print ("EFEKT JUZ BYL, nadaje NOWY celem zerowania czasu trwania")
                 self.active_effects.remove(act_effect)
+        #print ("NADAJE NOWY EFFECT")
         self.active_effects.append(effect)
+        #self.game.player.update_stats()
 
     def remove_effect(self, effect):
         for act_effect in self.active_effects:

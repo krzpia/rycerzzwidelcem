@@ -190,7 +190,7 @@ class Game:
         self.credits_text1 = "My dear wife Monika, Piotr Kopalko, Zuza and Magda for inspiration and superb sound effects"
         self.credits_text2 = "Chris Bradfield for his amazing tutorials on www.kidscancode.org"
         self.credits_text3 = "Thanks to Thorbjørn Lindeijer for great tool TiledMapEditor"
-        self.credits_text4 = "Assets used from www.opengameart: DungeonCrawler, Adrix89, gargargarrick and many more.."
+        self.credits_text4 = "www.opengameart.org: DungeonCrawler,Lorc, Adrix89, gargargarrick and many more"
         self.author_text = "Author: K.J.Piatkowski"
         self.screen.fill(BGCOLOR)
         if self.to_char_chose:
@@ -366,7 +366,7 @@ class Game:
         self.levelgen.load_level_02()
         self.levelgen.load_level_03()
         self.levelgen.load_level_04()
-        self.levelgen.go_to_level("level02", 21,9)
+        self.levelgen.go_to_level("level01", 2, 2)
         print ("INITIALIZING CAMERA...")
         ##### CAMERA INIT
         self.camera = tilemap.Camera(self.map.width, self.map.height)
@@ -1395,9 +1395,9 @@ class Game:
                 #### RYSUJEMY TEKST ROBOCZY
                 mouse_pos = pygame.mouse.get_pos()
                 mouse_pos = pygame.mouse.get_pos()
-                self.write(f'Mouse pos: {mouse_pos}', (150, 0))
-                self.write(f'Player pos: {self.player.pos}', (300, 0))
-                self.write(f'Diff factor: {self.difficulty}',(475,0))
+                self.write(f'Mouse pos: {mouse_pos}', (50, 0))
+                self.write(f'Player pos: {self.player.pos}', (200, 0))
+                self.write(f'Diff factor: {self.difficulty}',(400,0))
                 for mob in self.act_lvl.mobs:
                     mob_rect = self.camera.apply_rect(mob.rect)
                     mob_center = mob_rect.center
@@ -1426,7 +1426,7 @@ class Game:
         self.pause_button.show_button(self.screen)
         self.spell_book_button.show_button(self.screen)
         self.quest_book_button.show_button(self.screen)
-        self.write(str(self.clock.get_fps()), (0, 0))
+        self.write(str(int(self.clock.get_fps())), (0, 0))
         if self.paused:
             self.screen.blit(dim_screen, (MAP_TOPLEFT))
             if self.draw_debug:

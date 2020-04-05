@@ -159,17 +159,18 @@ class Spell_Bullet(pygame.sprite.Sprite):
 
 
 class Blow_Spell(pygame.sprite.Sprite):
-    def __init__(self, game, pos, images, size, str, duration):
+    def __init__(self, game, pos, images, size, strength, duration):
         self._layer = HIT_GRAPHICS_LAYER
         self.groups = game.act_lvl.all_sprites, game.act_lvl.lavas
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.str = str + int(self.game.player.intellect * self.game.player.spell_power_bonus)
+        self.strength = strength + int(self.game.player.intellect * self.game.player.spell_power_bonus)
         self.radius_sizer = size
         self.duration = duration
         #### CZAS TRWANIA EFEKTU = DURATION + INT
         if self.duration:
             self.duration += self.game.player.intellect
+        self.effect = ActiveEffect("fire", e_fire_ico, self.strength, 1)
         self.images = images
         self.image = self.images[0]
         self.base_size_image = self.images[3]
@@ -407,15 +408,17 @@ class Treasure_Object(pygame.sprite.Sprite):
         self.hit_rect = pygame.Rect(0, 0,hit_rect_width,  hit_rect_height)
         self.hit_rect.center = (x,y)
         self.last_damage = 0
-        self.lava_immune_time = 500
+        self.fire_immune_time = 500
 
 
     def update(self):
+        #### GDY UDERZENIE OD MELEE (Swing Class)
         hits = pygame.sprite.spritecollide(self,self.game.act_lvl.melle_swing,True,collide_double_hit_rect)
         for hit in hits:
             pygame.mixer.Sound.play(chop_snd)
             self.game.player.weapon_breakage()
             self.hp -= self.game.player.hit_dmg
+        #### GDY UDERZENIE OD STRZAL (Arrow Class)
         arrow_hits = pygame.sprite.spritecollide(self,self.game.act_lvl.arrows,False,collide_hit_rect)
         for hit in arrow_hits:
             pygame.mixer.Sound.play(chop_snd)
@@ -425,14 +428,15 @@ class Treasure_Object(pygame.sprite.Sprite):
             elif self.game.player.attack_type_flag == "ranged":
                 self.hp -= self.game.player.arrow_damage
                 hit.kill()
+        #### GDY UDERZENIE FIRE (lava group)
         lava_hits = pygame.sprite.spritecollide(self,self.game.act_lvl.lavas,False,collide_hit_rect)
-        #### GDY UDERZENIE CZAREM, gdzie spritem zadjącym obrazenia jest grupa Lava
         for lava_hit in lava_hits:
-            now = (int(self.game.player.score_time_played * 1000))
-            if now - self.last_damage >= self.lava_immune_time:
-                self.hp -= lava_hit.str
-                pygame.mixer.Sound.play(chop_snd)
-                self.last_damage = now
+            if lava_hit.effect.name == "fire":
+                now = (int(self.game.player.score_time_played * 1000))
+                if now - self.last_damage >= self.fire_immune_time:
+                    self.hp -= lava_hit.effect.strength
+                    pygame.mixer.Sound.play(chop_snd)
+                    self.last_damage = now
         if self.hp < self.max_hp / 2:
             if not self.half_damaged:
                 self.image.blit(barrel_damage_mask,(0,0))
@@ -516,7 +520,8 @@ class Treasure_Chest(pygame.sprite.Sprite):
                 print ("NO ITEMS IN INV")
             if not pygame.mixer.Channel(1).get_busy():
                 pygame.mixer.Channel(1).play(try_unlock_snd)
-            #print ("UNLOCK FAILED")
+                self.game.put_txt("Chest locked")
+                #print ("UNLOCK FAILED")
             return False
         else:
             #print ("ALREADY UNLOCKED")
@@ -644,7 +649,7 @@ class Fence_Object(pygame.sprite.Sprite):
         self.rect.center = (x,y)
         self.hit_rect = pygame.Rect(0, 0,hit_rect_width,  hit_rect_height)
         self.hit_rect.center = (x,y)
-        self.lava_immune_time = 500
+        self.fire_immune_time = 500
         self.last_damage = 0
         self.water = False
 
@@ -663,15 +668,17 @@ class Fence_Object(pygame.sprite.Sprite):
                 #print("magic damage to fence object")
                 #print("object hp = " + str(self.hp))
                 hit.blow()
+        #### UDERZENIE OD FIRE (group lavas)
         lava_hits = pygame.sprite.spritecollide(self, self.game.act_lvl.lavas, False, collide_hit_rect)
         for lava_hit in lava_hits:
-            now = (int(self.game.player.score_time_played * 1000))
-            if now - self.last_damage >= self.lava_immune_time:
-                self.hp -= lava_hit.str
-                #print ("lava damage to fence object")
-                #print ("object hp = "+ str(self.hp))
-                pygame.mixer.Sound.play(chop_snd)
-                self.last_damage = now
+            if lava_hit.effect.name == "fire":
+                now = (int(self.game.player.score_time_played * 1000))
+                if now - self.last_damage >= self.fire_immune_time:
+                    self.hp -= lava_hit.effect.strength
+                    print ("lava damage to fence object")
+                    print ("object hp = "+ str(self.hp))
+                    pygame.mixer.Sound.play(chop_snd)
+                    self.last_damage = now
         if self.hp <=0:
             self.kill()
 
@@ -1081,6 +1088,7 @@ class Player(pygame.sprite.Sprite):
         self.spell_power_bonus = 1
         self.bow_hit_rate_bonus = 1
         self.barter_bonus = 0
+        self.slow_mod = 0
         ##############################
         if self.char_class.name == "Knight":
             self.inventory.put_in_first_free_slot(Potion(self.game, "Red Potion", "Cure", 15, 30, 26, 42))
@@ -1112,14 +1120,14 @@ class Player(pygame.sprite.Sprite):
                            75, True, 3, 1250, False,
                            0, 0, 0, 0, 0, 0, 25, 38, 49, 26, 87))
             self.bow_hit_rate_bonus = 0.75
-            self.barter_bonus = 25
+            self.barter_bonus = 50
         self.active_effects_lib = ActiveEffectsLibrary(self.game)
         self.quest_book = QuestBook(self.game)
         self.spell_book = SpellBook(self.game)
         if self.char_class.spells:
             for spell in self.char_class.spells:
                 self.spell_book.add_spell_by_name(spell)
-           #self.spell_book.add_spell_by_name("Fireball")
+                self.spell_book.add_spell_by_name("Fireball")
            #self.spell_book.add_spell_by_name("Tricebolt")
            #self.spell_book.add_spell_by_name("Iron Skin")
            #self.spell_book.add_spell_by_name("Cure")
@@ -1195,7 +1203,7 @@ class Player(pygame.sprite.Sprite):
         self.last_magic = 0
         self.attack_type_flag = "melle"
         self.movement_speed = self.calculate_movement_speed(self.speed)
-        self.lava_immune_time = 500
+        self.fire_immune_time = 500
         self.invisible = False
         #### score values
         self.score_killed_enemies = []
@@ -1350,7 +1358,8 @@ class Player(pygame.sprite.Sprite):
         temp_arrow_damage = 0
         self.armor = 0
         self.invisible = False
-        ## ZERUJE IKONY AKTYWNYCH EFEKTOW ULUBIONYCH lub NIELUBIANYCH BRONI
+        ## ZERUJE IKONY AKTYWNYCH EFEKTOW SPECJALNYCH, EFEKTOW ULUBIONYCH lub NIELUBIANYCH BRONI
+        self.slow_mod = 0
         self.active_effects_lib.remove_fav_dis_weapons_effects()
         self.active_effects_lib.remove_fav_dis_armors_effects()
         if self.weapon_slot.item:
@@ -1395,7 +1404,7 @@ class Player(pygame.sprite.Sprite):
             else:
                 temp_armor_mod += self.armor_slot.item.armor
             if self.armor_slot.item.subtype == "plate":
-                #print ("Knight bonus aplied")
+                print ("Knight bonus aplied")
                 temp_hit_rate_mod *= (self.armor_slot.item.hit_rate_mod * self.plate_armor_penalty_reduction)
             else:
                 temp_hit_rate_mod *= self.armor_slot.item.hit_rate_mod
@@ -1430,7 +1439,11 @@ class Player(pygame.sprite.Sprite):
                 self.active_effects_lib.add_effect(self.game.e_disliked_armor)
             else:
                 temp_armor_mod += self.helmet_slot.item.armor
-            temp_hit_rate_mod *= self.helmet_slot.item.hit_rate_mod
+            if self.helmet_slot.item.subtype == "plate":
+                print ("Knight bonus aplied")
+                temp_hit_rate_mod *= (self.helmet_slot.item.hit_rate_mod * self.plate_armor_penalty_reduction)
+            else:
+                temp_hit_rate_mod *= self.helmet_slot.item.hit_rate_mod
             temp_str_mod += self.helmet_slot.item.str_mod
             temp_sta_mod += self.helmet_slot.item.sta_mod
             temp_int_mod += self.helmet_slot.item.int_mod
@@ -1446,7 +1459,11 @@ class Player(pygame.sprite.Sprite):
                 self.active_effects_lib.add_effect(self.game.e_disliked_armor)
             else:
                 temp_armor_mod += self.boots_slot.item.armor
-            temp_hit_rate_mod *= self.boots_slot.item.hit_rate_mod
+            if self.boots_slot.item.subtype == "plate":
+                print ("Knight bonus aplied")
+                temp_hit_rate_mod *= (self.boots_slot.item.hit_rate_mod * self.plate_armor_penalty_reduction)
+            else:
+                temp_hit_rate_mod *= self.boots_slot.item.hit_rate_mod
             temp_str_mod += self.boots_slot.item.str_mod
             temp_sta_mod += self.boots_slot.item.sta_mod
             temp_int_mod += self.boots_slot.item.int_mod
@@ -1501,6 +1518,8 @@ class Player(pygame.sprite.Sprite):
                 temp_str_mod += effect.strength
             if effect.name == "barter":
                 temp_barter_bonus += effect.strength
+            if effect.name == "slow":
+                self.slow_mod = effect.strength
         #########################
         self.strength = self.base_strength + temp_str_mod
         self.stamina = self.base_stamina + temp_sta_mod
@@ -1576,6 +1595,8 @@ class Player(pygame.sprite.Sprite):
     def calculate_movement_speed(self,x):
         result = 80 + (10 * math.log2(x * x / 4))
         result = max(80, int(result))
+        if self.slow_mod > 0:
+            return result * self.slow_mod / 100
         return result
 
     def armor_breakage(self):
@@ -1669,27 +1690,53 @@ class Player(pygame.sprite.Sprite):
                 self.score_blocks += 1
                 txt = (self.name + "blocks!")
                 self.game.put_txt(txt)
-        ### OBRAZENIA(kolizja) OD(z) LAVA
+        ### OBRAZENIA(kolizja) OD(z) LAVA - w tym FIRE, SLOW etc..
         hits = pygame.sprite.spritecollide(self,self.game.act_lvl.lavas,False,collide_double_hit_rect)
         for hit in hits:
-            ## uderzenie .str na 0.2s
-            now = (int(self.score_time_played * 1000))
-            if now - self.last_damage >= self.lava_immune_time:
-                reduction = 1 - self.calculate_hit_reduction(self.armor)
-                damage = math.ceil(hit.str * reduction)
-                #print ("Redukcja od zbroji: " + str(reduction))
-                self.act_hp -= damage
-                #print ("Obrażenia od obiektu lava: " + str(damage))
-                self.game.put_txt(self.name + " received " + str(damage) + " damage")
-                self.damaged = True
-                self.damage_alpha = chain(DAMAGE_ALPHA_LIST * 2)
-                if ouch_snd.get_num_channels() > 2:
-                    ouch_snd.stop()
-                ouch_snd.play()
-                self.armor_breakage()
-                self.last_damage = now
-            #### SPRAWDZAM CZY ZYJE PO KAZDYM UDERZENIU
-            self.check_live()
+            if hit.effect.name == "damage":
+                ## uderzenie DAMAGE z grupu lava fire immune time = 500 czyli udrz. 1x effect.strength na 0.2s
+                now = (int(self.score_time_played * 1000))
+                if now - self.last_damage >= self.fire_immune_time:
+                    reduction = 1 - self.calculate_hit_reduction(self.armor)
+                    damage = math.ceil(hit.effect.strength * reduction)
+                    #print ("Redukcja od zbroji: " + str(reduction))
+                    print("UDERZENIE OD EFFECTU DAMAGE z GRUPY LAVAS")
+                    self.act_hp -= damage
+                    #print ("Obrażenia od obiektu lava: " + str(damage))
+                    self.game.put_txt(self.name + " received " + str(damage) + " damage")
+                    self.damaged = True
+                    self.damage_alpha = chain(DAMAGE_ALPHA_LIST * 2)
+                    if ouch_snd.get_num_channels() > 2:
+                        ouch_snd.stop()
+                    ouch_snd.play()
+                    self.armor_breakage()
+                    self.last_damage = now
+            if hit.effect.name == "fire":
+                ## uderzenie FIRE z grupu lava fire immune time =500 czyli udrz. 1x effect.strength na 0.2s
+                now = (int(self.score_time_played * 1000))
+                if now - self.last_damage >= self.fire_immune_time:
+                    reduction = 1 - self.calculate_hit_reduction(self.armor)
+                    damage = math.ceil(hit.effect.strength * reduction)
+                    #print ("Redukcja od zbroji: " + str(reduction))
+                    print("UDERZENIE OD EFFECTU FIRE z GRUPY LAVAS")
+                    self.act_hp -= damage
+                    #print ("Obrażenia od obiektu lava: " + str(damage))
+                    self.game.put_txt(self.name + " received " + str(damage) + " damage")
+                    self.damaged = True
+                    self.damage_alpha = chain(DAMAGE_ALPHA_LIST * 2)
+                    if ouch_snd.get_num_channels() > 2:
+                        ouch_snd.stop()
+                    ouch_snd.play()
+                    self.armor_breakage()
+                    self.last_damage = now
+                #### SPRAWDZAM CZY ZYJE PO KAZDYM UDERZENIU
+
+            if hit.effect.name == "slow":
+                #print("EFFECT SLOW z GRUPY LAVAS")
+                self.active_effects_lib.add_effect(hit.effect)
+                self.update_stats()
+                ## NIE UZYWAM UPDATE STATS CELEM NIE OBCIAZANIA PAMIECI. ZMIENIAM TYLKO SZYBKOSC!
+        self.check_live()
         ### KOLIZJE Z MUREM ###################
         self.hit_rect.centerx = self.pos.x
         collide_wall(self,self.game.act_lvl.walls,'x')
@@ -1714,6 +1761,8 @@ class Player(pygame.sprite.Sprite):
         ### UPDATE INVISIBLE EFFECT
         if self.invisible:
             self.image.fill((180,180,180,100),special_flags=pygame.BLEND_RGBA_MULT)
+        ### UPDATE SLOW EFFECT
+
 
 
 class Npc(pygame.sprite.Sprite):
@@ -1818,7 +1867,7 @@ class Mob(pygame.sprite.Sprite):
         self.last_damage = 0
         self.last_bullet = 0
         self.hit_stun_time = stun_time * 1000
-        self.lava_immune_time = 500
+        self.fire_immune_time = 500
         self.avoid_radius = 50
         self.sleep_radius = sleep_radius
         self.updated_sleep_radius = sleep_radius
@@ -2046,22 +2095,32 @@ class Mob(pygame.sprite.Sprite):
         ##### STRZELANIE :
         if self.bullet_type:
             self.mob_ranged_attack()
-        #### OBRAZENIA OD LAVY:
+        #### OBRAZENIA OD FIRE i EFFECT SLOW -- zobaczymy LAVY:
         hits = pygame.sprite.spritecollide(self, self.game.act_lvl.lavas, False)
         for hit in hits:
-            ## uderzenie .str na 0.1s
-            now = (int(self.game.player.score_time_played * 1000))
-            if now - self.last_damage >= self.lava_immune_time:
-                self.hp -= hit.str
-                print ("Obrażenia od obiektu typ lava: " + str(hit.str))
-                self.damage_alpha = chain(DAMAGE_ALPHA_LIST * 2)
-                self.last_damage = now
-                self.damaged = True
-                if isinstance(hit, Blow_Spell):
-                    self.game.put_txt(f'Spell explosion inflicted {hit.str} damage')
-                    #print ("TO BYL WYBUCH CZARU!")
-            #if self.hp <= 0:
-            #    self.kill()
+            if hit.effect.name == "damage":
+                ## uderzenie fizyczne .str na 0.2s
+                now = (int(self.game.player.score_time_played * 1000))
+                if now - self.last_damage >= self.fire_immune_time:
+                    self.hp -= hit.effect.strength
+                    print(f'Obrażenia od obiektu typ lava, efekt damage: {hit.effect.strength}')
+                    self.damage_alpha = chain(DAMAGE_ALPHA_LIST * 2)
+                    self.last_damage = now
+                    self.damaged = True
+            if hit.effect.name == "fire":
+                ## uderzenie od ognia .str na 0.2s
+                now = (int(self.game.player.score_time_played * 1000))
+                if now - self.last_damage >= self.fire_immune_time:
+                    self.hp -= hit.effect.strength
+                    print (f'Obrażenia od obiektu typ lava, efekt fire: {hit.effect.strength}')
+                    self.damage_alpha = chain(DAMAGE_ALPHA_LIST * 2)
+                    self.last_damage = now
+                    self.damaged = True
+                    if isinstance(hit, Blow_Spell):
+                        self.game.put_txt(f'Spell explosion inflicted {hit.effect.strength} damage')
+                        #print ("TO BYL WYBUCH CZARU!")
+                #if self.hp <= 0:
+                #    self.kill()
         ### OBRAZENIA OD STRZAL INNYCH POTWOROW:
         hits = pygame.sprite.spritecollide(self,self.game.act_lvl.mob_arrows, False)
         for hit in hits:
@@ -2248,16 +2307,29 @@ class ShopDoor(pygame.sprite.Sprite):
 
 
 class Lava(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, w, h, str):
+    def __init__(self, game, x, y, w, h, effect):
         self.groups = game.act_lvl.lavas
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.str = str
+        self.effect = effect
         self.rect = pygame.Rect(x, y, w, h)
         self.x = x
         self.y = y
         self.rect.x = x
         self.rect.y = y
+        self.hit_rect = self.rect
+
+
+class EffectObject(pygame.sprite.Sprite):
+    def __init__(self, game, x, y, image, effect):
+        self.groups = game.act_lvl.all_sprites, game.act_lvl.lavas
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.pos = (x, y)
+        self.effect = effect
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.center = self.pos
         self.hit_rect = self.rect
 
 
@@ -2333,14 +2405,15 @@ class MobArrow(pygame.sprite.Sprite):
 
 
 class Dart(pygame.sprite.Sprite):
-    def __init__(self, game, pos, dir, str, image = bullet_dart_image):
+    def __init__(self, game, pos, dir, strength, image = bullet_dart_image):
         self._layer = HIT_GRAPHICS_LAYER
         self.groups = game.act_lvl.all_sprites, game.act_lvl.lavas
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.speed = 400
         self.lifetime = 1000
         self.game = game
-        self.str = str
+        self.strength = strength
+        self.effect = ActiveEffect("damage",e_fire_ico,strength,1)
         self.pos = vec(pos)
         self.vel = dir * self.speed
         self.image = image
@@ -2369,11 +2442,13 @@ class Dart(pygame.sprite.Sprite):
 
 
 class PinTrap(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, img_hidden, img_open, str):
+    def __init__(self, game, x, y, img_hidden, img_open, strength):
         self._layer = EFFECTS_LAYER
         self.groups = game.act_lvl.all_sprites #, game.act_lvl.lavas
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
+        self.strength = strength
+        self.effect = ActiveEffect("damage", e_fire_ico, strength, 1)
         self.image_h = img_hidden
         self.image_o = img_open
         self.image = self.image_h
@@ -2381,7 +2456,6 @@ class PinTrap(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
         self.hit_rect = pygame.Rect(self.rect.left + 5, self.rect.top + 8 ,18,18)
-        self.str = str
         self.active = True
         self.open = False
 
@@ -2414,14 +2488,14 @@ class PinTrap(pygame.sprite.Sprite):
 
 
 class Trap(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, img, direction, str):
+    def __init__(self, game, x, y, img, direction, strength):
         self._layer = EFFECTS_LAYER
         self.groups = game.act_lvl.all_sprites, game.act_lvl.lavas
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.pins_img = img
         self.image = pygame.Surface((22,12),pygame.HWSURFACE|pygame.SRCALPHA)
-        self.str = str
+        self.effect = ActiveEffect("damage", e_fire_ico, strength, 1)
         self.range = 12
         self.speed = 0.2
         self.tween = pytw.easeInExpo

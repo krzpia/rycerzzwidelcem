@@ -5,6 +5,7 @@ from data import *
 from items import ItemGenerator
 from enemies import EnemyGenerator
 from npcs import NpcGenerator
+from ui import ActiveEffect
 
 
 class LevelGen:
@@ -14,6 +15,8 @@ class LevelGen:
         self.enemy_gen = EnemyGenerator(self.game,tileset_image,full_tileset_image)
         self.npcs_gen = NpcGenerator(self.game,tileset_image,full_tileset_image)
         self.shop_gen = ShopGenerator(self.game)
+        self.lava_effect = ActiveEffect("fire",e_fire_ico,5,1)
+        self.slow_effect = ActiveEffect("slow",e_slow_ico,50,1.2)
 
     def load(self,name):
         if name == "level01":
@@ -223,7 +226,7 @@ class LevelGen:
             if tile_object.name == "water":
                 Obstacle(self.game,tile_object.x,tile_object.y,tile_object.width,tile_object.height, water=True)
             if tile_object.name == "lava":
-                Lava(self.game,tile_object.x,tile_object.y,tile_object.width,tile_object.height, 15)
+                Lava(self.game,tile_object.x,tile_object.y,tile_object.width,tile_object.height,self.lava_effect)
             if tile_object.type == "teleport":
                 Teleport(self.game,tile_object.name, tile_object.destination, tile_object.pos_x, tile_object.pos_y,
                          tile_object.x,tile_object.y,tile_object.width,tile_object.height)
@@ -250,6 +253,8 @@ class LevelGen:
                 DartTrap(self.game,object_center.x,object_center.y,vec(-1,0),200,5)
             if tile_object.name == "pintrap":
                 PinTrap(self.game, object_center.x,object_center.y,pintrap_h_img, pintrap_o_img,5)
+            if tile_object.name == "spider web":
+                EffectObject(self.game,object_center.x,object_center.y,tile_object.image,self.slow_effect)
             #### DOORS
             if tile_object.name == "door":
                 Door(self.game,object_center.x,object_center.y,tile_object.key,tile_object.image)

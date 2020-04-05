@@ -147,6 +147,8 @@ e_haste_ico = pygame.image.load(path.join(img_folder, 'e_haste.png')).convert_al
 e_invisibility_ico = pygame.image.load(path.join(img_folder, 'e_invisibility.png')).convert_alpha()
 e_ironskin_ico = pygame.image.load(path.join(img_folder, 'e_ironskin.png')).convert_alpha()
 e_heroism_ico = pygame.image.load(path.join(img_folder, 'e_heroism.png')).convert_alpha()
+e_slow_ico = pygame.image.load(path.join(img_folder, 'e_slow.png')).convert_alpha()
+e_fire_ico = pygame.image.load(path.join(img_folder, 'e_fire_ico.png')).convert_alpha()
 ### SPELL ICONS
 sb_firebolt_image = pygame.image.load(path.join(img_folder, 'sb_firebolt.png')).convert_alpha()
 sb_fireball_image = pygame.image.load(path.join(img_folder, 'sb_fireball.png')).convert_alpha()
