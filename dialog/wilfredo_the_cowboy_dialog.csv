@@ -2,9 +2,9 @@ Npc;Thread;Branch;Step;Text;Ask1;Ask2;Ask3;Ask4;Next_Thread;Goto_Branch;Goto_Ste
 True;welcome;0;0;Hello;False;False;False;False;Next;False;False;False
 True;welcome;1;0;Hello again;False;False;False;False;Next;False;False;False
 False;quest Mad Cow;0;0;Is this your bull?;False;False;False;False;False;False;False;False
-True;quest Mad Cow;0;1;Well, it was my cute cow. Now because of the curse it`s seems to be an mad bull, i can`t even close to it.;False;False;False;False;False;False;False;False
+True;quest Mad Cow;0;1;Well, it was my cute cow. Now because of the curseit`s seems to be an mad bull, i can`t even close  to it.;False;False;False;False;False;False;False;False
 True;quest Mad Cow;0;2;You seems to be a might warrior. Will you help me and try to remove the curse?;Yes, no problem, I`ll try>quest Mad Cow>0,3;No, I`m too scared>False>0,4;False;False;False;False;False;False
-True;quest Mad Cow;0;3;Thanks! Please do semothing. If you cant remove the curse, at least end the suffering of this creature.;False;False;False;False;Next;False;False;False
+True;quest Mad Cow;0;3;Thanks! Please do something. If you cant remove   the curse, at least end the suffering of this     creature.;False;False;False;False;Next;False;False;False
 True;quest Mad Cow;0;4;Oh no? I`ll try to manage it myself.;False;False;False;False;Next;False;False;False
 True;quest Mad Cow;1;0;Go, I think you can see the bull downe there.;False;False;False;False;Next;False;False;False
 True;quest Mad Cow;2;0;Wonderful you have made it! Congratulations. ;False;False;False;False;False;False;False;quest Mad Cow has been completed

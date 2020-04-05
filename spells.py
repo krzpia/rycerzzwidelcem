@@ -7,11 +7,11 @@ import random
 class SpellGenerator:
     def __init__(self):
         self.firebolt = ui.Spell("Firebolt", sb_firebolt_image, bullet_firebolt_image, False,
-                              "offensive", "fire", 2,2,5, 1000, "arrow", 1, 300, 180,
+                              "offensive", "fire", 2,2,4, 1000, "arrow", 1, 300, 180,
                               False, False, False, False, False, False, False, firebolt_snd)
         self.fireball = ui.Spell("Fireball", sb_fireball_image, bullet_fireball_image, fireball_animation_images,
-                              "offensive", "fire", 4, 4, 5, 1000, "arrow", 1, 275, 150,
-                              True, 15, 6, False, False, False, False, firebolt_snd)
+                              "offensive", "fire", 4, 4, 4, 1000, "arrow", 1, 275, 150,
+                              True, 15, 3, False, False, False, False, firebolt_snd)
         self.icebolt = ui.Spell("Icebolt", sb_icebolt_image, bullet_icebolt_image, False,
                              "offensive", "cold", 1, 2, 3, 800, "arrow", 1, 450, 250,
                              False, False, False, False, False, False, False, icebolt_snd)
@@ -23,7 +23,7 @@ class SpellGenerator:
                                  "offensive", "poison cloud", 8, 4, 0, 2500, "arrow", 1, 75, 100,
                                  True, False, 1, 5, False, False, False, firebolt_snd)
         self.freeze = ui.Spell("Freeze", sb_freeze_image, bullet_icebolt_image, False,
-                            "offensive", "cold", 6,4, 5, 2000, "arrow", 1, 375, 175,
+                            "offensive", "cold", 6, 4, 3, 2000, "arrow", 1, 375, 175,
                             False, False, False, False, 5, False, False, icebolt_snd)
         self.cure = ui.Spell("Cure", sb_cure_image, False, False, "defensive", "cure", 4, 2, 10, False,
                           False, False, False, False, False, False, False, False,

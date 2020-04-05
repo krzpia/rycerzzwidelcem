@@ -9,7 +9,7 @@ True;quest Karol the Alchemist;2;1;Eveandro fallen ill? I heard that he has many
 False;quest Karol the Alchemist;2;2;What?;False;False;False;False;False;False;False;False
 True;quest Karol the Alchemist;2;3;Well, nothing... I`ll make you a fine elixir,       one moment.;False;False;False;False;False;False;False;False
 True;quest Karol the Alchemist;2;4;Plusk, plumsk.. (Making potion in his cauldron);False;False;False;False;False;False;False;False
-True;quest Karol the Alchemist;2;5;Ok.. Here you go!. A magic elixir Archechinix.    Go and bring it to our king! Good luck!;False;False;False;False;False;False;False;quest Karol the Alchemist has been completed
+True;quest Karol the Alchemist;2;5;Ok.. Here you go!. A magic elixir Archechinix.    Go and bring it to our king! Remember use the key to open the shrine in the nortwest. Good luck!;False;False;False;False;False;False;False;quest Karol the Alchemist has been completed
 False;quest Karol the Alchemist;2;6;Thanks for your help!;False;False;False;False;Next;False;False;quest Karol the Alchemist has been rewarded
-False;quest Karol the Alchemist;3;0;Well, elixir works good, huh?;False;False;False;False;Next;False;False;False
+False;quest Karol the Alchemist;3;0;If you are looking way to the castle go northwest.;False;False;False;False;Next;False;False;False
 True;bye;0;0;Bye;False;False;False;False;False;False;False;False

@@ -1342,7 +1342,7 @@ class Game:
         mov_sp = str(self.player.movement_speed / 100)
         self.write("Active Spell :", (ST_POS[0] + ST_WIDTH - 250, ST_POS[1] + 80))
         if self.player.active_spell:
-            self.write(self.player.active_spell.name, (ST_POS[0] + ST_WIDTH - 170, ST_POS[1] + 80))
+            self.write(self.player.active_spell.name, (ST_POS[0] + ST_WIDTH - 160, ST_POS[1] + 80))
         self.write("Active Effects :", (ST_POS[0] + ST_WIDTH - 250, ST_POS[1] + 100))
         self.player.active_effects_lib.show(self.screen, (ST_POS[0] + ST_WIDTH - 150, ST_POS[1] + 100))
         self.write("Movement :" + mov_sp, (ST_POS[0] + ST_WIDTH - 250, ST_POS[1] + 120))

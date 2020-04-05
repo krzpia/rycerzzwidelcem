@@ -1008,7 +1008,7 @@ class Key(pygame.sprite.Sprite):
     def update(self):
         for lock in self.game.act_lvl.doors:
             dist = lock.pos - self.game.player.pos
-            if dist.length_squared() < 30**2:
+            if dist.length_squared() < 36**2:
                 self.lock_is_close = lock
                 return True
         for lock in self.game.act_lvl.chest_to_open:
@@ -1127,17 +1127,17 @@ class Player(pygame.sprite.Sprite):
         if self.char_class.spells:
             for spell in self.char_class.spells:
                 self.spell_book.add_spell_by_name(spell)
-            self.spell_book.add_spell_by_name("Fireball")
-            self.spell_book.add_spell_by_name("Tricebolt")
-            self.spell_book.add_spell_by_name("Iron Skin")
-            self.spell_book.add_spell_by_name("Cure")
-            self.spell_book.add_spell_by_name("Freeze")
-            self.spell_book.add_spell_by_name("Invisibility")
-            self.spell_book.add_spell_by_name("Icebolt")
-            self.spell_book.add_spell_by_name("Haste")
-            self.spell_book.add_spell_by_name("Poison Cloud")
-            self.spell_book.add_spell_by_name("Stone Skin")
-            self.spell_book.add_spell_by_name("Heroism")
+            #self.spell_book.add_spell_by_name("Fireball")
+            #self.spell_book.add_spell_by_name("Tricebolt")
+            #self.spell_book.add_spell_by_name("Iron Skin")
+            #self.spell_book.add_spell_by_name("Cure")
+            #self.spell_book.add_spell_by_name("Freeze")
+            #self.spell_book.add_spell_by_name("Invisibility")
+            #self.spell_book.add_spell_by_name("Icebolt")
+            #self.spell_book.add_spell_by_name("Haste")
+            #self.spell_book.add_spell_by_name("Poison Cloud")
+            #self.spell_book.add_spell_by_name("Stone Skin")
+            #self.spell_book.add_spell_by_name("Heroism")
         self.active_spell = False
         self.selected_spell = False
         self.active_quests = []
