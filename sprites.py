@@ -387,11 +387,12 @@ class Arrow_to_take(pygame.sprite.Sprite):
 
 
 class Treasure_Object(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, image, hp, item, max_cost, hit_rect_width, hit_rect_height):
+    def __init__(self, game, name, x, y, image, hp, item, max_cost, hit_rect_width, hit_rect_height):
         self._layer = FLOOR_LAYER
         self.groups = game.act_lvl.all_sprites, game.act_lvl.hr_obstacles
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
+        self.name = name
         if item == "random":
             self.item = self.game.levelgen.gen.generate_random_item("all",max_cost)
         elif item == "gold":
@@ -638,11 +639,12 @@ class InfoSprite(pygame.sprite.Sprite):
 
 
 class Fence_Object(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, hp, image, hit_rect_width, hit_rect_height):
+    def __init__(self, game, name, x, y, hp, image, hit_rect_width, hit_rect_height):
         self._layer = FLOOR_LAYER
         self.groups = game.act_lvl.all_sprites, game.act_lvl.walls
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
+        self.name = name
         self.image = image
         self.hp = hp
         self.rect = pygame.Rect(0, 0,TILE_SIZE, TILE_SIZE)
@@ -684,11 +686,12 @@ class Fence_Object(pygame.sprite.Sprite):
 
 
 class Door(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, key, image):
+    def __init__(self, game, name, x, y, key, image):
         self._layer = FLOOR_LAYER
         self.groups = game.act_lvl.all_sprites, game.act_lvl.hr_obstacles, game.act_lvl.doors
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
+        self.name = name
         self.open = False
         self.key = key
         self.image = image
@@ -767,6 +770,9 @@ class Weapon(pygame.sprite.Sprite):
         self.breakage_surf.fill((255 - (int(2.5 * self.condition)), (int(2.0 * self.condition)), 0))
         self.breakage_surf.blit(self.breakage_icon, (0, 0))
 
+    def set_condition(self, condition):
+        self.condition = condition
+
     def update(self):
         #### bron bedzie tam gdzie gracz (czyli vector Pos + (4,0)
         self.pos = self.game.player.pos
@@ -826,6 +832,9 @@ class Armor(pygame.sprite.Sprite):
         self.armor = round((0.4 * self.base_armor) + (0.6 * self.base_armor * self.condition / 100), 0)
         self.breakage_surf.fill((255 - (int(2.5 * self.condition)), (int(2.5 * self.condition)), 0))
         self.breakage_surf.blit(self.breakage_icon, (0, 0))
+
+    def set_condition(self, condition):
+        self.condition = condition
 
     def update(self):
         self.pos = self.game.player.pos
@@ -989,10 +998,8 @@ class Quest_Item:
         self.hit_rect = self.rect
 
 
-class Key(pygame.sprite.Sprite):
+class Key:
     def __init__(self, game, name, key, img_x, img_y, tileset = full_tileset_image):
-        self.groups = game.act_lvl.items
-        pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.owner = False
         self.b_image = pygame.Surface((32,32), pygame.HWSURFACE | pygame.SRCALPHA)
@@ -1025,7 +1032,6 @@ class Key(pygame.sprite.Sprite):
                 self.game.put_txt("Open door success")
                 pygame.mixer.Sound.play(door_open_snd)
                 self.lock_is_close.kill()
-                self.kill()
                 self.game.item_picked = False
             if isinstance(self.lock_is_close,Treasure_Chest):
                 #print("OPEN CHEST")
@@ -1068,6 +1074,7 @@ class Player(pygame.sprite.Sprite):
         #self.image.blit(player_image, (0, 0))
         self.name = name
         self.char_class = char_class
+        self.char_name = char_class.name
         self.favourite_weapons = char_class.favourite_weapons
         self.disliked_weapons = char_class.disliked_weapons
         self.favourite_armors = char_class.favourite_armors
@@ -1140,9 +1147,6 @@ class Player(pygame.sprite.Sprite):
             #self.spell_book.add_spell_by_name("Heroism")
         self.active_spell = False
         self.selected_spell = False
-        self.active_quests = []
-        self.completed_quests = []
-        self.failed_quests = []
         self.armor_slot = Slot(slot_a_img)
         self.armor_slot.define_type("armor")
         self.weapon_slot = Slot(slot_w_img)
@@ -1224,6 +1228,53 @@ class Player(pygame.sprite.Sprite):
         self.start_death_animation = False
         self.char_animation_time = 0
         self.last_char_animation_time = 0
+
+    def load_state(self):
+        pass
+
+    def return_active_slots_item_namecond_list(self):
+        list = []
+        for i in self.active_slots:
+            if i.item:
+                name = i.item.name
+                slot = i.type
+                if isinstance(i.item, sprites.Armor) or isinstance(i.item, sprites.Weapon):
+                    cond = i.item.condition
+                else:
+                    cond = False
+                list.append((name, slot, cond))
+        return list
+
+    def load_active_slots_from_item_namecond_list(self, nc_list, itemgen):
+        ring1occ = False
+        ring2occ = False
+        for tuple in nc_list:
+            if tuple[1] == "armor":
+                item = itemgen.load_item_by_name(tuple[0],tuple[2])
+                self.armor_slot.put_item(item)
+            elif tuple[1] == "weapon":
+                item = itemgen.load_item_by_name(tuple[0],tuple[2])
+                self.weapon_slot.put_item(item)
+            elif tuple[1] == "shield":
+                item = itemgen.load_item_by_name(tuple[0], tuple[2])
+                self.shield_slot.put_item(item)
+            elif tuple[1] == "helmet":
+                item = itemgen.load_item_by_name(tuple[0],tuple[2])
+                self.helmet_slot.put_item(item)
+            elif tuple[1] == "boots":
+                item = itemgen.load_item_by_name(tuple[0],tuple[2])
+                self.boots_slot.put_item(item)
+            elif tuple[1] == "ring" and not ring1occ:
+                item = itemgen.load_item_by_name(tuple[0])
+                self.ring1_slot.put_item(item)
+                ring1occ = True
+            elif tuple[1] == "ring" and not ring2occ:
+                item = itemgen.load_item_by_name(tuple[0])
+                self.armor_slot.put_item(item)
+                ring2occ = True
+            elif tuple[1] == "necklace":
+                item = itemgen.load_item_by_name(tuple[0],tuple[2])
+                self.armor_slot.put_item(item)
 
     def put_in_pos(self,x,y):
         self.x = x * TILE_SIZE + TILE_SIZE /2
@@ -1773,7 +1824,6 @@ class Npc(pygame.sprite.Sprite):
         self.start_y = start_y
         self.visible = True
         self.encountered = False
-        self.friendly = 100
         self.quests = []
         self.rect = self.image.get_rect()
         self.rect.x = self.start_x

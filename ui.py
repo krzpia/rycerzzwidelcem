@@ -1,6 +1,7 @@
 import typing
 import sys
 from events.event import Event
+from npcs import QuestGenerator
 from data import *
 import spells
 import random
@@ -60,6 +61,9 @@ class Slot:
             self.occ = True
             return True
 
+    def clear(self):
+        self.item = False
+        self.occ = False
 
     def pick_item(self):
         if self.occ == True:
@@ -103,6 +107,24 @@ class Inventory:
             if i.item:
                 item_list.append(i.item)
         return item_list
+
+    def return_item_namecond_list(self):
+        list = []
+        for i in self.item_slots:
+            if i.item:
+                name = i.item.name
+                if isinstance(i.item,sprites.Armor) or isinstance(i.item,sprites.Weapon):
+                    cond = i.item.condition
+                elif isinstance(i.item,sprites.Key):
+                    cond = i.item.key
+                elif isinstance(i.item, sprites.Gold_Item):
+                    cond = i.item.gold
+                elif isinstance(i.item, sprites.Arrow_Item):
+                    cond = i.item.number
+                else:
+                    cond = False
+                list.append((name,cond))
+        return list
 
     def find_free_slot(self):
         self.free_slots = []
@@ -162,6 +184,11 @@ class Inventory:
                 #print ("jest")
                 i.item = False
                 i.occ = False
+
+    def remove_all(self):
+        for i in self.item_slots:
+            if i.item:
+                i.clear()
 
     def put_item_to_inv(self,pos_cl,item):
         self.pos_cl = pos_cl
@@ -415,10 +442,17 @@ class QuestBook:
         self.act_page = 0
         self.next_page_button = EButton(next_page_img,549,377)
         self.prev_page_button = EButton(prev_page_img,18,376)
+        self.quest_generator = QuestGenerator(self.game)
 
     def add_quest(self, quest):
-        if len(self.quests)<11:
+        if len(self.quests)<50:
             self.quests.append(quest)
+        else:
+            print ("za dużo questow")
+
+    def add_quest_by_name(self, quest_name):
+        if len(self.quests)<50:
+            self.quests.append(self.quest_generator.return_quest_by_name(quest_name))
         else:
             print ("za dużo questow")
 
@@ -429,6 +463,18 @@ class QuestBook:
         for i in self.quests:
             if i.name == quest_name:
                 self.quests.remove(i)
+
+    def return_quest_name_list(self):
+        quest_list = []
+        for i in self.quests:
+            quest_list.append(i.name)
+        return quest_list
+
+    def load_quests_by_name_list(self, quest_name_list):
+        if quest_name_list:
+            quest_list = self.quest_generator.return_quest_list_by_name_list(quest_name_list)
+            for quest in quest_list:
+                self.add_quest(quest)
 
     def get_quest_by_name(self, quest_name):
         for i in self.quests:
@@ -523,11 +569,17 @@ class SpellBook:
             ### TO DO Usuwanie czarów
 
     def add_spell_by_name(self, name):
-        self.spells.append(self.spellgenerator.get_spell_by_name(name))
+        if not self.check_duplicate_by_name(name):
+            self.spells.append(self.spellgenerator.get_spell_by_name(name))
 
     def check_duplicate(self, spell):
         for i in self.spells:
             if i.name == spell.name:
+                return True
+
+    def check_duplicate_by_name(self, spell_name):
+        for i in self.spells:
+            if i.name == spell_name:
                 return True
 
     def update_buttons(self, mouse_pos):
@@ -737,6 +789,7 @@ class ActiveEffect:
                 #print ("KONIEC TRWANIA EFEKTU")
                 self.effect_time = 0
                 return True
+
 
 class ActiveEffectsLibrary:
     def __init__(self, game):
@@ -1416,10 +1469,6 @@ class QuestionBox:
         screen.blit(self.image, self.pos)
 
 
-
-
-
-
 class DialogBox:
     def __init__(self, game):
         self.game = game
@@ -1746,9 +1795,6 @@ class Quest:
             self.reward_item = reward_item
         else:
             self.reward_item = False
-        self.completed = False
-        self.in_progress = False
-        self.visible = False
         self.start_time = 0
         #### JEZELI MA SPRAWDZIC OD RAZU PO ZDARZENIU, uwaga zrobiona narazie opcja z napotkaniem NPC
         #### inne (przedmioty, wrogowie, lub miejsca - do zrobienia sprawdzanie warunku podczas zdarzenia
@@ -1868,7 +1914,6 @@ class Quest:
 
     def collect_reward(self):
         if self.completed:
-            #self.game.player.active_quests.remove(self)
             self.game.player.gold += self.reward_gold
             self.game.player.xp += self.reward_xp
             #### GENERUJE PRZEDMIOTY REWARD
@@ -1896,20 +1941,16 @@ class Quest:
                 self.game.message_box.show_message_quest_reward(f'Quest {self.name} completed!',
                                                                 self.reward_gold, self.reward_xp, self.reward_item)
             #### USUWAM ZAKONCZONE QUESTY
-            self.game.player.completed_quests.append(self)
             self.game.player.quest_book.remove(self)
             print("NAGRODA ODEBRANA i QUEST ZAPISANY JAKO WYKONANY")
 
 
     def get_quest(self):
-        if self not in self.game.player.active_quests:
-            print("GOT NEW QUEST")
-            self.game.put_txt(f'Got quest {self.name}')
-            self.in_progress = True
-            self.game.events_manager.emit(Event(id=f'got quest {self.name}'))
-            self.game.player.active_quests.append(self)
-            self.game.player.quest_book.add_quest(self)
-            self.start_time = (int(self.game.player.score_time_played * 1000))
+        print("GOT NEW QUEST")
+        self.game.put_txt(f'Got quest {self.name}')
+        self.game.events_manager.emit(Event(id=f'got quest {self.name}'))
+        self.game.player.quest_book.add_quest(self)
+        self.start_time = (int(self.game.player.score_time_played * 1000))
 
 
 class QuestGoal:

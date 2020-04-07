@@ -5,6 +5,7 @@ from data import *
 from items import ItemGenerator
 from enemies import EnemyGenerator
 from npcs import NpcGenerator
+from npcs import QuestGenerator
 from ui import ActiveEffect
 
 
@@ -14,6 +15,7 @@ class LevelGen:
         self.gen = ItemGenerator(self.game,tileset_image,full_tileset_image)
         self.enemy_gen = EnemyGenerator(self.game,tileset_image,full_tileset_image)
         self.npcs_gen = NpcGenerator(self.game,tileset_image,full_tileset_image)
+        self.quest_gen = QuestGenerator(self.game)
         self.shop_gen = ShopGenerator(self.game)
         self.lava_effect = ActiveEffect("fire",e_fire_ico,5,1)
         self.slow_effect = ActiveEffect("slow",e_slow_ico,50,1.2)
@@ -40,7 +42,7 @@ class LevelGen:
         self.game.map_rect = self.game.map_image.get_rect()
         self.game.player.put_in_pos(pos_x, pos_y)
 
-    def load_level_05(self):
+    def load_level_05(self, saved_data):
         self.game.act_lvl = self.game.level_05
         ### ALL SPRITES (BEZ GRACZA!)
         self.game.level_05.all_sprites = pygame.sprite.LayeredUpdates()
@@ -79,7 +81,7 @@ class LevelGen:
         #### LOAD TILE OBJECTS
         self.load_objects(self.game.map_level_05.tmxdata.objects)
 
-    def load_level_04(self):
+    def load_level_04(self, saved_data):
         self.game.act_lvl = self.game.level_04
         ### ALL SPRITES (BEZ GRACZA!)
         self.game.level_04.all_sprites = pygame.sprite.LayeredUpdates()
@@ -118,7 +120,7 @@ class LevelGen:
         #### LOAD TILE OBJECTS
         self.load_objects(self.game.map_level_04.tmxdata.objects)
 
-    def load_level_03(self):
+    def load_level_03(self, saved_data):
         self.game.act_lvl = self.game.level_03
         ### ALL SPRITES (BEZ GRACZA!)
         self.game.level_03.all_sprites = pygame.sprite.LayeredUpdates()
@@ -157,7 +159,7 @@ class LevelGen:
         #### LOAD TILE OBJECTS
         self.load_objects(self.game.map_level_03.tmxdata.objects)
 
-    def load_level_02(self):
+    def load_level_02(self, saved_data):
         self.game.act_lvl = self.game.level_02
         ### ALL SPRITES (BEZ GRACZA!)
         self.game.level_02.all_sprites = pygame.sprite.LayeredUpdates()
@@ -205,7 +207,7 @@ class LevelGen:
         #        Teleport(self.game, tile_object.destination, tile_object.pos_x, tile_object.pos_y,
         #                 tile_object.x, tile_object.y, tile_object.width, tile_object.height)
 
-    def load_level_01(self):
+    def load_level_01(self, saved_data):
         self.game.act_lvl = self.game.level_01
         ### ALL SPRITES (BEZ GRACZA!)
         self.game.level_01.all_sprites = pygame.sprite.LayeredUpdates()
@@ -242,7 +244,115 @@ class LevelGen:
         ## SHOPS
         self.game.level_01.shops = pygame.sprite.LayeredUpdates()
         ### LOAD TILE OBJECTS
-        self.load_objects(self.game.map_level_01.tmxdata.objects)
+        if not saved_data:
+            self.load_objects(self.game.map_level_01.tmxdata.objects)
+        else:
+            print ("MAM DANE")
+            self.load_objects(self.game.map_level_01.tmxdata.objects)
+
+    def save_objects(self, act_lvl):
+        ##### KODUJE WSZYSTKIE PRZEDMIOTY, KTORE MAJA MIEC NADPISANY STAN
+        ### HR OBSTACLES:
+        treasure_objects_list = []
+        door_list = []
+        for hrob in act_lvl.hr_obstacles:
+            if isinstance(hrob, Treasure_Object):
+                if hrob.item:
+                    if hrob.item == "gold":
+                        hrob_item = "gold"
+                        hrob_max_cost = hrob.max_cost
+                    elif hrob.item == "random":
+                        hrob_item = "random"
+                        hrob_max_cost = hrob.max_cost
+                    else:
+                        hrob_item = hrob.item.name
+                        hrob_max_cost = hrob.max_cost
+                else:
+                    hrob_item = False
+                    hrob_max_cost = False
+                treasure_objects_list.append((hrob.name, hrob.rect.centerx,hrob.rect.centery,
+                                              hrob_item, hrob_max_cost))
+            if isinstance(hrob, Door):
+                door_list.append((hrob.name, hrob.rect.centerx,hrob.rect.centery,hrob.key))
+        ### MOBS:
+        mob_list = []
+        for mob in act_lvl.mobs:
+            if mob.item:
+                mob_item_name = mob.item
+            else:
+                mob_item_name = False
+            if mob.s_pos and not mob.bullet_type:
+                mob_type = "enemy s"
+            elif mob.bullet_type:
+                mob_type = "enemy_r"
+            else:
+                mob_type = "enemy"
+            mob_list.append((mob_type, mob.name, mob.pos.x, mob.pos.y, mob_item_name, mob.hp))
+        ### ITEMS:
+        item_list = []
+        hidden_item_list = []
+        gold_list = []
+        hidden_gold_list = []
+        arrow_list = []
+        for item in act_lvl.items_to_pick:
+            if isinstance(item, Item_to_take):
+                item_list.append((item.item.name, item.rect.centerx, item.rect.centery))
+            elif isinstance(item, HiddenItem_to_take):
+                hidden_item_list.append((item.item.name, item.rect.centerx, item.rect.centery))
+            elif isinstance(item, HiddenGold_to_take):
+                hidden_gold_list.append((item.gold, item.rect.centerx, item.rect.centery))
+            else:
+                print("ERROR INCODING items_to_pick")
+        for item in act_lvl.gold_to_pick:
+            if isinstance(item, Gold_to_take):
+                gold_list.append((item.gold, item.rect.centerx, item.rect.centery))
+        for item in act_lvl.arrows_to_pick:
+            if isinstance(item, Arrow_to_take):
+                arrow_list.append((item.number,item.rect.centerx, item.rect.centery))
+        ### WALLS (Fence objects):
+        wall_list = []
+        for wall in act_lvl.walls:
+            if isinstance(wall, sprites.Fence_Object):
+                wall_list.append((wall.name,wall.rect.centerx,wall.rect.centery,wall.hp))
+        ### TREASURE CHESTS:
+        chest_list = []
+        for chest in act_lvl.chest_to_open:
+            chest_namecond_list = chest.inventory.return_item_namecond_list()
+            chest_list.append((chest.rect.centerx, chest.rect.centery,chest.locked, chest.closed,
+                              chest.key, chest_namecond_list))
+        ##### UTWORZONO TYMCzASOWE LISTY DWUWYMIAROWE
+        print ("OBIEKTY Z DANEGO LEVELU:")
+        print (treasure_objects_list)
+        print (door_list)
+        print ("MOBs..")
+        print (mob_list)
+        print ("ITEMS On Ground")
+        print (item_list)
+        print(hidden_item_list)
+        print(gold_list)
+        print(hidden_gold_list)
+        print(arrow_list)
+        print ("WALLS..")
+        print (wall_list)
+        print ("Chest..")
+        print (chest_list)
+        print ("KONIEC DANYCH")
+        obj_data = {'treasure_objects_list':treasure_objects_list,
+                      'door_list':door_list,
+                      'mob_list':mob_list,
+                      'item_list':item_list,
+                      'hidden_item_list':hidden_item_list,
+                      'gold_list':gold_list,
+                      'hidden_gold_list':hidden_gold_list,
+                      'arrow_list':arrow_list,
+                      'wall_list':wall_list,
+                      'chest_list':chest_list,
+                      }
+        return obj_data
+
+
+    def load_objects_form_save_data(self, saved_levels_data):
+        pass
 
     def load_objects(self, tmx_objects):
         for tile_object in tmx_objects:
@@ -298,10 +408,10 @@ class LevelGen:
                 EffectObject(self.game,object_center.x,object_center.y,tile_object.image,self.slow_effect)
             #### DOORS
             if tile_object.name == "door":
-                Door(self.game,object_center.x,object_center.y,tile_object.key,tile_object.image)
+                Door(self.game,tile_object.name, object_center.x,object_center.y,tile_object.key,tile_object.image)
             #### FENCE
             if tile_object.name == "wood fence":
-                Fence_Object(self.game,object_center.x,object_center.y,10,tile_object.image,32,32)
+                Fence_Object(self.game,tile_object.name, object_center.x,object_center.y,10,tile_object.image,32,32)
             #### TREASURES AND INTERACTIVE SPRITES ########
             if tile_object.name == "sign":
                 InfoSprite(self.game,tile_object.name,object_center.x,object_center.y,
@@ -309,7 +419,7 @@ class LevelGen:
             if tile_object.type == "fruit tree":
                 CollectingSprite(self.game,tile_object.name,object_center.x,object_center.y,"hp",tile_object.strength,tile_object.no,12,20)
             if tile_object.name == "barrel":
-                Treasure_Object(self.game,object_center.x,object_center.y,barrel_img,22,
+                Treasure_Object(self.game,tile_object.name, object_center.x,object_center.y,barrel_img,22,
                                 tile_object.item,tile_object.maxcost,20,20)
             if tile_object.name == "gold":
                 Gold_to_take(self.game,object_center.x,object_center.y,tile_object.gold)

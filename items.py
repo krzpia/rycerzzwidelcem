@@ -64,7 +64,7 @@ class ItemGenerator:
                                                      25, False,3, 625,"small",
                                                      0, 0, 0, 0, 0, 0,55,63,46,52,89))
         self.weapons.append(sprites.Weapon(self.game, "Wooden Spear", "weapon","spear",
-                                           30, False, 4, 900, "big",
+                                           30, False, 5, 900, "big",
                                            0, 0, 0, 0, 0, 0,30, 27, 47, 56, 89))
         self.weapons.append(sprites.Weapon(self.game, "Wood Axe", "weapon","axe",
                                            35, False, 6, 750, "medium",
@@ -76,7 +76,7 @@ class ItemGenerator:
                                            35, False, 5, 900, "big",
                                            0, 0, 0, 0, 0, 0,50, 43, 47, 7, 89))
         self.weapons.append(sprites.Weapon(self.game, "Scythe", "weapon","spear",
-                                           40, False, 8, 1000, "big",
+                                           40, False, 7, 1000, "big",
                                            0, 0, 0, 0, 0, 0,40, 14, 47, 46, 89))
         self.weapons.append(sprites.Weapon(self.game, "Steel Dagger", "weapon","dagger",
                                            45, False, 3, 500, "small",
@@ -439,5 +439,17 @@ class ItemGenerator:
                 return copy.copy(i)
         print ("e NO ITEM of NAME: " + name)
         return False
+
+    def load_item_by_name(self, name, condition = False):
+        if name[:3] == "Key":
+            print("found a key")
+            new_item = self.g_key(name, condition)
+            return new_item
+        for i in self.all_item_and_quest_items:
+            if i.name == name:
+                new_item = copy.copy(i)
+                if isinstance(new_item, sprites.Armor) or isinstance(new_item, sprites.Weapon):
+                    new_item.set_condition(condition)
+        return new_item
 
 

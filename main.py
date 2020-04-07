@@ -1,11 +1,13 @@
 from sprites import *
 import sys
+import pickle
 from ui import *
 from settings import *
 import tilemap
 from os import path
 from data import *
 import levels
+from items import ItemGenerator
 from events.events_manager import EventManager
 
 
@@ -26,8 +28,6 @@ class Level:
         self.arrows = pygame.sprite.LayeredUpdates()
         ### Sprite ataku wręcz
         self.melle_swing = pygame.sprite.LayeredUpdates()
-        ### PRZEDMIOTY NA UI
-        self.items = pygame.sprite.LayeredUpdates()
         ### PRZEDMIOTY NA MAPIE DO PODNIESIENIA
         self.items_to_pick = pygame.sprite.LayeredUpdates()
         ### COLLECTING_SPRITES:
@@ -40,8 +40,6 @@ class Level:
         self.doors = pygame.sprite.LayeredUpdates()
         ### SKRZYNIE
         self.chest_to_open = pygame.sprite.LayeredUpdates()
-        ### CHYBA NIC..
-        self.active_items = pygame.sprite.LayeredUpdates()
         ### TELEPORTS
         self.teleports = pygame.sprite.LayeredUpdates()
         ### SHOPS
@@ -117,14 +115,16 @@ class Game:
         self.incr_diff_button = RadioButton(rad_add_img,rad_add_h_img,INCR_DIF_BUT[0],INCR_DIF_BUT[1])
         self.decr_diff_button = RadioButton(rad_subs_img, rad_subs_h_img, DECR_DIF_BUT[0], DECR_DIF_BUT[1])
         self.new_game_button = Button(intro_but_img, intro_but_h_img, 128, 32, "New Game", SCREEN_WIDTH / 2 - 64, 370)
+        self.load_game_button = Button(intro_but_img,intro_but_h_img,128,32,"Load Game",
+                                       SCREEN_WIDTH/2 - 64,320)
         self.quit_game_button = Button(intro_but_img, intro_but_h_img, 128, 32, "Quit", SCREEN_WIDTH / 2 - 64, 420)
         self.start_game_button = Button(intro_but_img, intro_but_h_img, 150, 32, "Start Game", SCREEN_WIDTH / 2 - 64,650)
         self.knight_class_button = Button(intro_but_img, intro_but_h_img, 128, 32, "Knight", 170, 365)
         self.wizard_class_button = Button(intro_but_img, intro_but_h_img, 128, 32, "Wizard", 170, 415)
         self.thief_class_button = Button(intro_but_img, intro_but_h_img, 128, 32, "Thief", 170, 465)
         self.intro_buttons = [self.new_game_button, self.quit_game_button]
-        self.class_buttons = [self.knight_class_button, self.wizard_class_button, self.thief_class_button,
-                              self.start_game_button]
+        self.class_buttons = [self.knight_class_button, self.wizard_class_button,
+                              self.thief_class_button, self.start_game_button]
 
         while self.intro_screen:
             self.dt = self.clock.tick(FPS) / 1000
@@ -160,6 +160,8 @@ class Game:
                         self.class_selected = self.thief_class
                     if self.quit_game_button.check_if_clicked(mouse_pos):
                         self.quit()
+                    if self.load_game_button.check_if_clicked(mouse_pos):
+                        self.load_game()
                     if self.incr_diff_button.check_if_clicked(mouse_pos):
                         a = self.dif_list.index(self.difficulty)
                         if a < 4:
@@ -282,12 +284,149 @@ class Game:
             self.write(self.credits_text4,(200,660), PURPLE)
             self.write(self.credits_text5, (200, 680), PURPLE)
             self.new_game_button.show_button(self.screen, font20)
+            self.load_game_button.show_button(self.screen, font20)
             self.quit_game_button.show_button(self.screen, font20)
         self.write(str(self.clock.get_fps()), (0, 0))
         #### FLIP
         pygame.display.flip()
 
-    def new(self, class_selected, difficulty):
+    #def load(self, file):
+    #   pass
+
+    def save_game(self):
+        print ("saving...")
+        saveGame = open('savegame.txt', 'wb')
+        print ("looking for act_lvl...")
+        for key in self.levels:
+            if self.levels[key] == self.act_lvl:
+                act_level_name = key
+        print ("looking for spells in spellbook:")
+        spell_name_list = []
+        for spell in self.player.spell_book.spells:
+            spell_name_list.append(spell.name)
+        print ("looking for quests in questbook:")
+        quest_name_list = []
+        for quest in self.player.quest_book.quests:
+            quest_name_list.append(quest.name)
+        print ("packing player_data...")
+        player_data = {'char_name': self.player.char_name,
+                       'name': self.player.name,
+                       'act_lvl_name': act_level_name,
+                       'x': self.player.pos.x,
+                       'y': self.player.pos.y,
+                       'pos_x': int(self.player.pos.x / TILE_SIZE),
+                       'pos_y': int(self.player.pos.y / TILE_SIZE),
+                       'act_hp':self.player.act_hp,
+                       'act_mana':self.player.act_mana,
+                       'gold': self.player.gold,
+                       'level': self.player.level,
+                       'attribute_points': self.player.attribute_points,
+                       'xp': self.player.xp,
+                       'arrows': self.player.arrows,
+                       'base_str':self.player.base_strength,
+                       'base_sta':self.player.base_stamina,
+                       'base_int':self.player.base_intellect,
+                       'base_wis':self.player.base_wisdom,
+                       'base_spe':self.player.base_speed,
+                       'base_ste':self.player.base_stealth,
+                       'inventory_namecond_list' : self.player.inventory.return_item_namecond_list(),
+                       'active_slots_item_namecond_list': self.player.return_active_slots_item_namecond_list(),
+                       'spell_list':spell_name_list,
+                       'quest_list':quest_name_list}
+        print ("packing levels_data...")
+        levels_data = {}
+        for level_name in self.levels:
+            levels_data[level_name] = self.levelgen.save_objects(self.levels[level_name])
+        saveValues = (self.difficulty, self.events_manager, player_data, levels_data)
+        pickle.dump(saveValues, saveGame)
+        saveGame.close()
+
+    def load_game(self):
+        print("load")
+        with open('savegame.txt', 'rb') as f:
+            loadValues = pickle.load(f)
+        difficulty = loadValues[0]
+        events_manager = loadValues[1]
+        player_data = loadValues[2]
+        levels_data = loadValues[3]
+        print("--LOAD OBJECTS--")
+        print("----------------")
+        print(levels_data)
+        print("----------------")
+        print("---LOAD PLAYER--")
+        print(difficulty)
+        print(events_manager.history())
+        print(player_data['char_name'])
+        print(player_data['name'])
+        pos = vec(player_data['x'],player_data['y'])
+        print(pos)
+        for item in player_data['inventory_namecond_list']:
+            print (item[0])
+        for item in player_data['active_slots_item_namecond_list']:
+            print (item[0])
+        print (player_data['quest_list'])
+        self.player_data = player_data
+        self.loaded_events_manager = events_manager
+        self.saved_levels_data = levels_data
+        if self.player_data['char_name'] == "Knight":
+            self.new(self.knight_class,difficulty,True)
+        if self.player_data['char_name'] == "Wizard":
+            self.new(self.wizard_class,difficulty,True)
+        if self.player_data['char_name'] == "Thief":
+            self.new(self.thief_class,difficulty,True)
+
+    def load_inventory_from_namecond_list(self, nc_list):
+        ## TO UNPACK ITEMS FOR PLAYER INVENTORY
+        self.itemgen = ItemGenerator(self, tileset_image,full_tileset_image)
+        for tuple in nc_list:
+            #if tuple[1]:
+            item = self.itemgen.load_item_by_name(tuple[0], tuple[1])
+            self.player.inventory.put_in_first_free_slot(item)
+            #else:
+            #item = self.itemgen.load_item_by_name(tuple[0], tuple[1])
+            #self.player.inventory.put_in_first_free_slot(item)
+
+    def new_player(self, name, class_selected):
+        print("CREATING PLAYER...")
+        self.name = name
+        self.player = Player(self, name, class_selected)
+
+    def load_player(self, player_data, class_selected):
+        ### TWORZE PLAYERA
+        self.player = Player(self, player_data['name'], class_selected)
+        ### POZYCJA
+        self.player.put_in_pos(player_data['pos_x'],player_data['pos_y'])
+        ### INVENTARZ
+        self.player.inventory.remove_all()
+        self.load_inventory_from_namecond_list(player_data['inventory_namecond_list'])
+        self.player.load_active_slots_from_item_namecond_list(player_data['active_slots_item_namecond_list'],self.itemgen)
+        ### ZASOBY i SKILLe
+        self.player.act_mana = player_data['act_mana']
+        self.player.act_hp = player_data['act_hp']
+        self.player.gold = player_data['gold']
+        self.player.arrows = player_data['arrows']
+        self.player.xp = player_data['xp']
+        self.player.attribute_points = player_data['attribute_points']
+        self.player.level = player_data['level']
+        self.player.xp_step = 10 * self.player.level + ((self.player.level - 1) * 2 * self.player.level)
+        self.player.base_strength = player_data['base_str']
+        self.player.base_stamina = player_data['base_sta']
+        self.player.base_intellect = player_data['base_int']
+        self.player.base_wisdom = player_data['base_wis']
+        self.player.base_stealth = player_data['base_ste']
+        self.player.base_speed = player_data['base_spe']
+        #### CZARY
+        spell_list = player_data['spell_list']
+        for spell in spell_list:
+            self.player.spell_book.add_spell_by_name(spell)
+        #### QUESTY
+        quest_list = player_data['quest_list']
+        self.player.quest_book.load_quests_by_name_list(quest_list)
+        ### UPDATING STATS!
+        self.player.update_stats()
+        self.update_game_enviroment()
+
+    def new(self, class_selected, difficulty, loaded = False):
         #### LOADING LEVELS ####
         self.difficulty = difficulty
         print("LOADING LEVELS...")
@@ -332,10 +471,15 @@ class Game:
         #####################
         ### CREATE PLAYER ###
         #####################
-        print ("CREATING PLAYER...")
-        self.player = Player(self, "Kris", class_selected)
+        if not loaded:
+            self.new_player("Kris", class_selected)
+        else:
+            self.load_player(self.player_data, class_selected)
         ### CREATE EVENTS MANAGER
-        self.events_manager = EventManager()
+        if not loaded:
+            self.events_manager = EventManager()
+        else:
+            self.events_manager = self.loaded_events_manager
         print ("INITIALIZING USER INTERFACE...")
         ### DIALOG BOX
         self.dialog_box = DialogBox(self)
@@ -347,7 +491,8 @@ class Game:
                                           INV_POS[0] + 140, INV_POS[1] + 80)
         self.inv_open_door_button = RadioButton(rad_open_img, rad_open_h_img,
                                                 INV_POS[0] + 120, INV_POS[1] + 20)
-        self.pause_button = RadioButton(rad_pause_img, rad_pause_h_img, INV_POS[0]+200, 690)
+        self.pause_button = RadioButton(rad_pause_img, rad_pause_h_img, INV_POS[0]+200, 680)
+        self.save_button = RadioButton(rad_but_img,rad_but_h_img,INV_POS[0]+280, 740)
         self.spell_book_button = RadioButton(sbb_img, sbb_h_img, INV_POS[0], 680)
         self.quest_book_button = RadioButton(qbb_img,qbb_h_img,INV_POS[0]+100, 680)
         self.cast_button = RadioButton(rad_cast_img, rad_cast_h_img, MAP_WIDTH / 2 - 72, MAP_HEIGHT - 96)
@@ -368,19 +513,31 @@ class Game:
         self.all_buttons = [self.inv_use_button, self.inv_open_door_button,
                             self.str_ad_button, self.sta_ad_button, self.int_ad_button,
                             self.wis_ad_button, self.spe_ad_button, self.ste_ad_button,
-                            self.spell_book_button, self.pause_button, self.cast_button,
-                            self.quest_book_button]
+                            self.spell_book_button, self.pause_button,
+                            self.cast_button, self.quest_book_button]
         self.att_buttons = [self.str_ad_button, self.sta_ad_button, self.int_ad_button,
                             self.wis_ad_button, self.spe_ad_button, self.ste_ad_button]
         ####### START LEVEL
         print ("STARTING LEVEL...")
         self.levelgen = levels.LevelGen(self)
-        self.levelgen.load_level_01()
-        self.levelgen.load_level_02()
-        self.levelgen.load_level_03()
-        self.levelgen.load_level_04()
-        self.levelgen.load_level_05()
-        self.levelgen.go_to_level("level01", 2, 2)
+        if not loaded:
+            self.levelgen.load_level_01(False)
+            self.levelgen.load_level_02(False)
+            self.levelgen.load_level_03(False)
+            self.levelgen.load_level_04(False)
+            self.levelgen.load_level_05(False)
+        else:
+            print ("saved level data:")
+            print (self.saved_levels_data["level01"])
+            self.levelgen.load_level_01(self.saved_levels_data['level01'])
+            self.levelgen.load_level_02(self.saved_levels_data['level02'])
+            self.levelgen.load_level_03(self.saved_levels_data['level03'])
+            self.levelgen.load_level_04(self.saved_levels_data['level04'])
+            self.levelgen.load_level_05(self.saved_levels_data['level05'])
+        if not loaded:
+            self.levelgen.go_to_level("level01", 2, 2)
+        else:
+            self.levelgen.go_to_level(self.player_data["act_lvl_name"], self.player_data["pos_x"], self.player_data["pos_y"])
         print ("INITIALIZING CAMERA...")
         ##### CAMERA INIT
         self.camera = tilemap.Camera(self.map.width, self.map.height)
@@ -739,6 +896,8 @@ class Game:
                                 self.back_to_game_and_unpause()
                             else:
                                 self.paused = True
+                        if self.save_button.check_if_clicked(mouse_pos):
+                            self.save_game()
                     ### PRZYCISK QUEST BOOK
                     if not self.dialog_in_progress or not self.ph_shop:
                         if self.quest_book_button.check_if_highlight(mouse_pos):
@@ -947,6 +1106,7 @@ class Game:
             self.pause_button.deactivate()
 
     def update_game_enviroment(self):
+        ### REMOVING rem_objects
         for rem_obj in self.rem_objects:
             if rem_obj.check_remove_condition():
                 #print ("Removing sprite")
@@ -1451,6 +1611,7 @@ class Game:
         self.draw_stats()
         self.draw_info()
         self.pause_button.show_button(self.screen)
+        self.save_button.show_button(self.screen)
         self.spell_book_button.show_button(self.screen)
         self.quest_book_button.show_button(self.screen)
         self.write(str(int(self.clock.get_fps())), (0, 0))

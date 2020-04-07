@@ -54,6 +54,16 @@ class QuestGenerator:
             if quest.name == name:
                 return quest
 
+    def return_quest_list_by_name_list(self, name_list):
+        quest_list = []
+        for quest_name in name_list:
+            for quest in self.quests:
+                if quest_name == quest.name:
+                    quest_list.append(quest)
+                    name_list.remove(quest_name)
+                    break
+        return quest_list
+
 class NpcGenerator:
     def __init__(self, game,tileset1, tileset2):
         self.game = game
