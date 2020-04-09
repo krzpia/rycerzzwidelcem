@@ -55,17 +55,20 @@ class QuestGenerator:
                 return quest
 
     def return_quest_list_by_name_list(self, name_list):
+        print ("QUEST GENERATOR RE-GAINING QUESTS:")
         quest_list = []
+        print ("QUEST LIST")
+        print (name_list)
         for quest_name in name_list:
             for quest in self.quests:
                 if quest_name == quest.name:
                     quest_list.append(quest)
-                    name_list.remove(quest_name)
-                    break
+        print (quest_list)
         return quest_list
 
 class NpcGenerator:
     def __init__(self, game,tileset1, tileset2):
+        print ("initializing NPC GENERATOR")
         self.game = game
         self.tileset = tileset1
         self.f_set = tileset2
@@ -88,6 +91,8 @@ class NpcGenerator:
         if name == "Gold Crusader":
             gold_crusader = sprites.Npc(self.game,name,x,y,image)
             gold_crusader.dialog_data.load_from_dict(self.gold_crusader_csv,self.quest_gen)
+            print ("Gold Crusader generated at:")
+
             return gold_crusader
 
         if name == "Blue Gnom":
@@ -135,6 +140,7 @@ class NpcGenerator:
             eveandro_the_druid.dialog_data.thread_block_with_event("intro eveandro",['got quest Open the Gates'])
             eveandro_the_druid.dialog_data.thread_block_with_event("quest Open the Gates", ['quest Speak with the King has been completed'])
             eveandro_the_druid.dialog_data.thread_unblock_with_event("cure",['quest Speak with the King has been completed'])
+            print("Eveandro generated at:")
             return eveandro_the_druid
 
         if name == "King Sancho":

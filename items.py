@@ -287,9 +287,10 @@ class ItemGenerator:
         self.potions.append(sprites.Potion(self.game, "Small Blue Potion", "Mana", 5, 15, 23, 42))
 
         #### ARROWS
-        self.arrows.append(sprites.Arrow_Item(self.game,"Arrows",5,5))
-        self.arrows.append(sprites.Arrow_Item(self.game,"Arrows",10,10))
-        self.arrows.append(sprites.Arrow_Item(self.game,"Arrows",25,25))
+        self.arrows.append(sprites.Arrow_Item(self.game,"Arrows",5))
+        self.arrows.append(sprites.Arrow_Item(self.game,"Arrows",10))
+        self.arrows.append(sprites.Arrow_Item(self.game,"Arrows",25))
+        self.arrows.append(sprites.Arrow_Item(self.game,"Arrows",50))
 
         #### BOOKS ######
         self.books.append(sprites.Book(self.game,"Firebolt",100,2,40,39))
@@ -406,6 +407,9 @@ class ItemGenerator:
             return copy.copy(random.choice(temp_list))
 
     def generate_item_by_name(self, name):
+        if name == "random":
+            item = self.generate_random_item("all")
+            return copy.copy(item)
         for i in self.all_item_and_quest_items:
             if i.name == name:
                 return copy.copy(i)
@@ -443,6 +447,7 @@ class ItemGenerator:
     def load_item_by_name(self, name, condition = False):
         if name[:3] == "Key":
             print("found a key")
+            ## KLUCz condition to bedzie zmienna key... (wiem, ze zle nie powinienem podstawiac zmiennych)
             new_item = self.g_key(name, condition)
             return new_item
         for i in self.all_item_and_quest_items:

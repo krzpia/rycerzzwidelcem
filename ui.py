@@ -1246,7 +1246,7 @@ class ShopDialogBox:
         self.clear()
         self.game.paused = True
         self.shop = shop
-        self.game.put_txt(f'Entering {self.shop.shop_name}')
+        self.game.put_txt(f'You are in {self.shop.shop_name}')
         self.game.ph_shop = True
         self.game.update_ui_buttons()
         print("START SPEAKING WITH SHOP OWNER")
@@ -1384,6 +1384,7 @@ class MessageBox:
         self.clear()
         self.game.message_shown = True
         self.game.paused = True
+        print ("akukukuku")
         self.game.update_ui_buttons()
         self.show_title(title)
         self.show_text(text)
@@ -1424,33 +1425,54 @@ class QuestionBox:
         self.mouse_pos = (mouse_x, mouse_y)
         if self.ok_button.check_if_clicked(self.mouse_pos):
             print ("OK CLICKED - Q BOX")
-            self.ok_function()
             self.game.qbox_shown = False
-            self.game.paused = False
+            if self.gobackph:
+                self.game.paused = True
+            else:
+                self.game.paused = False
             self.ok_button.deactivate()
             self.back_button.deactivate()
             self.game.update_ui_buttons()
-            return True
+            self.ok_function()
+
         if self.back_button.check_if_clicked(self.mouse_pos):
             print ("BACK CLICKED QBOX")
             self.game.qbox_shown = False
-            self.game.paused = False
+            if self.gobackph:
+                self.game.paused = True
+            else:
+                self.game.paused = False
             self.ok_button.deactivate()
             self.back_button.deactivate()
             self.game.update_ui_buttons()
-            return False
+
+    def void_function(self):
+        pass
 
     ## MOZNA ZROBIC TYPY PYTAN - narazie 1 o podróż.
     def ask_travel(self, teleport):
         self.image = dialogbox_img_2.copy()
         self.game.paused = True
         self.game.qbox_shown = True
+        self.gobackph = False
         self.ok_button.activate()
         self.back_button.activate()
         self.game.update_ui_buttons()
         self.show_text(f'Are you sure you want to travel to {teleport.name}?')
         self.show_title("Travel")
         self.ok_function = teleport.activate_teleport
+
+    def ask_save_game(self, save_game):
+        self.image = dialogbox_img_2.copy()
+        self.game.paused = True
+        self.game.qbox_shown = True
+        self.gobackph = self.game.ph_shop
+        self.ok_button.activate()
+        self.back_button.activate()
+        self.game.update_ui_buttons()
+        self.show_text(f'Are you sure?')
+        self.show_title("Tavern")
+        self.ok_function = save_game
 
     def show_title(self, text):
         self.game.s_write(text, self.image,DB2_TXT_POS,WHITE)
@@ -1634,7 +1656,6 @@ class DialogBox:
             ### jezeli next level, pauzuje gre po dialogu
             if self.game.player.check_next_level():
                 self.game.paused = True
-
 
     def write_actual_text(self):
         if self.actual_text.ifnpc:
@@ -1944,7 +1965,6 @@ class Quest:
             self.game.player.quest_book.remove(self)
             print("NAGRODA ODEBRANA i QUEST ZAPISANY JAKO WYKONANY")
 
-
     def get_quest(self):
         print("GOT NEW QUEST")
         self.game.put_txt(f'Got quest {self.name}')
@@ -1974,19 +1994,75 @@ class QuestGoal:
 
 
 class ShopGenerator:
-    def __init__(self, game):
+    def __init__(self, game, item_gen):
         self.game = game
+        self.item_gen = item_gen
+        self.level_02_magic_shop = Shop(self.game, "Magic Shop 02", "magic",
+                                        129, 150, "Harold the Alchemist", default_shop_owner_img, self.item_gen)
+        self.level_02_smith_shop = Shop(self.game, "Smith 02", "smith",
+                                        59, 100, "Jendryk the Smith", default_shop_owner_img, self.item_gen)
+        self.level_02_inn = Shop(self.game, "Inn 02", "inn",
+                                 99, 50, "Donald the Innkeeper", default_shop_owner_img, self.item_gen)
+        self.level_05_inn = Shop(self.game, "Inn 05", "inn",
+                                 159,120,"Astrid the Bartender",default_shop_owner_img,self.item_gen)
+        self.shops = {'Magic Shop 02': self.level_02_magic_shop,
+                      'Smith 02': self.level_02_smith_shop,
+                      'Inn 02': self.level_02_inn,
+                      'Inn 05': self.level_05_inn}
 
     def generate_shop_by_name(self, name):
-        self.level_02_magic_shop = Shop(self.game,name,"magic",129,150,"Harold the Alchemist")
-        self.level_02_smith_shop = Shop(self.game,name,"smith",59,100,"Jendryk the Smith")
         if name == "Magic Shop 02":
-            #print("shop on level 02 created")
+            print("shop on level 02 created")
             return self.level_02_magic_shop
         if name == "Smith 02":
-            #print("shop on level 02 created")
+            print("shop on level 02 created")
             return self.level_02_smith_shop
+        if name == "Inn 02":
+            print ("inn on level 02 created")
+            return self.level_02_inn
+        if name == "Inn 05":
+            print ("inn lvl 05 created")
+            return self.level_05_inn
         print ("ERROR IN SHOP GENERATION (name not recognized")
+
+    def load_shops_data(self, shops_data):
+        print("SHOPS_DATA:")
+        print(shops_data)
+        for shop in self.shops:
+            print (f'LOADING SHOP {shop}')
+            print (f'ACCESING TO {self.shops[shop]}')
+            self.shops[shop].set_owner_gold(shops_data[shop]['owner_gold'])
+            if shops_data[shop]['ask1_namecond_list']:
+                print ("Putting items in INV by namecond list - ask1")
+                self.shops[shop].set_ask1_items_by_namecondlist(shops_data[shop]['ask1_namecond_list'])
+            if shops_data[shop]['ask2_namecond_list']:
+                print("Putting items in INV by namecond list - ask2")
+                self.shops[shop].set_ask2_items_by_namecondlist(shops_data[shop]['ask2_namecond_list'])
+            if shops_data[shop]['ask3_namecond_list']:
+                print("Putting items in INV by namecond list - ask3")
+                self.shops[shop].set_ask3_items_by_namecondlist(shops_data[shop]['ask3_namecond_list'])
+            if shops_data[shop]['ask4_namecond_list']:
+                print("Putting items in INV by namecond list - ask4")
+                self.shops[shop].set_ask4_items_by_namecondlist(shops_data[shop]['ask4_namecond_list'])
+
+    def save_shops_data(self):
+        self.saved_shops_dic = {}
+        for shop in self.shops:
+            print(f'SAVING SHOP {shop}')
+            print(f'GETTING INFO FROM {self.shops[shop]}')
+            owner_gold = self.shops[shop].owner_gold
+            ask1_namecond_list = self.shops[shop].shop_ask1.return_inventory_namecond_list()
+            ask2_namecond_list = self.shops[shop].shop_ask2.return_inventory_namecond_list()
+            ask3_namecond_list = self.shops[shop].shop_ask3.return_inventory_namecond_list()
+            ask4_namecond_list = self.shops[shop].shop_ask4.return_inventory_namecond_list()
+            self.saved_shops_dic[shop] = {'owner_gold':owner_gold,
+                                          'ask1_namecond_list':ask1_namecond_list,
+                                          'ask2_namecond_list':ask2_namecond_list,
+                                          'ask3_namecond_list':ask3_namecond_list,
+                                          'ask4_namecond_list':ask4_namecond_list,
+                                          }
+        print(self.saved_shops_dic)
+        return self.saved_shops_dic
 
 
 class ShopAsk:
@@ -2008,11 +2084,21 @@ class ShopAsk:
     def configure_activity(self, activity):
         self.activity = activity
 
+    def return_inventory_namecond_list(self):
+        if self.inventory:
+            if isinstance(self.inventory, Inventory):
+                return self.inventory.return_item_namecond_list()
+            else:
+                return False
+        else:
+            return False
+
 
 class Shop:
-    def __init__(self, game, name, shop_type, quality, owner_gold, owner_name, owner_image=default_shop_owner_img):
+    def __init__(self, game, name, shop_type, quality, owner_gold, owner_name, owner_image, item_gen):
         self.game = game
         self.name = name
+        self.item_gen = item_gen
         self.shop_name = name[:-2]
         self.owner_name = owner_name
         self.act_inventory = False
@@ -2031,7 +2117,9 @@ class Shop:
         self.owner_gold = owner_gold
         self.repair_cost = 0
         self.arrow_price = 5
+        self.recover_price = 2
         self.arrow_pack = 10
+        self.rest_price = 10
         self.open = True
         self.welcome_text = "Welcome adventurer!"
         if self.shop_type == "magic":
@@ -2064,6 +2152,15 @@ class Shop:
             self.shop_ask3.put_repair_inv()
             self.shop_ask4.put_text("I`d like to buy some arrows (10 arrows for 5 gold)")
             self.shop_ask4.configure_activity("arrows")
+        elif self.shop_type == "inn":
+            self.shop_ask1.put_text("Have a drink? (Restores HP and MP for 2 gold)")
+            self.shop_ask1.configure_activity("recover")
+            self.shop_ask2.put_text("Something for takeaway?")
+            self.shop_ask2.configure_activity("buy and sell")
+            self.shop_ask2.put_inventory(10,6)
+            self.generate_new_potions(self.shop_ask2.inventory)
+            self.shop_ask3.put_text("Rest (SAVE GAME and restore HP for 10 gold")
+            self.shop_ask3.configure_activity("rest")
         else:
             self.shop_ask1.put_text("Wish you trade?")
             self.shop_ask1.configure_activity("buy and sell")
@@ -2073,10 +2170,130 @@ class Shop:
         self.local_ph_repair = False
         self.local_ph_charge_wands = False
         self.local_ph_arrows = False
+        self.local_ph_rest = False
+        self.local_ph_restore = False
         #### EXIT BUTTON
         self.exit_button = RadioButton(rad_back_img, rad_back_h_img, 178,290)
         self.repair_button = RadioButton(repb_img, repb_h_img,345,145)
         ##########
+        self.subscribe_owner_to_all_items()
+
+    def generate_new_items(self,item_type,inventory):
+        items_no = 0
+        items_maxcost = 0
+        if 0 < self.quality <= 100:
+            items_no = random.randint(5, 10)
+            items_maxcost = self.quality
+        elif 100 < self.quality:
+            items_no = random.randint(5, 25)
+            items_maxcost = self.quality
+        else:
+            print("ERROR 0 or neg number of items in shop while generating shop items")
+        if items_no > 0:
+            for i in range(items_no):
+                inventory.put_in_first_free_slot(
+                    self.item_gen.generate_random_item(item_type,items_maxcost))
+
+    def generate_new_smith_items(self,inventory):
+        items_no = 0
+        items_maxcost = 0
+        if 0 < self.quality <= 100:
+            items_no = random.randint(8, 16)
+            items_maxcost = self.quality
+        elif 100 < self.quality:
+            items_no = random.randint(10, 25)
+            items_maxcost = self.quality
+        else:
+            print("ERROR 0 or neg number of items in shop while generating shop items")
+        if items_no > 0:
+            for i in range(items_no):
+                inventory.put_in_first_free_slot(
+                    self.item_gen.generate_random_item("smith",items_maxcost))
+
+    def generate_new_books(self,inventory):
+        items_no = 0
+        items_maxcost = 0
+        if 0 < self.quality <= 100:
+            items_no = random.randint(1, 3)
+            items_maxcost = self.quality + 200
+        elif 100 < self.quality:
+            items_no = random.randint(2, 6)
+            items_maxcost = self.quality + 400
+        else:
+            print("ERROR 0 or neg number of items in shop while generating shop items")
+        ## TODO wiecej eliksirow mniej innych, sie zobaczy jak wyskakują
+        if items_no > 0:
+            for i in range(items_no):
+                inventory.put_in_first_free_slot(
+                    self.item_gen.generate_random_item("book", items_maxcost))
+
+    def generate_new_potions(self,inventory):
+        items_no = 0
+        items_maxcost = 0
+        if 0 < self.quality <= 100:
+            items_no = random.randint(5, 15)
+            items_maxcost = self.quality
+        elif 100 < self.quality:
+            items_no = random.randint(10, 25)
+            items_maxcost = self.quality
+        else:
+            print("ERROR 0 or neg number of items in shop while generating shop items")
+        ## TODO wiecej eliksirow mniej innych, sie zobaczy jak wyskakują
+        if items_no > 0:
+            for i in range(items_no):
+                inventory.put_in_first_free_slot(
+                    self.item_gen.generate_random_item("potion",items_maxcost))
+
+    def generate_new_magic_items(self,inventory):
+        items_no = 0
+        items_maxcost = 0
+        if 0 < self.quality <= 100:
+            items_no = random.randint(2, 5)
+            items_maxcost = self.quality
+        elif 100 < self.quality:
+            items_no = random.randint(4, 10)
+            items_maxcost = self.quality
+        else:
+            print("ERROR 0 or neg number of items in shop while generating shop items")
+        ## TODO wiecej eliksirow mniej innych, sie zobaczy jak wyskakują
+        if items_no > 0:
+            for i in range(items_no):
+                inventory.put_in_first_free_slot(
+                    self.item_gen.generate_random_item("rings",items_maxcost))
+
+    def set_owner_gold(self, owner_gold):
+        self.owner_gold = owner_gold
+
+    def set_ask1_items_by_namecondlist(self, namecond_list):
+        if self.shop_ask1.activity == "buy and sell":
+            self.shop_ask1.inventory.remove_all()
+            for tuple in namecond_list:
+                item = self.item_gen.load_item_by_name(tuple[0], tuple[1])
+                self.shop_ask1.inventory.put_in_first_free_slot(item)
+        self.subscribe_owner_to_all_items()
+
+    def set_ask2_items_by_namecondlist(self, namecond_list):
+        if self.shop_ask2.activity == "buy and sell":
+            self.shop_ask2.inventory.remove_all()
+            for tuple in namecond_list:
+                item = self.item_gen.load_item_by_name(tuple[0], tuple[1])
+                self.shop_ask2.inventory.put_in_first_free_slot(item)
+        self.subscribe_owner_to_all_items()
+
+    def set_ask3_items_by_namecondlist(self, namecond_list):
+        if self.shop_ask3.activity == "buy and sell":
+            self.shop_ask3.inventory.remove_all()
+            for tuple in namecond_list:
+                item = self.item_gen.load_item_by_name(tuple[0], tuple[1])
+                self.shop_ask3.inventory.put_in_first_free_slot(item)
+        self.subscribe_owner_to_all_items()
+
+    def set_ask4_items_by_namecondlist(self, namecond_list):
+        if self.shop_ask4.activity == "buy and sell":
+            self.shop_ask4.inventory.remove_all()
+            for tuple in namecond_list:
+                item = self.item_gen.load_item_by_name(tuple[0], tuple[1])
+                self.shop_ask4.inventory.put_in_first_free_slot(item)
         self.subscribe_owner_to_all_items()
 
     def set_owner_attitude(self, attitude):
@@ -2151,6 +2368,10 @@ class Shop:
         elif ask.activity == "arrows":
             ## FOR KNOW NO SPECIAL PHASE< DIRECT pack to buy wih price. arrows unlimited.
             self.buy_arrows()
+        elif ask.activity == "rest":
+            self.rest()
+        elif ask.activity == "recover":
+            self.recover()
         else:
             print ("ERROR couldnt encode ask1 activity")
 
@@ -2162,6 +2383,38 @@ class Shop:
         else:
             pygame.mixer.Sound.play(empty_spell_snd)
         self.back_to_shop_dialog()
+
+    def recover(self):
+        if self.game.player.gold >= self.recover_price:
+            self.game.player.gold -= self.recover_price
+            self.game.player.hp = self.game.player.max_hp
+            self.game.player.mana = self.game.player.max_mana
+            pygame.mixer.Sound.play(drink_snd)
+        else:
+            pygame.mixer.Sound.play(empty_spell_snd)
+        self.back_to_shop_dialog()
+
+    def rest(self):
+        if self.game.player.gold >= self.rest_price:
+            if not self.game.item_picked:
+                self.game.q_box.ask_save_game(self.tavern_save_game)
+            else:
+                pygame.mixer.Sound.play(empty_spell_snd)
+                self.game.put_txt("Please remove your item to inventory before saving game")
+        else:
+            pygame.mixer.Sound.play(empty_spell_snd)
+            self.game.put_txt("Not enough gold")
+        self.game.paused = True
+        self.back_to_shop_dialog()
+
+    def tavern_save_game(self):
+        print("Tavern save game funccion")
+        self.game.player.gold -= self.rest_price
+        pygame.mixer.Sound.play(coin_snd)
+        self.game.save_game()
+        self.game.ph_shop = False
+        self.game.paused = True
+        self.game.message_box.show_message("Tavern","Game Saved. You wake up next morning..")
 
     def activate_repair(self, inventory):
         self.act_inventory = inventory
@@ -2180,89 +2433,6 @@ class Shop:
         self.blit_upper_part()
         self.exit_button.activate()
         self.repair_button.deactivate()
-
-    def generate_new_items(self,item_type,inventory):
-        items_no = 0
-        items_maxcost = 0
-        if 0 < self.quality <= 100:
-            items_no = random.randint(5, 10)
-            items_maxcost = self.quality
-        elif 100 < self.quality:
-            items_no = random.randint(5, 25)
-            items_maxcost = self.quality
-        else:
-            print("ERROR 0 or neg number of items in shop while generating shop items")
-        if items_no > 0:
-            for i in range(items_no):
-                inventory.put_in_first_free_slot(
-                    self.game.levelgen.gen.generate_random_item(item_type,items_maxcost))
-
-    def generate_new_smith_items(self,inventory):
-        items_no = 0
-        items_maxcost = 0
-        if 0 < self.quality <= 100:
-            items_no = random.randint(8, 16)
-            items_maxcost = self.quality
-        elif 100 < self.quality:
-            items_no = random.randint(10, 25)
-            items_maxcost = self.quality
-        else:
-            print("ERROR 0 or neg number of items in shop while generating shop items")
-        if items_no > 0:
-            for i in range(items_no):
-                inventory.put_in_first_free_slot(
-                    self.game.levelgen.gen.generate_random_item("smith",items_maxcost))
-
-    def generate_new_books(self,inventory):
-        items_no = 0
-        items_maxcost = 0
-        if 0 < self.quality <= 100:
-            items_no = random.randint(1, 3)
-            items_maxcost = self.quality + 200
-        elif 100 < self.quality:
-            items_no = random.randint(2, 6)
-            items_maxcost = self.quality + 400
-        else:
-            print("ERROR 0 or neg number of items in shop while generating shop items")
-        ## TODO wiecej eliksirow mniej innych, sie zobaczy jak wyskakują
-        if items_no > 0:
-            for i in range(items_no):
-                inventory.put_in_first_free_slot(
-                    self.game.levelgen.gen.generate_random_item("book", items_maxcost))
-
-    def generate_new_potions(self,inventory):
-        items_no = 0
-        items_maxcost = 0
-        if 0 < self.quality <= 100:
-            items_no = random.randint(5, 15)
-            items_maxcost = self.quality
-        elif 100 < self.quality:
-            items_no = random.randint(10, 25)
-            items_maxcost = self.quality
-        else:
-            print("ERROR 0 or neg number of items in shop while generating shop items")
-        ## TODO wiecej eliksirow mniej innych, sie zobaczy jak wyskakują
-        if items_no > 0:
-            for i in range(items_no):
-                inventory.put_in_first_free_slot(
-                    self.game.levelgen.gen.generate_random_item("potion",items_maxcost))
-
-    def generate_new_magic_items(self,inventory):
-        items_no = 0
-        items_maxcost = 0
-        if 0 < self.quality <= 100:
-            items_no = random.randint(2, 5)
-            items_maxcost = self.quality
-        elif 100 < self.quality:
-            items_no = random.randint(4, 10)
-            items_maxcost = self.quality
-        else:
-            print("ERROR 0 or neg number of items in shop while generating shop items")
-        ## TODO wiecej eliksirow mniej innych, sie zobaczy jak wyskakują
-        if items_no > 0:
-            for i in range(items_no):
-                inventory.put_in_first_free_slot(
-                    self.game.levelgen.gen.generate_random_item("rings",items_maxcost))
 
     def clear_image(self):
         self.image = dialogbox_img_2.copy()
@@ -2425,6 +2595,7 @@ class Shop:
             print ("NO ITEM ON REPAIR SLOT")
 
     def exit_shop(self):
+        print ("Exit SHOP function")
         self.local_ph_deactivate()
         self.clear_image()
         self.repair_button.deactivate()
@@ -2435,6 +2606,7 @@ class Shop:
         self.game.back_to_game_and_unpause()
 
     def back_to_shop_dialog(self):
+        print ("Back to shop dialog function")
         self.local_ph_deactivate()
         self.clear_image()
         self.repair_button.deactivate()

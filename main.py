@@ -333,11 +333,15 @@ class Game:
                        'active_slots_item_namecond_list': self.player.return_active_slots_item_namecond_list(),
                        'spell_list':spell_name_list,
                        'quest_list':quest_name_list}
+        print (player_data)
+        print ("-------------------------------")
         print ("packing levels_data...")
         levels_data = {}
         for level_name in self.levels:
             levels_data[level_name] = self.levelgen.save_objects(self.levels[level_name])
-        saveValues = (self.difficulty, self.events_manager, player_data, levels_data)
+        print ("packing shops data...")
+        shops_data = self.levelgen.shop_gen.save_shops_data()
+        saveValues = (self.difficulty, self.events_manager, player_data, levels_data, shops_data)
         pickle.dump(saveValues, saveGame)
         saveGame.close()
 
@@ -349,6 +353,7 @@ class Game:
         events_manager = loadValues[1]
         player_data = loadValues[2]
         levels_data = loadValues[3]
+        shops_data = loadValues[4]
         print("--LOAD OBJECTS--")
         print("----------------")
         print(levels_data)
@@ -365,15 +370,19 @@ class Game:
         for item in player_data['active_slots_item_namecond_list']:
             print (item[0])
         print (player_data['quest_list'])
+        self.shops_data = shops_data
         self.player_data = player_data
         self.loaded_events_manager = events_manager
         self.saved_levels_data = levels_data
+        print("LOAD DATA DESARIALISED")
+        print("STARTING GAME with LOADED")
         if self.player_data['char_name'] == "Knight":
             self.new(self.knight_class,difficulty,True)
         if self.player_data['char_name'] == "Wizard":
             self.new(self.wizard_class,difficulty,True)
         if self.player_data['char_name'] == "Thief":
             self.new(self.thief_class,difficulty,True)
+
 
     def load_inventory_from_namecond_list(self, nc_list):
         ## TO UNPACK ITEMS FOR PLAYER INVENTORY
@@ -527,17 +536,22 @@ class Game:
             self.levelgen.load_level_04(False)
             self.levelgen.load_level_05(False)
         else:
-            print ("saved level data:")
-            print (self.saved_levels_data["level01"])
             self.levelgen.load_level_01(self.saved_levels_data['level01'])
             self.levelgen.load_level_02(self.saved_levels_data['level02'])
             self.levelgen.load_level_03(self.saved_levels_data['level03'])
             self.levelgen.load_level_04(self.saved_levels_data['level04'])
             self.levelgen.load_level_05(self.saved_levels_data['level05'])
+            self.levelgen.shop_gen.load_shops_data(self.shops_data)
         if not loaded:
-            self.levelgen.go_to_level("level01", 2, 2)
+            self.levelgen.go_to_level("level02", 25, 7)
         else:
             self.levelgen.go_to_level(self.player_data["act_lvl_name"], self.player_data["pos_x"], self.player_data["pos_y"])
+            ### AKTUALIZUJE wyglad gracza:
+            for slot in self.player.active_slots:
+                if slot.item:
+                    if isinstance(slot.item, Armor) or isinstance(slot.item, Weapon):
+                        self.player_group.add(slot.item)
+            self.player.update_stats()
         print ("INITIALIZING CAMERA...")
         ##### CAMERA INIT
         self.camera = tilemap.Camera(self.map.width, self.map.height)
@@ -801,6 +815,7 @@ class Game:
                     teleport_hits = pygame.sprite.spritecollide(self.player, self.act_lvl.teleports, False)
                     for tele_hit in teleport_hits:
                         self.q_box.ask_travel(tele_hit)
+                        #self.back_to_game_and_unpause()
                     ####### GATHER COLLECT SPRITE
                     sprites_to_collect = pygame.sprite.spritecollide(self.player, self.act_lvl.collecting_sprites,False,collide_double_hit_rect)
                     for sprite in sprites_to_collect:
@@ -1095,6 +1110,25 @@ class Game:
                     # 8. PRZYCISKI QBOX
                     if self.qbox_shown:
                         self.q_box.check_button(mouse_pos)
+
+    def get_act_ph(self):
+        if self.ph_shop:
+            return "ph_shop"
+        elif self.ph_buy_and_sell:
+            return "ph_buy_and_sell"
+        elif self.ph_treasure_inv:
+            return "ph_treasure_inv"
+        elif self.ph_repair:
+            return "ph_repair"
+        elif self.dialog_in_progress:
+            return "dialog_in_progress"
+        elif self.message_shown:
+            return "message_shown"
+        elif self.qbox_shown:
+            return "qbox_shown"
+        else:
+            print("NOT RECOGNIZED GET ACTUAL PHASE")
+            return False
 
     def update_ui_buttons(self):
         self.quest_book_button.activate()

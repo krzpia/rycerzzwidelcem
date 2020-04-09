@@ -77,6 +77,7 @@ class Arrow(pygame.sprite.Sprite):
         self.speed = 400
         self.lifetime = 800
         self.game = game
+        self.name = "Arrow"
         self.pos = vec(pos)
         self.vel = dir * self.speed
         self.image = arrow_img
@@ -457,39 +458,54 @@ class Treasure_Object(pygame.sprite.Sprite):
 
 
 class Treasure_Chest(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, key, locked, treasure_value, special_item,
-                 hit_rect_width, hit_rect_height):
+    def __init__(self, game, x, y, key, locked, closed, treasure_value, special_item,
+                 hit_rect_width, hit_rect_height, item_namecond_list = False):
         self._layer = FLOOR_LAYER
         self.groups = game.act_lvl.all_sprites, game.act_lvl.chest_to_open
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
+        self.closed = closed
+        self.locked = locked
         self.inventory = Inventory(slot_img,8,4)
         self.special_item = special_item
-        if 0 < treasure_value <= 10:
-            self.gold_coins = random.randint(1,treasure_value)
-            self.treasure_items_no = 0
-            self.treasure_items_maxcost = 0
-        elif 10 < treasure_value <= 100:
-            self.gold_coins = random.randint(5,treasure_value)
-            self.treasure_items_no = random.randint(1,3)
-            self.treasure_items_maxcost = treasure_value + 19
-        elif 100 < treasure_value:
-            self.gold_coins = random.randint(20,treasure_value)
-            self.treasure_items_no = random.randint(2,8)
-            self.treasure_items_maxcost = treasure_value
-        self.inventory.put_in_first_free_slot(Gold_Item(self.game,"Gold",self.gold_coins))
-        if self.treasure_items_no > 0:
-            for i in range(self.treasure_items_no):
-                self.inventory.put_in_first_free_slot(
-                    self.game.levelgen.gen.generate_random_item("all",self.treasure_items_maxcost))
+        if treasure_value:
+            if 0 < treasure_value <= 10:
+                self.gold_coins = random.randint(1,treasure_value)
+                self.treasure_items_no = 0
+                self.treasure_items_maxcost = 0
+            elif 10 < treasure_value <= 100:
+                self.gold_coins = random.randint(5,treasure_value)
+                self.treasure_items_no = random.randint(1,3)
+                self.treasure_items_maxcost = treasure_value + 19
+            elif 100 < treasure_value:
+                self.gold_coins = random.randint(20,treasure_value)
+                self.treasure_items_no = random.randint(2,8)
+                self.treasure_items_maxcost = treasure_value
+            self.inventory.put_in_first_free_slot(Gold_Item(self.game,"Gold",self.gold_coins))
+            if self.treasure_items_no > 0:
+                for i in range(self.treasure_items_no):
+                    self.inventory.put_in_first_free_slot(
+                        self.game.levelgen.gen.generate_random_item("all",self.treasure_items_maxcost))
         if special_item:
-            special_item = self.game.levelgen.gen.generate_quest_item_by_name(self.special_item)
+            special_item = self.game.levelgen.gen.generate_item_by_name(self.special_item)
             self.inventory.put_in_first_free_slot(special_item)
-        self.closed = True
-        self.locked = locked
         self.key = key
-        self.image = pygame.Surface((32,32),pygame.HWSURFACE | pygame.SRCALPHA)
-        self.update_img()
+        if self.closed:
+            self.image = treasure_chest_closed.copy()
+        else:
+            self.image = treasure_chest_open.copy()
+        if item_namecond_list:
+            for tuple in item_namecond_list:
+                if tuple[0] == "Gold":
+                    self.inventory.put_in_first_free_slot(Gold_Item(self.game, "Gold", tuple[1]))
+                elif tuple[0] == "Arrows":
+                    self.inventory.put_in_first_free_slot(Arrow_Item(self.game, "Arrows", tuple[1]))
+                elif tuple[0][:3] == "Key":
+                    item = self.game.levelgen.gen.g_key(tuple[0], tuple[1])
+                    self.inventory.put_in_first_free_slot(item)
+                else:
+                    item = self.game.levelgen.gen.load_item_by_name(tuple[0], tuple[1])
+                    self.inventory.put_in_first_free_slot(item)
         self.pos = vec(x, y)
         self.rect = pygame.Rect(0, 0,TILE_SIZE, TILE_SIZE)
         self.rect.center = (x,y)
@@ -513,7 +529,6 @@ class Treasure_Chest(pygame.sprite.Sprite):
                             self.locked = False
                             self.game.player.score_chest_opened += 1
                             self.game.player.inventory.remove_item(item)
-                            item.kill()
                             return True
                         else:
                             self.game.put_txt("WRONG KEY")
@@ -529,12 +544,11 @@ class Treasure_Chest(pygame.sprite.Sprite):
             pygame.mixer.Sound.play(door_open_snd)
             return True
 
-    def unlock_with_key(self, key):
+    def unlock_with_key(self):
         pygame.mixer.Sound.play(door_open_snd)
         self.game.put_txt("Chest unlock success!")
         self.locked = False
         self.game.item_picked = False
-        key.kill()
         return True
 
     def open(self):
@@ -722,12 +736,13 @@ class Gold_Item:
 
 class Arrow_Item:
     ## TYLKO DO TREASURE CHESTÓW / NIE SPRITE!
-    def __init__(self, game, name, number, cost):
+    def __init__(self, game, name, number):
         self.game = game
         self.number = number
         self.image = arrows_icon
         self.name = name
-        self.cost = cost
+        #### TODO zrobic cene strzał oddzielnie?
+        self.cost = number
         self.b_image = self.image
         self.rect = self.b_image.get_rect()
 
@@ -1880,6 +1895,7 @@ class Mob(pygame.sprite.Sprite):
         self.bullet_damage = False
         self.bullet_speed = False
         self.bullet_hitrate = False
+        self.ranged_parameters = ranged_parameters
         if ranged_parameters:
             self.bullet_type = ranged_parameters[0]
             if self.bullet_type == "magic":
@@ -1895,6 +1911,8 @@ class Mob(pygame.sprite.Sprite):
             self.bullet_damage = ranged_parameters[1]
             self.bullet_speed = ranged_parameters[2]
             self.bullet_hitrate = ranged_parameters[3]
+        self.start_x = start_x
+        self.start_y = start_y
         self.pos = vec(start_x,start_y)
         self.s_pos = s_pos
         if s_pos:
@@ -1923,6 +1941,8 @@ class Mob(pygame.sprite.Sprite):
         self.attention = 0
         ### DO WYSWIETLENIA EFEKTU GRAFICZNEGO
         self.damaged = False
+
+
 
     def load_image_from_tileset(self, tileset, x, y):
         self.image.blit(tileset, (0, 0), (x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE))
