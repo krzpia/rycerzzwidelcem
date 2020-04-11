@@ -1,0 +1,13 @@
+Npc;Thread;Branch;Step;Text;Ask1;Ask2;Ask3;Ask4;Next_Thread;Goto_Branch;Goto_Step;Event
+True;welcome;0;0;Hello;False;False;False;False;Next;False;False;False
+True;welcome;1;0;Hello again;False;False;False;False;Next;False;False;False
+True;quest Pedritos Wolf;0;0;Have you seen my dog? I`ve lost him.;I can help you find it>quest Pedritos Wolf>0,1;No, not really>False>0,2;False;False;False;False;False;False
+True;quest Pedritos Wolf;0;1;Thanks! I don`t know what happened to my dog.     I gave him my best meal: Salad, tomato, beans and even soya burger, and he didn`t want to eat.      I think it could be the corona curse that he lost  appetite.;False;False;False;False;Next;False;False;False
+True;quest Pedritos Wolf;0;2;Oh no? I will search him then.;False;False;False;False;Next;False;False;False
+True;quest Pedritos Wolf;1;0;Go, find my dog and tell him to come back to home!;False;False;False;False;Next;False;False;False
+True;quest Pedritos Wolf;2;0;Go, find my dog and tell him to come back to home!;False;False;False;False;Next;False;False;False
+True;quest Pedritos Wolf;3;0;Well, my dog has returned, thanks to you, but he  still doesn`t eat. I think it`s the corona diseasePoor doggy.;False;False;False;False;bye;False;False;False
+True;quest Pedritos Wolf;4;0;Thank you! I`ll prepare him my best vegetable soupat once!. Please take it, it`s for you!;False;False;False;False;bye;False;False;quest Pedritos Wolf has been rewarded
+True;wait dog;0;0;Go, find my dog and tell him to come back to home!;False;False;False;False;Next;False;False;False
+True;bye;0;0;Goodbye!;False;False;False;False;False;False;False;False
+False;bye;0;1;See you next time!;False;False;False;False;False;False;False;False

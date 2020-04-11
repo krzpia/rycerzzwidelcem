@@ -18,6 +18,7 @@ class LevelGen:
         self.quest_gen = QuestGenerator(self.game)
         self.shop_gen = ShopGenerator(self.game, self.gen)
         self.lava_effect = ActiveEffect("fire",e_fire_ico,5,1)
+        self.cactus_effect = ActiveEffect("damage",e_dam_ico,1,1)
         self.slow_effect = ActiveEffect("slow",e_slow_ico,50,1.2)
         self.images_dict = {}
 
@@ -32,6 +33,12 @@ class LevelGen:
             self.load_level_04()
         elif name == "level05":
             self.load_level_05()
+        elif name == "level06":
+            self.load_level_06()
+        elif name == "level07":
+            self.load_level_07()
+        elif name == "level08":
+            self.load_level_08()
         else:
             print ("ERROR DECODIN LEVELGEN LOAD LEVEL by NAME")
 
@@ -42,6 +49,145 @@ class LevelGen:
         self.game.map_image = self.game.map.make_map()
         self.game.map_rect = self.game.map_image.get_rect()
         self.game.player.put_in_pos(pos_x, pos_y)
+
+    def load_level_08(self, saved_data):
+        self.game.act_lvl = self.game.level_08
+        ### ALL SPRITES (BEZ GRACZA!)
+        self.game.level_08.all_sprites = pygame.sprite.LayeredUpdates()
+        ## MURY / tylko odbijanie od obiektu Rect z TMX MAPS
+        self.game.level_08.walls = pygame.sprite.LayeredUpdates()
+        ## PRZESZKODY / odbijaja sie za pomoca hit_rect.
+        self.game.level_08.hr_obstacles = pygame.sprite.LayeredUpdates()
+        ## NIEWIDZIALNE POLE ZABIERAJACE HP
+        self.game.level_08.lavas = pygame.sprite.LayeredUpdates()
+        ## NPCS
+        self.game.level_08.npcs = pygame.sprite.LayeredUpdates()
+        ## PRZECIWNICY
+        self.game.level_08.mobs = pygame.sprite.LayeredUpdates()
+        ## STRZALY PRZECIWNIKOW
+        self.game.level_08.mob_arrows = pygame.sprite.LayeredUpdates()
+        ## STRZALY ranged
+        self.game.level_08.arrows = pygame.sprite.LayeredUpdates()
+        ## Sprite ataku wręcz
+        self.game.level_08.melle_swing = pygame.sprite.LayeredUpdates()
+        ## PRZEDMIOTY NA MAPIE DO PODNIESIENIA
+        self.game.level_08.items_to_pick = pygame.sprite.LayeredUpdates()
+        ## OBIEKTY DO INTERAKCJI (PODNIESIENIA, WYLECZENIA ITP)
+        self.game.level_08.collecting_sprites = pygame.sprite.LayeredUpdates()
+        ## ZLOTE MONETY DO PODNIESIENIA
+        self.game.level_08.gold_to_pick = pygame.sprite.LayeredUpdates()
+        ## STRZALY DO PODNIESIENIA
+        self.game.level_08.arrows_to_pick = pygame.sprite.LayeredUpdates()
+        ## DRZWI
+        self.game.level_08.doors = pygame.sprite.LayeredUpdates()
+        ## SKRZYNIE
+        self.game.level_08.chest_to_open = pygame.sprite.LayeredUpdates()
+        ## TELEPORTS
+        self.game.level_08.teleports = pygame.sprite.LayeredUpdates()
+        ## SHOPS
+        self.game.level_08.shops = pygame.sprite.LayeredUpdates()
+        if not saved_data:
+            ### 1 URUCHOMIENIE:
+            self.load_objects(self.game.map_level_08.tmxdata.objects)
+        else:
+            ### 2. z LOAD GAME
+            print ("MAM DANE, uruchamiam load level from saved data...")
+            self.load_enemy_images(self.game.map_level_08.tmxdata.objects)
+            self.load_object_images(self.game.map_level_08.tmxdata.objects)
+            self.load_objects_from_save_data(self.game.map_level_08.tmxdata.objects, saved_data)
+
+    def load_level_07(self, saved_data):
+        self.game.act_lvl = self.game.level_07
+        ### ALL SPRITES (BEZ GRACZA!)
+        self.game.level_07.all_sprites = pygame.sprite.LayeredUpdates()
+        ## MURY / tylko odbijanie od obiektu Rect z TMX MAPS
+        self.game.level_07.walls = pygame.sprite.LayeredUpdates()
+        ## PRZESZKODY / odbijaja sie za pomoca hit_rect.
+        self.game.level_07.hr_obstacles = pygame.sprite.LayeredUpdates()
+        ## NIEWIDZIALNE POLE ZABIERAJACE HP
+        self.game.level_07.lavas = pygame.sprite.LayeredUpdates()
+        ## NPCS
+        self.game.level_07.npcs = pygame.sprite.LayeredUpdates()
+        ## PRZECIWNICY
+        self.game.level_07.mobs = pygame.sprite.LayeredUpdates()
+        ## STRZALY PRZECIWNIKOW
+        self.game.level_07.mob_arrows = pygame.sprite.LayeredUpdates()
+        ## STRZALY ranged
+        self.game.level_07.arrows = pygame.sprite.LayeredUpdates()
+        ## Sprite ataku wręcz
+        self.game.level_07.melle_swing = pygame.sprite.LayeredUpdates()
+        ## PRZEDMIOTY NA MAPIE DO PODNIESIENIA
+        self.game.level_07.items_to_pick = pygame.sprite.LayeredUpdates()
+        ## OBIEKTY DO INTERAKCJI (PODNIESIENIA, WYLECZENIA ITP)
+        self.game.level_07.collecting_sprites = pygame.sprite.LayeredUpdates()
+        ## ZLOTE MONETY DO PODNIESIENIA
+        self.game.level_07.gold_to_pick = pygame.sprite.LayeredUpdates()
+        ## STRZALY DO PODNIESIENIA
+        self.game.level_07.arrows_to_pick = pygame.sprite.LayeredUpdates()
+        ## DRZWI
+        self.game.level_07.doors = pygame.sprite.LayeredUpdates()
+        ## SKRZYNIE
+        self.game.level_07.chest_to_open = pygame.sprite.LayeredUpdates()
+        ## TELEPORTS
+        self.game.level_07.teleports = pygame.sprite.LayeredUpdates()
+        ## SHOPS
+        self.game.level_07.shops = pygame.sprite.LayeredUpdates()
+        if not saved_data:
+            ### 1 URUCHOMIENIE:
+            self.load_objects(self.game.map_level_07.tmxdata.objects)
+        else:
+            ### 2. z LOAD GAME
+            print ("MAM DANE, uruchamiam load level from saved data...")
+            self.load_enemy_images(self.game.map_level_07.tmxdata.objects)
+            self.load_object_images(self.game.map_level_07.tmxdata.objects)
+            self.load_objects_from_save_data(self.game.map_level_07.tmxdata.objects, saved_data)
+
+    def load_level_06(self, saved_data):
+        print ("LOADING LEVEL 06")
+        self.game.act_lvl = self.game.level_06
+        ### ALL SPRITES (BEZ GRACZA!)
+        self.game.level_06.all_sprites = pygame.sprite.LayeredUpdates()
+        ## MURY / tylko odbijanie od obiektu Rect z TMX MAPS
+        self.game.level_06.walls = pygame.sprite.LayeredUpdates()
+        ## PRZESZKODY / odbijaja sie za pomoca hit_rect.
+        self.game.level_06.hr_obstacles = pygame.sprite.LayeredUpdates()
+        ## NIEWIDZIALNE POLE ZABIERAJACE HP
+        self.game.level_06.lavas = pygame.sprite.LayeredUpdates()
+        ## NPCS
+        self.game.level_06.npcs = pygame.sprite.LayeredUpdates()
+        ## PRZECIWNICY
+        self.game.level_06.mobs = pygame.sprite.LayeredUpdates()
+        ## STRZALY PRZECIWNIKOW
+        self.game.level_06.mob_arrows = pygame.sprite.LayeredUpdates()
+        ## STRZALY ranged
+        self.game.level_06.arrows = pygame.sprite.LayeredUpdates()
+        ## Sprite ataku wręcz
+        self.game.level_06.melle_swing = pygame.sprite.LayeredUpdates()
+        ## PRZEDMIOTY NA MAPIE DO PODNIESIENIA
+        self.game.level_06.items_to_pick = pygame.sprite.LayeredUpdates()
+        ## OBIEKTY DO INTERAKCJI (PODNIESIENIA, WYLECZENIA ITP)
+        self.game.level_06.collecting_sprites = pygame.sprite.LayeredUpdates()
+        ## ZLOTE MONETY DO PODNIESIENIA
+        self.game.level_06.gold_to_pick = pygame.sprite.LayeredUpdates()
+        ## STRZALY DO PODNIESIENIA
+        self.game.level_06.arrows_to_pick = pygame.sprite.LayeredUpdates()
+        ## DRZWI
+        self.game.level_06.doors = pygame.sprite.LayeredUpdates()
+        ## SKRZYNIE
+        self.game.level_06.chest_to_open = pygame.sprite.LayeredUpdates()
+        ## TELEPORTS
+        self.game.level_06.teleports = pygame.sprite.LayeredUpdates()
+        ## SHOPS
+        self.game.level_06.shops = pygame.sprite.LayeredUpdates()
+        if not saved_data:
+            ### 1 URUCHOMIENIE:
+            self.load_objects(self.game.map_level_06.tmxdata.objects)
+        else:
+            ### 2. z LOAD GAME
+            print ("MAM DANE, uruchamiam load level from saved data...")
+            self.load_enemy_images(self.game.map_level_06.tmxdata.objects)
+            self.load_object_images(self.game.map_level_06.tmxdata.objects)
+            self.load_objects_from_save_data(self.game.map_level_06.tmxdata.objects, saved_data)
 
     def load_level_05(self, saved_data):
         self.game.act_lvl = self.game.level_05
@@ -432,7 +578,7 @@ class LevelGen:
             Item_to_take(self.game,item[1],item[2],self.gen.load_item_by_name(item[0],item[3]))
         hidden_item_list = obj_data['hidden_item_list']
         for hidden_item in hidden_item_list:
-            Item_to_take(self.game,hidden_item[1],hidden_item[2],self.gen.load_item_by_name(hidden_item[0], hidden_item[3]))
+            HiddenItem_to_take(self.game,hidden_item[1],hidden_item[2],self.gen.load_item_by_name(hidden_item[0], hidden_item[3]))
         arrow_list = obj_data['arrow_list']
         for arrow in arrow_list:
             Arrow_to_take(self.game,arrow[1],arrow[2],arrow[0])
@@ -451,11 +597,13 @@ class LevelGen:
                 Obstacle(self.game,tile_object.x,tile_object.y,tile_object.width,tile_object.height, water=False)
             if tile_object.name == "rem_wall":
                 RemObstacle(self.game,tile_object.x,tile_object.y,tile_object.width,
-                            tile_object.height, water=False,remove_event=tile_object.event)
+                            tile_object.height, water=False, remove_event=tile_object.event)
             if tile_object.name == "water":
                 Obstacle(self.game,tile_object.x,tile_object.y,tile_object.width,tile_object.height, water=True)
             if tile_object.name == "lava":
                 Lava(self.game,tile_object.x,tile_object.y,tile_object.width,tile_object.height,self.lava_effect)
+            if tile_object.name == "cactus":
+                Lava(self.game,tile_object.x,tile_object.y,tile_object.width,tile_object.height,self.cactus_effect)
             if tile_object.type == "teleport":
                 Teleport(self.game,tile_object.name, tile_object.destination, tile_object.pos_x, tile_object.pos_y,
                          tile_object.x,tile_object.y,tile_object.width,tile_object.height)
@@ -477,9 +625,17 @@ class LevelGen:
             if tile_object.name == "trap1s":
                 Trap(self.game,object_center.x,object_center.y,trap1_img,"S", 4)
             if tile_object.name == "darttrape":
-                DartTrap(self.game,object_center.x,object_center.y,vec(1,0),200,5)
+                DartTrap(self.game,object_center.x,object_center.y,tile_object.image,
+                         vec(1,0),500,1000,2000,5,bullet_dart_image)
             if tile_object.name == "darttrapw":
-                DartTrap(self.game,object_center.x,object_center.y,vec(-1,0),200,5)
+                DartTrap(self.game,object_center.x,object_center.y,tile_object.image,
+                         vec(-1,0),500,1000,2000,5,bullet_dart_image)
+            if tile_object.name == "stonetrape":
+                DartTrap(self.game,object_center.x,object_center.y,tile_object.image,
+                         vec(1,0),100,5000,5000,12,bullet_stone_image)
+            if tile_object.name == "stonetrapw":
+                DartTrap(self.game,object_center.x,object_center.y,tile_object.image,
+                         vec(-1,0),100,5000,5000,12,bullet_stone_image)
             if tile_object.name == "pintrap":
                 PinTrap(self.game, object_center.x,object_center.y,pintrap_h_img, pintrap_o_img,5)
             if tile_object.name == "spider web":
@@ -519,6 +675,8 @@ class LevelGen:
                 Obstacle(self.game,tile_object.x,tile_object.y,tile_object.width,tile_object.height, water=True)
             if tile_object.name == "lava":
                 Lava(self.game,tile_object.x,tile_object.y,tile_object.width,tile_object.height,self.lava_effect)
+            if tile_object.name == "cactus":
+                Lava(self.game,tile_object.x,tile_object.y,tile_object.width,tile_object.height,self.cactus_effect)
             if tile_object.type == "teleport":
                 Teleport(self.game,tile_object.name, tile_object.destination, tile_object.pos_x, tile_object.pos_y,
                          tile_object.x,tile_object.y,tile_object.width,tile_object.height)
@@ -540,9 +698,17 @@ class LevelGen:
             if tile_object.name == "trap1s":
                 Trap(self.game,object_center.x,object_center.y,trap1_img,"S", 4)
             if tile_object.name == "darttrape":
-                DartTrap(self.game,object_center.x,object_center.y,vec(1,0),200,5)
+                DartTrap(self.game,object_center.x,object_center.y,tile_object.image,
+                         vec(1,0),500,1000,2000,5,bullet_dart_image)
             if tile_object.name == "darttrapw":
-                DartTrap(self.game,object_center.x,object_center.y,vec(-1,0),200,5)
+                DartTrap(self.game,object_center.x,object_center.y,tile_object.image,
+                         vec(-1,0),500,1000,2000,5,bullet_dart_image)
+            if tile_object.name == "stonetrape":
+                DartTrap(self.game,object_center.x,object_center.y,tile_object.image,
+                         vec(1,0),100,5000,5000,12,bullet_stone_image)
+            if tile_object.name == "stonetrapw":
+                DartTrap(self.game,object_center.x,object_center.y,tile_object.image,
+                         vec(-1,0),100,5000,5000,12,bullet_stone_image)
             if tile_object.name == "pintrap":
                 PinTrap(self.game, object_center.x,object_center.y,pintrap_h_img, pintrap_o_img,5)
             if tile_object.name == "spider web":

@@ -794,11 +794,11 @@ class Weapon(pygame.sprite.Sprite):
         self.rect.center = self.pos + (4,0)
 
     def breakage(self):
-        self.condition -= 10 / self.durability
-        if self.condition <=0:
+        self.condition -= 20 / self.durability
+        if self.condition <= 0:
             self.condition = 0
         self.damage = round((0.4 * self.base_damage) + (0.6 * self.base_damage * self.condition / 100), 0)
-        #print (f'{self.name} condition: {self.condition}')
+        print (f'{self.name} condition: {self.condition}')
         self.breakage_surf.fill((255 - (int(2.5 * self.condition)),(int(2.5* self.condition)),0))
         self.breakage_surf.blit(self.breakage_icon,(0,0))
 
@@ -856,11 +856,11 @@ class Armor(pygame.sprite.Sprite):
         self.rect.center = self.pos
 
     def breakage(self):
-        self.condition -= 10 / self.durability
+        self.condition -= 15 / self.durability
         if self.condition <= 0:
             self.condition = 0
         self.armor = round((0.4 * self.base_armor) + (0.6 * self.base_armor * self.condition / 100), 0)
-        #print (f'{self.name} condition: {self.condition}')
+        print (f'{self.name} condition: {self.condition}')
         self.breakage_surf.fill((255 - (int(2.5 * self.condition)), (int(2.5 * self.condition)), 0))
         self.breakage_surf.blit(self.breakage_icon, (0, 0))
 
@@ -949,6 +949,9 @@ class Potion:
         elif self.potion_type == "Mana":
             if self.game.player.act_mana == self.game.player.max_mana:
                 return False
+        elif self.potion_type == "All":
+            if self.game.player.act_mana == self.game.player.max_mana and self.game.player.act_hp == self.game.player.max_hp:
+                return False
         return True
 
     def use(self):
@@ -964,6 +967,15 @@ class Potion:
             self.game.put_txt("You`ve drink a Mana Potion. " + str(self.strength) + " MP restored.")
             if self.game.player.act_mana >= self.game.player.max_mana:
                 self.game.player.act_mana = self.game.player.max_mana
+        elif self.potion_type == "All":
+            pygame.mixer.Sound.play(drink_snd)
+            self.game.player.act_mana += self.strength
+            self.game.player.act_hp += self.strength
+            self.game.put_txt("You`ve drink a Restore Potion. " + str(self.strength) + " HP and MP restored.")
+            if self.game.player.act_mana >= self.game.player.max_mana:
+                self.game.player.act_mana = self.game.player.max_mana
+            if self.game.player.act_hp >= self.game.player.max_hp:
+                self.game.player.act_hp = self.game.player.max_hp
         else:
             print ("ERROR POTION TYPE UNKNOWN")
 
@@ -1264,6 +1276,7 @@ class Player(pygame.sprite.Sprite):
         ring1occ = False
         ring2occ = False
         for tuple in nc_list:
+            print ("item name: " + tuple[0] + ", item type: " + tuple[1] + ",item_cond: "+ str(tuple[2]))
             if tuple[1] == "armor":
                 item = itemgen.load_item_by_name(tuple[0],tuple[2])
                 self.armor_slot.put_item(item)
@@ -1285,11 +1298,11 @@ class Player(pygame.sprite.Sprite):
                 ring1occ = True
             elif tuple[1] == "ring" and not ring2occ:
                 item = itemgen.load_item_by_name(tuple[0])
-                self.armor_slot.put_item(item)
+                self.ring2_slot.put_item(item)
                 ring2occ = True
             elif tuple[1] == "necklace":
                 item = itemgen.load_item_by_name(tuple[0],tuple[2])
-                self.armor_slot.put_item(item)
+                self.necklace_slot.put_item(item)
 
     def put_in_pos(self,x,y):
         self.x = x * TILE_SIZE + TILE_SIZE /2
@@ -1470,7 +1483,7 @@ class Player(pygame.sprite.Sprite):
             else:
                 temp_armor_mod += self.armor_slot.item.armor
             if self.armor_slot.item.subtype == "plate":
-                print ("Knight bonus aplied")
+                #print ("Knight bonus aplied")
                 temp_hit_rate_mod *= (self.armor_slot.item.hit_rate_mod * self.plate_armor_penalty_reduction)
             else:
                 temp_hit_rate_mod *= self.armor_slot.item.hit_rate_mod
@@ -1906,6 +1919,8 @@ class Mob(pygame.sprite.Sprite):
                 self.bullet_image = arrow_img
             elif self.bullet_type == "rock":
                 self.bullet_image = bullet_rock_image
+            elif self.bullet_type == "dart":
+                self.bullet_image = bullet_dart_image
             else:
                 self.bullet_image = bullet_magic_image
             self.bullet_damage = ranged_parameters[1]
@@ -2037,6 +2052,54 @@ class Mob(pygame.sprite.Sprite):
                 self.destination_position = self.second_pos
         self.pos += self.vel * self.game.dt + 0.5 * self.acc * self.game.dt ** 2
 
+    def mob_movement_ranged(self):
+        if self.game.dt > 0.1:
+            self.game.dt = 0.1
+        distance_to_player = (self.game.player.pos - self.pos).length_squared()
+        awake_distance = max(48, self.updated_sleep_radius)
+        if self.game.player.invisible:
+            awake_distance = 32
+        # print ("distance to player: " + str(distance_to_player))
+        #### JEZELI DOSTRZEGL GRACZA
+        if distance_to_player < awake_distance**2:
+            self.rot = (self.game.player.pos - self.pos).angle_to(vec(1, 0))
+            # jezeli ma rotowac sie w kierunku gracza...
+            # self.image = pygame.trasform.rotate(self.non_rotated_image, self.rot)
+            ### RUCH
+            #print ("Jednostka strzelajaca sie rusza w kierunku przeciwnym do gracza (vec -1")
+            self.acc = vec(-1, 0).rotate(self.rot)
+            self.avoid_mobs()
+            self.acc.scale_to_length(self.speed)
+            self.acc += self.vel * - 1
+            self.vel += self.acc * self.game.dt
+            now = (int(self.game.player.score_time_played * 1000))
+            #### JEZELI NIE JEST UDERZONY, WLACZAM  MINIMALNA PREDKOSC!
+            if now - self.last_hit_moment > self.hit_stun_time:
+                # print ("APPLY MIN SPEED")
+                if self.vel.length_squared() <= self.min_speed**2:
+                    if self.speed:
+                        self.vel.scale_to_length(self.min_speed)
+            else:
+                pass
+                # print ("POZWALAM NA ZMINEJSZENIE PREDKOSCI PONIZEJ MINIMALNEJ")
+                # print ("SPEED: " + str(self.vel.length()))
+                # print ("ACC: " + str(self.acc.length()))
+        #### JEZELI NIE WIDZI GRACZA WRACA NA SWOJA POZYCJE
+        else:
+            #### JEZELI GRACz O 60 od SLEEP RADIUS
+            if distance_to_player < (awake_distance + 60)**2:
+                self.image.blit(attent_image,(0,0))
+            self.rot = (self.spawn_position - self.pos).angle_to(vec(1, 0))
+            self.acc = vec(1, 0).rotate(-self.rot)
+            self.acc.scale_to_length(self.speed / 2)
+            self.acc += self.vel * - 2
+            self.vel += self.acc * self.game.dt
+            ## JEZELI JEST BLISKO SPAWN LOC - ZATRZYMUJE SIE
+            if (self.pos - self.spawn_position).length_squared() < 5**2:
+                self.acc = vec(0, 0)
+                self.vel = vec(0, 0)
+        self.pos += self.vel * self.game.dt + 0.5 * self.acc * self.game.dt ** 2
+
     def mob_movement1(self):
         if self.game.dt > 0.1:
             self.game.dt = 0.1
@@ -2115,7 +2178,7 @@ class Mob(pygame.sprite.Sprite):
         else:
             Flesh(self.game, self.pos, False)
         ### METODY DO KOLEKCJI INFORMACJI, jedna MOJA, druga COPALCO
-        self.game.player.score_killed_enemies.append(self)
+        self.game.player.score_killed_enemies.append((self.name, self.max_hp))
         self.game.events_manager.emit(Event(id=f'{self.name} has been killed'))
         ### GDY WYPADA PRZEDMIOT Z MOBA
         if self.item:
@@ -2159,9 +2222,12 @@ class Mob(pygame.sprite.Sprite):
             ### JEZELI POSIADA ZMIENNA S_POS - chodzi w linii
             if self.s_pos:
                 self.mob_movement_s()
-            ### JEZELI NIE CZEKA W MIEJSCU
+            ### JEZELI NIE CZEKA W MIEJSCU LUB GONI WROGA (MOVEMENT)
             else:
-                self.mob_movement1()
+                if not self.ranged_parameters:
+                    self.mob_movement1()
+                else:
+                    self.mob_movement_ranged()
         else:
             print (self.name + " FROZEN!")
         ##### STRZELANIE :
@@ -2409,20 +2475,23 @@ class EffectObject(pygame.sprite.Sprite):
 
 
 class DartTrap(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, direction, distance, str):
+    def __init__(self, game, x, y, image, direction, speed, lifetime, freq, strength, bull_img = bullet_dart_image):
         self._layer = EFFECTS_LAYER
         self.groups = game.act_lvl.all_sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pygame.Surface((TILE_SIZE,TILE_SIZE),pygame.HWSURFACE | pygame.SRCALPHA)
-        self.image.blit(tileset_image,(0,0),(36*TILE_SIZE,11*TILE_SIZE,TILE_SIZE,TILE_SIZE))
-        self.str = str
+        if image:
+            self.image = image
+        else:
+            self.image = pygame.Surface((TILE_SIZE,TILE_SIZE),pygame.HWSURFACE | pygame.SRCALPHA)
+        self.bull_img = bull_img
+        self.strength = strength
         self.direction = direction
         self.angle = self.direction.angle_to(vec(0,-1))
         self.image = pygame.transform.rotate(self.image, self.angle)
-        self.distance = distance
-        self.freq = 2000
-        self.str = str
+        self.speed = speed
+        self.lifetime = lifetime
+        self.freq = freq
         self.pos = (x, y)
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
@@ -2436,7 +2505,7 @@ class DartTrap(pygame.sprite.Sprite):
         if now - self.last_dart > self.freq:
             #print ("DART DIR")
             #print (self.direction)
-            Dart(self.game,self.pos,self.direction, self.str)
+            Dart(self.game,self.pos,self.direction, self.speed, self.lifetime, self.strength, self.bull_img)
             self.last_dart = now
 
 
@@ -2480,12 +2549,12 @@ class MobArrow(pygame.sprite.Sprite):
 
 
 class Dart(pygame.sprite.Sprite):
-    def __init__(self, game, pos, dir, strength, image = bullet_dart_image):
+    def __init__(self, game, pos, dir, speed, lifetime, strength, image = bullet_dart_image):
         self._layer = HIT_GRAPHICS_LAYER
         self.groups = game.act_lvl.all_sprites, game.act_lvl.lavas
         pygame.sprite.Sprite.__init__(self, self.groups)
-        self.speed = 400
-        self.lifetime = 1000
+        self.speed = speed
+        self.lifetime = lifetime
         self.game = game
         self.strength = strength
         self.effect = ActiveEffect("damage",e_fire_ico,strength,1)
@@ -2502,7 +2571,7 @@ class Dart(pygame.sprite.Sprite):
         self.pos += self.vel * self.game.dt
         self.rect.center = self.pos
         now = (int(self.game.player.score_time_played * 1000))
-        if now - self.spawn_time > 100:
+        if now - self.spawn_time > 250:
             ## Kolizja z murem (nie wodą!)
             hits = pygame.sprite.spritecollide(self, self.game.act_lvl.walls, False)
             for hit in hits:

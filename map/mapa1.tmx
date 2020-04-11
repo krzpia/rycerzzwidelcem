@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="50" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="15" nextobjectid="332">
+<map version="1.2" tiledversion="1.3.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="50" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="15" nextobjectid="336">
  <tileset firstgid="1" source="terrain_tile_set.tsx"/>
  <tileset firstgid="1025" source="build atlas.tsx"/>
  <tileset firstgid="2049" source="full tileset.tsx"/>
@@ -275,8 +275,6 @@
   <object id="145" name="wall" x="368" y="504" width="16" height="8"/>
   <object id="146" name="wall" x="480" y="504" width="16" height="8"/>
   <object id="147" name="water" x="368" y="608" width="128" height="16"/>
-  <object id="153" name="darttrape" x="16" y="400"/>
-  <object id="154" name="darttrapw" x="336" y="816"/>
   <object id="161" name="wood fence" type="hr_obstacle" gid="1406" x="63" y="192" width="34" height="29"/>
   <object id="163" name="wood fence" type="hr_obstacle" gid="1403" x="160" y="128" width="32" height="32"/>
   <object id="164" name="wood fence" type="hr_obstacle" gid="1404" x="184" y="128" width="32" height="32"/>
@@ -309,7 +307,6 @@
   <object id="249" name="torch" type="anim_obs" x="859" y="79"/>
   <object id="250" name="torch" type="anim_obs" x="1104" y="78"/>
   <object id="276" name="lava" x="1508" y="233" width="21" height="16"/>
-  <object id="319" name="darttrape" x="1488" y="624"/>
  </objectgroup>
  <objectgroup id="10" name="enemies">
   <object id="291" name="Rat" type="enemy" gid="8408" x="160" y="80" width="32" height="32">
@@ -397,6 +394,9 @@
   <object id="329" name="spider web" gid="8089" x="624" y="192" width="32" height="32"/>
   <object id="330" name="spider web" gid="8089" x="496" y="192" width="32" height="32"/>
   <object id="331" name="spider web" gid="8090" x="640" y="160" width="32" height="32"/>
+  <object id="332" name="darttrape" gid="2882" x="0" y="416" width="32" height="32"/>
+  <object id="333" name="darttrapw" gid="2882" x="320" y="832" width="32" height="32"/>
+  <object id="335" name="darttrape" gid="2882" x="1472" y="640" width="32" height="32"/>
  </objectgroup>
  <objectgroup id="13" name="npcs">
   <object id="317" name="Gold Crusader" type="npc" gid="6420" x="256" y="768" width="32" height="32"/>
@@ -434,7 +434,7 @@
     <property name="item" value="Holy Grail"/>
     <property name="key" type="int" value="5"/>
     <property name="locked" type="int" value="1"/>
-    <property name="treasure_value" type="int" value="40"/>
+    <property name="treasure_value" type="int" value="59"/>
    </properties>
   </object>
   <object id="220" name="Key" type="key" x="1327" y="880">
@@ -447,7 +447,7 @@
     <property name="item" value=""/>
     <property name="key" type="int" value="0"/>
     <property name="locked" type="int" value="0"/>
-    <property name="treasure_value" type="int" value="35"/>
+    <property name="treasure_value" type="int" value="39"/>
    </properties>
   </object>
   <object id="231" name="Red Potion" type="potion" x="623" y="911"/>
@@ -496,7 +496,7 @@
     <property name="gold" type="int" value="2"/>
    </properties>
   </object>
-  <object id="271" name="treasure chest" x="34" y="33">
+  <object id="271" name="treasure chest" x="32" y="32">
    <properties>
     <property name="item" value=""/>
     <property name="key" type="int" value="0"/>

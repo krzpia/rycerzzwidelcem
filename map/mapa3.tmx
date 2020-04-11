@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="50" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="105">
+<map version="1.2" tiledversion="1.3.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="50" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="106">
  <tileset firstgid="1" source="build2 atlas.tsx"/>
  <tileset firstgid="1025" source="full tileset.tsx"/>
  <tileset firstgid="7105" source="terrain_tile_set.tsx"/>
@@ -256,6 +256,7 @@
   <object id="75" name="wall" x="872" y="816" width="16" height="32"/>
   <object id="94" name="wall" x="1248" y="752" width="32" height="16"/>
   <object id="104" name="wall" x="424" y="784" width="48" height="48"/>
+  <object id="105" name="wall" x="800" y="952" width="64" height="16"/>
  </objectgroup>
  <objectgroup id="10" name="npc">
   <object id="77" name="King`s Guard" type="npc" gid="10166" x="856" y="112" width="32" height="32"/>

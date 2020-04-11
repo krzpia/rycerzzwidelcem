@@ -849,6 +849,7 @@ class Dialog:
         self.blocked_threads = []
         self.threads_to_block_by_event = {}
         self.threads_to_unblock_by_event = {}
+        self.threads_to_late_unblock_by_event = {}
         self.text_returned = False
 
     #### DODAJE SILNIK BLOKOWANIA I ODBLOKOWANIA WATKOW W ZALEZNOSCI OD PRZYPISANIA I EVENT MANAGERA
@@ -878,6 +879,10 @@ class Dialog:
             self.threads_to_unblock_by_event[game_event] = thread
         #print (self.threads_to_unblock_by_event)
 
+    def thread_late_unblock_with_event(self, thread, game_event):
+        print ("adding late unblock formula")
+        self.threads_to_late_unblock_by_event[game_event] = thread
+
     def setup_blocked_threads(self):
         ## EVENTY TO WARUNKI DO SPELNIENIA. WYSTARCZY 1 SPELNIONY z wielu mozliwych..
         ## TE KTORE SA DO ODBLOKOWANIA SA PER SE ZABLOKOWANE:
@@ -891,6 +896,12 @@ class Dialog:
         for event, thread in self.threads_to_block_by_event.items():
             if self.game.events_manager.search_event(event):
                 self.add_blocked_thread(thread)
+        ## LATE UNBLOCK
+        for event, thread in self.threads_to_late_unblock_by_event.items():
+            if self.game.events_manager.search_event(event):
+                print ("late removing")
+                self.remove_blocked_thread(thread)
+
         ############
         print ("BLOCKED THREADS:")
         print (self.blocked_threads)
@@ -1113,10 +1124,17 @@ class Dialog:
                 if self.game.events_manager.find_got_quest_event(thread_name[6:]):
                     print (f'FOUND {thread_name[6:]} quest in event manager - Branch 1,2,3')
                     if self.game.events_manager.find_quest_compl_event(thread_name[6:]):
-                        print ("BRANCH 3 = quest completed")
-                        text = self.find_branch_in_thread(3, thread_name)
-                        self.text_returned = text
-                        return text
+                        print("BRANCH 3 or 4 = quest completed")
+                        if self.game.events_manager.find_quest_rewarded_event(thread_name[6:]):
+                            print ("BRANCH 3 = quest completed and rewarded")
+                            text = self.find_branch_in_thread(3, thread_name)
+                            self.text_returned = text
+                            return text
+                        else:
+                            print("BRANCH 4 = qust completed but not rewarded")
+                            text = self.find_branch_in_thread(4, thread_name)
+                            self.text_returned = text
+                            return text
                     else:
                         ## Tu male peligro jezeli nie bedzie questu w ksiazce a bedzie
                         # sytuacja w ktorej Event_manager nie znajdzie quest_compl o danej nazwie [6:]!!
@@ -1894,10 +1912,13 @@ class Quest:
                             quest_items_to_fulfil.append(quest_item)
                             print (f'Masz: {quest_item} i potzebujesz {quest_item.name}! proba OK!')
             print (f'- LISTA FULFIL ITEMS: {quest_items_to_fulfil}')
+            print ("removing duplicates....")
+            quest_items_to_fulfil = list(dict.fromkeys(quest_items_to_fulfil))
+            print(f'- LISTA FULFIL ITEMS AFTER REMOVE DUPL: {quest_items_to_fulfil}')
             print (f'- DLUGOSC LISTY: {len(quest_items_to_fulfil)}')
             print (f'- DLUGOSC LISTY GOAL {len(self.goal.items_to_collect)}')
             ### JEZELI NA LISCIE SA WSZYSTKIE PRZEDMIOTY dopiero wysyłam listę przedmiotów!
-            if len(quest_items_to_fulfil) == len(self.goal.items_to_collect):
+            if len(quest_items_to_fulfil) >= len(self.goal.items_to_collect):
                 return quest_items_to_fulfil
             else:
                 return False
@@ -1909,7 +1930,6 @@ class Quest:
         quest_items_to_remove = self.check_quest_items()
         if quest_items_to_remove:
             self.emit_the_quest_fulfiled_event()
-            self.completed = True
             ### ZABIERA PRZEDMIOT GDY MA selfi.item_remove_bool
             if self.item_remove_bool: ### czyli czy ma zabierac przedmiot!
                 for item in quest_items_to_remove:
@@ -1919,13 +1939,11 @@ class Quest:
         npcs_to_encounter = self.check_npcs_to_encounter()
         if npcs_to_encounter:
             self.emit_the_quest_fulfiled_event()
-            self.completed = True
             return True
         ### 3. MOBs to kill
         mobs_to_kill = self.check_mobs_to_kill()
         if mobs_to_kill:
             self.emit_the_quest_fulfiled_event()
-            self.completed = True
             return True
         ### 4. TODO tile(area) to explore
 
@@ -1934,36 +1952,35 @@ class Quest:
             self.game.events_manager.emit(Event(id=f'quest {self.name} has been fulfiled'))
 
     def collect_reward(self):
-        if self.completed:
-            self.game.player.gold += self.reward_gold
-            self.game.player.xp += self.reward_xp
-            #### GENERUJE PRZEDMIOTY REWARD
-            if self.reward_item:
-                if self.reward_item[-3:] == "Key":
-                    item = self.game.levelgen.gen.g_key(self.reward_item,False)
-                else:
-                    item = self.game.levelgen.gen.generate_item_by_name(self.reward_item)
-                item_collected = self.game.player.inventory.put_in_first_free_slot(item)
-                if not item_collected:
-                    sprites.Item_to_take(self.game,self.game.player.pos.x, self.game.player.pos.y, item)
-            pygame.mixer.Sound.play(coin_snd)
-            ### JEZELI AUTO NEXT QUEST - dodaje nowy quest!
-            if self.auto_next_quest:
-                self.auto_next_quest.get_quest()
-            #### SEND INFO
-            if not self.game.events_manager.search_event(f'quest {self.name} has been completed'):
-                self.game.events_manager.emit(Event(id= f'quest {self.name} has been completed'))
-            if not self.game.events_manager.search_event(f'quest {self.name} has been rewarded'):
-                self.game.events_manager.emit(Event(id= f'quest {self.name} has been rewarded'))
-            pygame.mixer.Sound.play(levelup_snd)
-            self.game.put_txt(f'Quest {self.name} finished')
-            ### JEZELI AUTO-CHECK i nie prowadzisz rozmowy trzeba nadać informację o zakończeniu questa
-            if not self.game.dialog_in_progress:
-                self.game.message_box.show_message_quest_reward(f'Quest {self.name} completed!',
-                                                                self.reward_gold, self.reward_xp, self.reward_item)
-            #### USUWAM ZAKONCZONE QUESTY
-            self.game.player.quest_book.remove(self)
-            print("NAGRODA ODEBRANA i QUEST ZAPISANY JAKO WYKONANY")
+        self.game.player.gold += self.reward_gold
+        self.game.player.xp += self.reward_xp
+        #### GENERUJE PRZEDMIOTY REWARD
+        if self.reward_item:
+            if self.reward_item[-3:] == "Key":
+                item = self.game.levelgen.gen.g_key(self.reward_item,False)
+            else:
+                item = self.game.levelgen.gen.generate_item_by_name(self.reward_item)
+            item_collected = self.game.player.inventory.put_in_first_free_slot(item)
+            if not item_collected:
+                sprites.Item_to_take(self.game,self.game.player.pos.x, self.game.player.pos.y, item)
+        pygame.mixer.Sound.play(coin_snd)
+        ### JEZELI AUTO NEXT QUEST - dodaje nowy quest!
+        if self.auto_next_quest:
+            self.auto_next_quest.get_quest()
+        #### SEND INFO
+        if not self.game.events_manager.search_event(f'quest {self.name} has been completed'):
+            self.game.events_manager.emit(Event(id= f'quest {self.name} has been completed'))
+        if not self.game.events_manager.search_event(f'quest {self.name} has been rewarded'):
+            self.game.events_manager.emit(Event(id= f'quest {self.name} has been rewarded'))
+        pygame.mixer.Sound.play(levelup_snd)
+        self.game.put_txt(f'Quest {self.name} finished')
+        ### JEZELI AUTO-CHECK i nie prowadzisz rozmowy trzeba nadać informację o zakończeniu questa
+        if not self.game.dialog_in_progress:
+            self.game.message_box.show_message_quest_reward(f'Quest {self.name} completed!',
+                                                            self.reward_gold, self.reward_xp, self.reward_item)
+        #### USUWAM ZAKONCZONE QUESTY
+        self.game.player.quest_book.remove(self)
+        print("NAGRODA ODEBRANA i QUEST ZAPISANY JAKO WYKONANY")
 
     def get_quest(self):
         print("GOT NEW QUEST")
@@ -2005,10 +2022,21 @@ class ShopGenerator:
                                  99, 50, "Donald the Innkeeper", default_shop_owner_img, self.item_gen)
         self.level_05_inn = Shop(self.game, "Inn 05", "inn",
                                  159,120,"Astrid the Bartender",default_shop_owner_img,self.item_gen)
+        self.level_05_magic_shop = Shop(self.game, "Magic Shop 05", "magic",
+                                        229, 150, "Aghaton the Wise", default_shop_owner_img, self.item_gen)
+        self.level_05_smith_shop = Shop(self.game, "Smith 05", "smith",
+                                        259, 100, "Megathon the Smith", default_shop_owner_img, self.item_gen)
+        self.level_06_inn = Shop(self.game, "Inn 06", "inn",
+                                 159, 120, "Astrid the Bartender", default_shop_owner_img, self.item_gen)
+
         self.shops = {'Magic Shop 02': self.level_02_magic_shop,
                       'Smith 02': self.level_02_smith_shop,
                       'Inn 02': self.level_02_inn,
-                      'Inn 05': self.level_05_inn}
+                      'Inn 05': self.level_05_inn,
+                      'Magic Shop 05': self.level_05_magic_shop,
+                      'Smith 05': self.level_05_smith_shop,
+                      'Inn 06': self.level_06_inn
+                      }
 
     def generate_shop_by_name(self, name):
         if name == "Magic Shop 02":
@@ -2023,6 +2051,15 @@ class ShopGenerator:
         if name == "Inn 05":
             print ("inn lvl 05 created")
             return self.level_05_inn
+        if name == "Magic Shop 05":
+            print("shop on level 05 created")
+            return self.level_05_magic_shop
+        if name == "Smith 05":
+            print("shop on level 05 created")
+            return self.level_05_smith_shop
+        if name == "Inn 06":
+            print("inn lvl 06 created")
+            return self.level_06_inn
         print ("ERROR IN SHOP GENERATION (name not recognized")
 
     def load_shops_data(self, shops_data):
@@ -2379,6 +2416,7 @@ class Shop:
         if self.game.player.gold >= self.arrow_price:
             self.game.player.gold -= self.arrow_price
             self.game.player.arrows += self.arrow_pack
+            self.owner_gold += self.arrow_price
             pygame.mixer.Sound.play(coin_snd)
         else:
             pygame.mixer.Sound.play(empty_spell_snd)
@@ -2387,8 +2425,9 @@ class Shop:
     def recover(self):
         if self.game.player.gold >= self.recover_price:
             self.game.player.gold -= self.recover_price
-            self.game.player.hp = self.game.player.max_hp
-            self.game.player.mana = self.game.player.max_mana
+            self.game.player.act_hp = self.game.player.max_hp
+            self.game.player.act_mana = self.game.player.max_mana
+            self.owner_gold += self.recover_price
             pygame.mixer.Sound.play(drink_snd)
         else:
             pygame.mixer.Sound.play(empty_spell_snd)
@@ -2410,6 +2449,7 @@ class Shop:
     def tavern_save_game(self):
         print("Tavern save game funccion")
         self.game.player.gold -= self.rest_price
+        self.owner_gold += self.rest_price
         pygame.mixer.Sound.play(coin_snd)
         self.game.save_game()
         self.game.ph_shop = False

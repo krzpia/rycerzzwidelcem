@@ -22,23 +22,52 @@ class QuestGenerator:
         self.q_holy_grail = ui.Quest(self.game,"Holy Grail", "Find and bring a Holy Grail",
                                      1, [], ["Holy Grail"],True, [], [], 10, 50)
         self.q_holy_grail.put_image_from_tileset(23,94,full_tileset_image)
-        self.q_killer_bees = ui.Quest(self.game,"Killer Bees","Kill 3 giant bees             from the John`s filed",1,["Killer Bee", "Killer Bee", "Killer Bee"],[],False,[],[],15,10)
+        ###############################################################################################
+        self.q_killer_bees = ui.Quest(self.game,"Killer Bees","Kill 3 giant bees             from the John`s filed",
+                                      1,["Killer Bee", "Killer Bee", "Killer Bee"],[],False,[],[],15,10)
         self.q_killer_bees.put_image_from_tileset(5,65,full_tileset_image)
-        self.q_mieszko_ring = ui.Quest(self.game, "Mieszko Family Signet", "Find Mieszko`s father family signet", 1, [],["Mieszko Family Signet"], True, [], [], 12, 120)
+        ###############################################################################################
+        self.q_mieszko_ring = ui.Quest(self.game, "Mieszko Family Signet", "Find Mieszko`s father family signet",
+                                       1, [],["Mieszko Family Signet"], True, [], [], 12, 120)
         self.q_mieszko_ring.put_image_from_tileset(17, 43, full_tileset_image)
-        self.q_mad_cow = ui.Quest(self.game,"Mad Cow","Try to cure the Mad Cow",1,["Mad Bull"],[],False,[],[],10,0,"Wilfredo`s Lasso")
+        ###############################################################################################
+        self.q_mad_cow = ui.Quest(self.game,"Mad Cow","Try to cure the Mad Cow",
+                                  1,["Mad Bull"],[],False,[],[],10,0,"Wilfredo`s Lasso")
         self.q_mad_cow.put_image_from_tileset(15,63,full_tileset_image)
-        self.q_miraflorida = ui.Quest(self.game,"Miraflorida","Find castle of Miraflorida",1,[],[],False,[],["George the Guard"],6,0)
+        ###############################################################################################
+        self.q_miraflorida = ui.Quest(self.game,"Miraflorida","Find castle of Miraflorida",
+                                      1,[],[],False,[],["George the Guard"],6,0)
         self.q_miraflorida.set_to_autochecking()
         self.q_miraflorida.put_image_from_tileset(0,60,full_tileset_image)
-        self.q_open_the_gates = ui.Quest(self.game,"Open the Gates","Find and bring: Sunset Flower,Mad Bat Wing, Gremlin Tooth",1,[],["Sunset Flower","Mad Bat Wing", "Gremlin Tooth"],False,[],[],20,0,"Miraflorida Magic Key")
+        ###############################################################################################
+        self.q_open_the_gates = ui.Quest(self.game,"Open the Gates","Find and bring: Sunset Flower,Mad Bat Wing, Gremlin Tooth",
+                                         1,[],["Sunset Flower","Mad Bat Wing", "Gremlin Tooth"],False,[],[],20,0,"Miraflorida Magic Key")
         self.q_open_the_gates.put_image_from_tileset(32,94,full_tileset_image)
-        self.q_karol_the_alchemist = ui.Quest(self.game,"Karol the Alchemist","Find Karol and bring          him the ingriedients",1,[],["Sunset Flower","Mad Bat Wing", "Gremlin Tooth"],True,[],[],25,0,"Elixir Arechinix")
+        ###############################################################################################
+        self.q_karol_the_alchemist = ui.Quest(self.game,"Karol the Alchemist","Find Karol and bring          him the ingriedients",
+                                              1,[],["Sunset Flower","Mad Bat Wing", "Gremlin Tooth"],True,[],[],25,0,"Elixir Arechinix")
         self.q_karol_the_alchemist.put_image_from_tileset(1, 59, full_tileset_image)
-        self.q_speak_with_the_king = ui.Quest(self.game,"Speak with the King","Find King Sancho and bring    the Arechinix elixir",1,[],["Elixir Arechinix"],True,[],[],25,50,False)
+        ###############################################################################################
+        self.q_speak_with_the_king = ui.Quest(self.game,"Speak with the King","Find King Sancho and bring    the Arechinix elixir",
+                                              1,[],["Elixir Arechinix"],True,[],[],25,50,False)
         self.q_speak_with_the_king.put_image_from_tileset(23, 76, full_tileset_image)
-        self.q_golden_mask = ui.Quest(self.game,"Golden Mask","Find Golden Mask",1,[],["Golden Mask"],False,[],[],45,100)
+        ###############################################################################################
+        self.q_golden_mask = ui.Quest(self.game,"Golden Mask","Find Golden Mask",
+                                      1,[],["Golden Mask"],True,[],[],45,100,"HEPA Helmet")
         self.q_golden_mask.put_image_from_tileset(36,94,full_tileset_image)
+        ###############################################################################################
+        self.q_pedritos_wolf = ui.Quest(self.game,"Pedritos Wolf","Speak with pedrito`s wolf",
+                                        1,[],["Bone","Bone"],True,[],[],16,25,False)
+        self.q_pedritos_wolf.put_image_from_tileset(38,94,full_tileset_image)
+        ###############################################################################################
+        self.q_magic_rose = ui.Quest(self.game,"Magic Rose", "Bring to the Enano the magic  rose flower",
+                                     1,[],["Magic Rose"],True,[],[],20,20,"Enanos Cap")
+        self.q_magic_rose.put_image_from_tileset(39,94,full_tileset_image)
+        ###############################################################################################
+        self.q_coronavirus = ui.Quest(self.game,"Coronavirus","Kill the Coronavirus",1,["Coronavirus"],
+                                      [],False,[],[],100,10000,"Corona Crown")
+        self.q_coronavirus.put_image_from_tileset(24,62,full_tileset_image)
+        ###############################################################################################
 
         ### SPECIAL FACTORS - auto next quest
         self.q_open_the_gates.put_auto_next_quest(self.q_karol_the_alchemist)
@@ -47,7 +76,8 @@ class QuestGenerator:
         ### END........
         ### ALL QUESTS IN LIST
         self.quests = [self.q_holy_grail, self.q_killer_bees, self.q_mieszko_ring, self.q_mad_cow, self.q_miraflorida,
-                       self.q_open_the_gates, self.q_karol_the_alchemist, self.q_speak_with_the_king, self.q_golden_mask]
+                       self.q_open_the_gates, self.q_karol_the_alchemist, self.q_speak_with_the_king,
+                       self.q_golden_mask, self.q_pedritos_wolf, self.q_magic_rose, self.q_coronavirus]
 
     def return_quest_by_name(self, name):
         for quest in self.quests:
@@ -85,6 +115,9 @@ class NpcGenerator:
         self.ivan_the_physician_csv = csv.DictReader(open(path.join(dialog_folder, 'ivan_the_physician_dialog.csv')), delimiter=';')
         self.dori_the_smith_csv = csv.DictReader(open(path.join(dialog_folder,'dori_the_smith_dialog.csv')), delimiter=';')
         self.wilfredo_the_cowboy_csv = csv.DictReader(open(path.join(dialog_folder,'wilfredo_the_cowboy_dialog.csv')), delimiter=';')
+        self.pedritos_wolf_csv = csv.DictReader(open(path.join(dialog_folder,'pedritos_wolf_dialog.csv')), delimiter=';')
+        self.pedrito_the_elf_csv = csv.DictReader(open(path.join(dialog_folder, 'pedrito_the_elf_dialog.csv')),delimiter=';')
+        self.enano_csv = csv.DictReader(open(path.join(dialog_folder,'enano_dialog.csv')),delimiter=';')
         #############
 
     def generate(self, name, x, y, image):
@@ -148,6 +181,7 @@ class NpcGenerator:
             king_sancho.dialog_data.load_from_dict(self.king_sancho_csv,self.quest_gen)
             king_sancho.dialog_data.thread_unblock_with_event("quest Speak with the King",['got quest Speak with the King'])
             king_sancho.dialog_data.thread_block_with_event("ill",['quest Karol the Alchemist has been completed'])
+            king_sancho.dialog_data.thread_unblock_with_event("quest Coronavirus",['quest Golden Mask has been rewarded'])
             return king_sancho
 
         if name == "King`s Guard":
@@ -180,3 +214,27 @@ class NpcGenerator:
             wilfredo_the_cowboy = sprites.Npc(self.game,name,x,y,image)
             wilfredo_the_cowboy.dialog_data.load_from_dict(self.wilfredo_the_cowboy_csv, self.quest_gen)
             return wilfredo_the_cowboy
+
+        if name == "Pedrito the Elf":
+            pedrito_the_elf = sprites.Npc(self.game,name,x,y,image)
+            pedrito_the_elf.dialog_data.load_from_dict(self.pedrito_the_elf_csv, self.quest_gen)
+            pedrito_the_elf.dialog_data.thread_block_with_event("quest Pedritos Wolf",['got quest Pedritos Wolf'])
+            pedrito_the_elf.dialog_data.thread_unblock_with_event("wait dog",['got quest Pedritos Wolf'])
+            pedrito_the_elf.dialog_data.thread_late_unblock_with_event("quest Pedritos Wolf", 'quest Pedritos Wolf has been fulfiled')
+            return pedrito_the_elf
+
+        if name == "Pedrito`s Wolf":
+            pedritos_wolf = sprites.Npc(self.game,name,x,y,image)
+            pedritos_wolf.dialog_data.load_from_dict(self.pedritos_wolf_csv, self.quest_gen)
+            pedritos_wolf.put_sound(whoaf_snd)
+            return pedritos_wolf
+
+        if name == "Brid the Priest":
+            brid_the_priest = sprites.Npc(self.game,name,x,y,image)
+            brid_the_priest.dialog_data.load_text(True,"welcome",0,0,"The disease is spreading!!!                       It`s will be the end of this world!",False,False,False,False,False,False,False)
+            return brid_the_priest
+
+        if name == "Enano":
+            enano = sprites.Npc(self.game,name,x,y,image)
+            enano.dialog_data.load_from_dict(self.enano_csv, self.quest_gen)
+            return enano

@@ -53,6 +53,61 @@ class EnemyGenerator:
             return sprites.Mob(self.game, name, x, y, image, False, False,
                                110, 20, 1.0, hp, round(self.dif*7), 140, 12, item)
 
+        if name == "Green Spider":
+            if not hp:
+                hp = round(self.dif * 12)
+            return sprites.Mob(self.game, name, x, y,image, False,False,
+                               130, 60, 1, hp, round(self.dif*8), 150, 7, item)
+
+        if name == "Green Tarantula":
+            if not hp:
+                hp = round(self.dif * 22)
+            return sprites.Mob(self.game, name, x, y, image, False, False,
+                               150, 70, 1.0, hp, round(self.dif*10), 140, 12, item)
+
+        if name == "Ent":
+            if not hp:
+                hp = round(self.dif * 50)
+            return sprites.Mob(self.game, name, x, y, image, False, False,
+                              50, 10, 1.8, hp, round(self.dif*6), 200, 25, item)
+
+        if name == "Skeleton Warrior":
+            if not hp:
+                hp = round(self.dif * 26)
+            return sprites.Mob(self.game, name, x, y, image, False, False,
+                              75, 35, 1.8, hp, round(self.dif*8), 220, 9, item)
+
+        if name == "Wolf Skeleton":
+            if not hp:
+                hp = round(self.dif * 16)
+            return sprites.Mob(self.game, name, x, y, image, False, False,
+                              135, 35, 1.2, hp, round(self.dif*7), 240, 8, item)
+
+        if name == "Forest Worm":
+            if not hp:
+                hp = round(self.dif * 14)
+            return sprites.Mob(self.game, name, x, y, image, False, False,
+                              95, 35, 1.2, hp, round(self.dif*5),140, 5, item)
+
+        if name == "Goblin":
+            if not hp:
+                hp = round(self.dif * 32)
+            return sprites.Mob(self.game, name, x, y, image, False, False,
+                               100, 30, 1.5, hp, round(self.dif * 6), 180, 12, item)
+
+        if name == "Goblin Warrior":
+            if not hp:
+                hp = round(self.dif * 36)
+            return sprites.Mob(self.game, name, x, y, image, False, False,
+                               100, 30, 1.5, hp, round(self.dif * 8), 180, 15, item)
+
+        if name == "Two Head Giant":
+            if not hp:
+                hp = round(self.dif * 65)
+            return sprites.Mob(self.game, name, x, y, image, False, False,
+                               100, 10, 1.5, hp, round(self.dif * 10), 180, 45, item)
+
+
     def generate_s(self, name, x, y, image, sx, sy, item, hp = False):
         if name == "Rat":
             if not hp:
@@ -95,6 +150,32 @@ class EnemyGenerator:
             return sprites.Mob(self.game, name, x, y, image, (sx, sy), False,
                                120, 40, 1.4, hp, round(self.dif*4), 140, 6, item)
 
+        if name == "Dryad":
+            if not hp:
+                hp = round(self.dif * 25)
+            return sprites.Mob(self.game, name, x, y, image, (sx, sy), False,
+                               150, 50, 1.0, hp, round(self.dif*12), 210, 15, item)
+
+        if name == "Scorpion":
+            if not hp:
+                hp = round(self.dif * 26)
+            return sprites.Mob(self.game, name, x, y, image, (sx, sy), False,
+                               120, 20, 1.0, hp, round(self.dif*10), 200, 18, item)
+
+        if name == "Goblin":
+            if not hp:
+                hp = round(self.dif * 35)
+            return sprites.Mob(self.game, name, x, y, image, (sx, sy), False,
+                               100, 30, 1.5, hp, round(self.dif*6), 180, 12, item)
+
+        if name == "Goblin Warrior":
+            if not hp:
+                hp = round(self.dif * 40)
+            return sprites.Mob(self.game, name, x, y, image, (sx, sy), False,
+                               100, 30, 1.5, hp, round(self.dif*8), 180, 15, item)
+
+
+
         if name == "Skeleton":
             if not hp:
                 hp = round(self.dif * 20)
@@ -113,10 +194,37 @@ class EnemyGenerator:
             if not hp:
                 hp = round(self.dif * 18)
             return sprites.Mob(self.game, name, x, y, image, False, ("magic",round(self.dif*5),180,2000),
-                               -20,-10,1.5,hp,round(self.dif*2),120,7, item)
+                               20,10,1.5,hp,round(self.dif*2),120,7, item)
         if name == "Gremlin":
             if not hp:
                 hp = round(self.dif * 20)
             return sprites.Mob(self.game, name, x, y, image, False, ("rock",round(self.dif*4),220,2000),
-                               -20,-10,1.0,hp,round(self.dif*4),160,10, item)
+                               25,10,1.0,hp,round(self.dif*4),160,10, item)
+
+        if name == "Forest Goblin":
+            if not hp:
+                hp = round(self.dif * 26)
+            return sprites.Mob(self.game, name, x, y, image, False, ("rock",round(self.dif*5),250,1800),
+                               25,15,1.0,hp,round(self.dif*3),160,10, item)
+
+        if name == "Carn Rose":
+            if not hp:
+                hp = round(self.dif * 36)
+            return sprites.Mob(self.game, name, x, y, image, False, ("dart",round(self.dif*4),280,1300),
+                               1,1,1.0,hp,round(self.dif*2),160,12, item)
+
+        if name == "Centaur":
+            if not hp:
+                hp = round(self.dif * 30)
+            return sprites.Mob(self.game, name, x, y, image, False, ("dart",round(self.dif*4),280,2200),
+                               60,20,1.0,hp,round(self.dif*5),240,10, item)
+
+        if name == "Fire Butterfly":
+            if not hp:
+                hp = round(self.dif * 8)
+            return sprites.Mob(self.game, name, x, y, image, False, ("fire",round(self.dif*12),280,2000),
+                               40,20,1.0,hp,round(self.dif*1),200,7, item)
+
+
+
 

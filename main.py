@@ -122,7 +122,7 @@ class Game:
         self.knight_class_button = Button(intro_but_img, intro_but_h_img, 128, 32, "Knight", 170, 365)
         self.wizard_class_button = Button(intro_but_img, intro_but_h_img, 128, 32, "Wizard", 170, 415)
         self.thief_class_button = Button(intro_but_img, intro_but_h_img, 128, 32, "Thief", 170, 465)
-        self.intro_buttons = [self.new_game_button, self.quit_game_button]
+        self.intro_buttons = [self.new_game_button, self.quit_game_button, self.load_game_button]
         self.class_buttons = [self.knight_class_button, self.wizard_class_button,
                               self.thief_class_button, self.start_game_button]
 
@@ -161,7 +161,10 @@ class Game:
                     if self.quit_game_button.check_if_clicked(mouse_pos):
                         self.quit()
                     if self.load_game_button.check_if_clicked(mouse_pos):
+                        #try:
                         self.load_game()
+                        #except:
+                        print ("Load Not Succesfull")
                     if self.incr_diff_button.check_if_clicked(mouse_pos):
                         a = self.dif_list.index(self.difficulty)
                         if a < 4:
@@ -309,6 +312,18 @@ class Game:
         for quest in self.player.quest_book.quests:
             quest_name_list.append(quest.name)
         print ("packing player_data...")
+        score_data = [self.player.score_killed_enemies,
+                      self.player.score_swings,
+                      self.player.score_swing_enemy_hits,
+                      self.player.score_arrows,
+                      self.player.score_arrow_enemy_hits,
+                      self.player.score_spell_bullets,
+                      self.player.score_off_spell_damage,
+                      self.player.score_inflicted_damage,
+                      self.player.score_blocks,
+                      self.player.score_time_played,
+                      self.player.score_chest_opened,
+                      self.player.score_barrels_destroyed]
         player_data = {'char_name': self.player.char_name,
                        'name': self.player.name,
                        'act_lvl_name': act_level_name,
@@ -332,7 +347,8 @@ class Game:
                        'inventory_namecond_list' : self.player.inventory.return_item_namecond_list(),
                        'active_slots_item_namecond_list': self.player.return_active_slots_item_namecond_list(),
                        'spell_list':spell_name_list,
-                       'quest_list':quest_name_list}
+                       'quest_list':quest_name_list,
+                       'score_data':score_data}
         print (player_data)
         print ("-------------------------------")
         print ("packing levels_data...")
@@ -341,7 +357,7 @@ class Game:
             levels_data[level_name] = self.levelgen.save_objects(self.levels[level_name])
         print ("packing shops data...")
         shops_data = self.levelgen.shop_gen.save_shops_data()
-        saveValues = (self.difficulty, self.events_manager, player_data, levels_data, shops_data)
+        saveValues = (self.difficulty, self.events_manager, player_data, levels_data, shops_data, score_data)
         pickle.dump(saveValues, saveGame)
         saveGame.close()
 
@@ -354,6 +370,7 @@ class Game:
         player_data = loadValues[2]
         levels_data = loadValues[3]
         shops_data = loadValues[4]
+        score_data = loadValues[5]
         print("--LOAD OBJECTS--")
         print("----------------")
         print(levels_data)
@@ -374,6 +391,7 @@ class Game:
         self.player_data = player_data
         self.loaded_events_manager = events_manager
         self.saved_levels_data = levels_data
+        self.score_data = score_data
         print("LOAD DATA DESARIALISED")
         print("STARTING GAME with LOADED")
         if self.player_data['char_name'] == "Knight":
@@ -401,15 +419,15 @@ class Game:
         self.player = Player(self, name, class_selected)
 
     def load_player(self, player_data, class_selected):
-        ### TWORZE PLAYERA
+        print ("### TWORZE PLAYERA")
         self.player = Player(self, player_data['name'], class_selected)
-        ### POZYCJA
+        print("###### POZYCJA")
         self.player.put_in_pos(player_data['pos_x'],player_data['pos_y'])
-        ### INVENTARZ
+        print("###### INVENTARZ")
         self.player.inventory.remove_all()
         self.load_inventory_from_namecond_list(player_data['inventory_namecond_list'])
         self.player.load_active_slots_from_item_namecond_list(player_data['active_slots_item_namecond_list'],self.itemgen)
-        ### ZASOBY i SKILLe
+        print("###### ZASOBY i SKILLe")
         self.player.act_mana = player_data['act_mana']
         self.player.act_hp = player_data['act_hp']
         self.player.gold = player_data['gold']
@@ -424,13 +442,27 @@ class Game:
         self.player.base_wisdom = player_data['base_wis']
         self.player.base_stealth = player_data['base_ste']
         self.player.base_speed = player_data['base_spe']
-        #### CZARY
+        print("####### CZARY")
         spell_list = player_data['spell_list']
         for spell in spell_list:
             self.player.spell_book.add_spell_by_name(spell)
-        #### QUESTY
+        print("####### QUESTY")
         quest_list = player_data['quest_list']
         self.player.quest_book.load_quests_by_name_list(quest_list)
+        print("####### GAME SCORE and TIME")
+        print (self.score_data[0])
+        self.player.score_killed_enemies = self.score_data[0]
+        self.player.score_swings = self.score_data[1]
+        self.player.score_swing_enemy_hits = self.score_data[2]
+        self.player.score_arrows = self.score_data[3]
+        self.player.score_arrow_enemy_hits = self.score_data[4]
+        self.player.score_spell_bullets = self.score_data[5]
+        self.player.score_off_spell_damage = self.score_data[6]
+        self.player.score_inflicted_damage = self.score_data[7]
+        self.player.score_blocks = self.score_data[8]
+        self.player.score_time_played = self.score_data[9]
+        self.player.score_chest_opened = self.score_data[10]
+        self.player.score_barrels_destroyed = self.score_data[11]
         ### UPDATING STATS!
         self.player.update_stats()
         self.update_game_enviroment()
@@ -452,18 +484,30 @@ class Game:
         self.map_level_04 = tilemap.TiledMap(path.join(map_folder, 'mapa4.tmx'))
         self.level_05 = Level()
         self.map_level_05 = tilemap.TiledMap(path.join(map_folder, 'mapa5.tmx'))
+        self.level_06 = Level()
+        self.map_level_06 = tilemap.TiledMap(path.join(map_folder, 'mapa6.tmx'))
+        self.level_07 = Level()
+        self.map_level_07 = tilemap.TiledMap(path.join(map_folder, 'mapa7.tmx'))
+        self.level_08 = Level()
+        self.map_level_08 = tilemap.TiledMap(path.join(map_folder, 'mapa8.tmx'))
         #####
         self.levels['level01'] = self.level_01
         self.levels['level02'] = self.level_02
         self.levels['level03'] = self.level_03
         self.levels['level04'] = self.level_04
         self.levels['level05'] = self.level_05
+        self.levels['level06'] = self.level_06
+        self.levels['level07'] = self.level_07
+        self.levels['level08'] = self.level_08
         #####
         self.map_levels['level01'] = self.map_level_01
         self.map_levels['level02'] = self.map_level_02
         self.map_levels['level03'] = self.map_level_03
         self.map_levels['level04'] = self.map_level_04
         self.map_levels['level05'] = self.map_level_05
+        self.map_levels['level06'] = self.map_level_06
+        self.map_levels['level07'] = self.map_level_07
+        self.map_levels['level08'] = self.map_level_08
         #### CREATE ##########################################
         ### SPRITE GROUPS NALEZACE DO GAME a nie DO LEVEL! ###
         ######################################################
@@ -501,7 +545,7 @@ class Game:
         self.inv_open_door_button = RadioButton(rad_open_img, rad_open_h_img,
                                                 INV_POS[0] + 120, INV_POS[1] + 20)
         self.pause_button = RadioButton(rad_pause_img, rad_pause_h_img, INV_POS[0]+200, 680)
-        self.save_button = RadioButton(rad_but_img,rad_but_h_img,INV_POS[0]+280, 740)
+        #self.save_button = RadioButton(rad_but_img,rad_but_h_img,INV_POS[0]+280, 740)
         self.spell_book_button = RadioButton(sbb_img, sbb_h_img, INV_POS[0], 680)
         self.quest_book_button = RadioButton(qbb_img,qbb_h_img,INV_POS[0]+100, 680)
         self.cast_button = RadioButton(rad_cast_img, rad_cast_h_img, MAP_WIDTH / 2 - 72, MAP_HEIGHT - 96)
@@ -535,15 +579,21 @@ class Game:
             self.levelgen.load_level_03(False)
             self.levelgen.load_level_04(False)
             self.levelgen.load_level_05(False)
+            self.levelgen.load_level_06(False)
+            self.levelgen.load_level_07(False)
+            self.levelgen.load_level_08(False)
         else:
             self.levelgen.load_level_01(self.saved_levels_data['level01'])
             self.levelgen.load_level_02(self.saved_levels_data['level02'])
             self.levelgen.load_level_03(self.saved_levels_data['level03'])
             self.levelgen.load_level_04(self.saved_levels_data['level04'])
             self.levelgen.load_level_05(self.saved_levels_data['level05'])
+            self.levelgen.load_level_06(self.saved_levels_data['level06'])
+            self.levelgen.load_level_07(self.saved_levels_data['level07'])
+            self.levelgen.load_level_08(self.saved_levels_data['level08'])
             self.levelgen.shop_gen.load_shops_data(self.shops_data)
         if not loaded:
-            self.levelgen.go_to_level("level02", 25, 7)
+            self.levelgen.go_to_level("level01", 2, 2)
         else:
             self.levelgen.go_to_level(self.player_data["act_lvl_name"], self.player_data["pos_x"], self.player_data["pos_y"])
             ### AKTUALIZUJE wyglad gracza:
@@ -552,6 +602,7 @@ class Game:
                     if isinstance(slot.item, Armor) or isinstance(slot.item, Weapon):
                         self.player_group.add(slot.item)
             self.player.update_stats()
+            self.update_game_enviroment()
         print ("INITIALIZING CAMERA...")
         ##### CAMERA INIT
         self.camera = tilemap.Camera(self.map.width, self.map.height)
@@ -581,9 +632,9 @@ class Game:
             biggest_hp = 0
             most_powerful_enemy = False
             for enemy in self.player.score_killed_enemies:
-                if enemy.max_hp > biggest_hp:
-                    biggest_hp = enemy.max_hp
-                    most_powerful_enemy = enemy
+                if enemy[1] > biggest_hp:
+                    biggest_hp = enemy[1]
+                    most_powerful_enemy = enemy[0]
             self.most_powerful_enemy = most_powerful_enemy
         else:
             self.most_powerful_enemy = False
@@ -649,7 +700,7 @@ class Game:
         self.big_write("Gold: " + str(self.player.gold), (x_pos + 60, y_pos + 70))
         self.big_write("Killed enemies: " + str(self.killed_enemies), (x_pos + 60, y_pos + 90))
         if self.most_powerful_enemy:
-            self.big_write("Most powerful enemy: " + str(self.most_powerful_enemy.name), (x_pos + 60, y_pos + 110))
+            self.big_write("Most powerful enemy: " + self.most_powerful_enemy, (x_pos + 60, y_pos + 110))
         self.big_write("Melle damage: " + str(self.overall_melle_hits), (x_pos + 60, y_pos + 140))
         self.big_write("Melle accuracy: " + str(self.melle_accuracy) + "%", (x_pos + 60, y_pos + 160))
         self.big_write("Ranged damage: " + str(self.overall_arrow_hits), (x_pos + 60, y_pos + 190))
@@ -810,6 +861,10 @@ class Game:
                     else:
                         self.player.active_spell = self.player.selected_spell
                         self.player.update_stats()
+                if event.key == pygame.K_BACKSPACE:
+                    if self.item_picked:
+                        Item_to_take(self,self.player.pos.x,self.player.pos.y,self.item_picked)
+                        self.item_picked = False
                 if event.key == pygame.K_e:
                     ####### USE TELEPORT ########
                     teleport_hits = pygame.sprite.spritecollide(self.player, self.act_lvl.teleports, False)
@@ -911,8 +966,9 @@ class Game:
                                 self.back_to_game_and_unpause()
                             else:
                                 self.paused = True
-                        if self.save_button.check_if_clicked(mouse_pos):
-                            self.save_game()
+                        ##### WHILE DEVELOPING SAVE GAME IN GAME
+                        #if self.save_button.check_if_clicked(mouse_pos):
+                            #self.save_game()
                     ### PRZYCISK QUEST BOOK
                     if not self.dialog_in_progress or not self.ph_shop:
                         if self.quest_book_button.check_if_highlight(mouse_pos):
@@ -1143,7 +1199,7 @@ class Game:
         ### REMOVING rem_objects
         for rem_obj in self.rem_objects:
             if rem_obj.check_remove_condition():
-                #print ("Removing sprite")
+                print ("Removing sprite")
                 rem_obj.kill()
 
     def update(self):
@@ -1506,7 +1562,7 @@ class Game:
         self.screen.blit(i_ste_ico, (ST_POS[0] + 30, ST_POS[1] + 140))
         self.write("CLASS :" + str(self.player.char_class.name), (ST_POS[0] + ST_WIDTH - 250, ST_POS[1] + 40))
         self.write("LEVEL " + str(self.player.level), (ST_POS[0] + ST_WIDTH - 250, ST_POS[1] + 60))
-        self.write("XP: " + str(self.player.xp), (ST_POS[0] + ST_WIDTH - 150, ST_POS[1] + 60))
+        self.write("XP: " + str(self.player.xp), (ST_POS[0] + ST_WIDTH - 100, ST_POS[1] + 60))
         if self.player.attribute_points > 0:
             self.write("Points to spend :" + str(self.player.attribute_points), (ST_POS[0] + 10, ST_POS[1] + 10))
             self.str_ad_button.show_button(self.screen)
@@ -1529,8 +1585,8 @@ class Game:
         # print("xp_ratio_c")
         # print (xp_ratio_c)
         # print ("--------")
-        self.screen.blit(small_bar, (ST_POS[0] + ST_WIDTH - 100, ST_POS[1] + 65))
-        self.screen.blit(silver_line, (ST_POS[0] + ST_WIDTH - 100, ST_POS[1] + 65),
+        self.screen.blit(small_bar, (ST_POS[0] + ST_WIDTH - 100, ST_POS[1] + 45))
+        self.screen.blit(silver_line, (ST_POS[0] + ST_WIDTH - 100, ST_POS[1] + 45),
                          (0, 0, 80 * xp_ratio_c, 5))
         ####################
         mov_sp = str(self.player.movement_speed / 100)
@@ -1645,7 +1701,7 @@ class Game:
         self.draw_stats()
         self.draw_info()
         self.pause_button.show_button(self.screen)
-        self.save_button.show_button(self.screen)
+        #self.save_button.show_button(self.screen)
         self.spell_book_button.show_button(self.screen)
         self.quest_book_button.show_button(self.screen)
         self.write(str(int(self.clock.get_fps())), (0, 0))

@@ -24,10 +24,21 @@ class ItemGenerator:
         self.q_items.append(sprites.Quest_Item(self.game, "Gremlin Tooth", 0, 34, 94))
         self.q_items.append(sprites.Quest_Item(self.game, "Sunset Flower", 0, 35, 94))
         self.q_items.append(sprites.Quest_Item(self.game, "Elixir Arechinix",0,61,41))
-        self.q_items.append(sprites.Quest_Item(self.game, "Golden Mask",0,35,95))
+        self.q_items.append(sprites.Quest_Item(self.game, "Golden Mask",0,36,94))
         self.q_items.append(sprites.Quest_Item(self.game, "Mieszko Family Signet",100,17,43))
         self.q_items.append(sprites.Weapon(self.game,"Wilfredo`s Lasso","weapon","blunt",5,False,5,550,"big",
                                            0,0,0,0,0,0,50,48,44,35,90))
+        self.q_items.append(sprites.Quest_Item(self.game, "Bone",0,38,94))
+        self.q_items.append(sprites.Weapon(self.game,"Ent`s Staff","weapon","staff",250,False,8,
+                                           775,"big",0,2,0,0,0,0,80,53,43,3,90))
+        self.q_items.append(sprites.Quest_Item(self.game, "Magic Rose",0,40,94))
+        self.q_items.append(sprites.Armor(self.game,"Enanos Cap","armor","robe",
+                                          175,9,1,0,0,0,5,0,0,70,59,37,49,81))
+        self.q_items.append(sprites.Quest_Item(self.game,"Spider`s Leg",0,41,94))
+        self.q_items.append(sprites.Armor(self.game,"HEPA Helmet","helmet","textile",
+                                          10000,50,1,0,25,0,0,0,0,15,42,94,43,94))
+        self.q_items.append(sprites.Armor(self.game, "Corna Crown", "helmet", "crown",
+                                          10000, 0, 1, 10, 10, 10, 10, 10, 10, 100, 47, 35, 17, 92))
 
         ######## WEAPONS ###########
         self.weapons.append(sprites.Weapon(self.game, "Wooden Club", "weapon","blunt",
@@ -105,6 +116,9 @@ class ItemGenerator:
         self.weapons.append(sprites.Weapon(self.game, "Scimitair", "weapon","sword",
                                            100, False, 5, 550, "small",
                                            0, 0, 0, 0, 0, 0,50,10,47,42,89))
+        self.weapons.append(sprites.Weapon(self.game, "Crossbow","weapon","bow",
+                                           110,True,6,1500,False,
+                                           0,0,0,0,0,0,35,22,49,36,87))
         self.weapons.append(sprites.Weapon(self.game,"Double Axe", "weapon","axe",
                                            120,False,9,725,"medium",
                                            0,0,0,0,0,0,60,31,44,10,87))
@@ -123,6 +137,9 @@ class ItemGenerator:
         self.weapons.append(sprites.Weapon(self.game, "Golden Mace", "weapon", "blunt",
                                            175, False, 10, 800, "medium",
                                            0, 0, 0, 0, 0, 0,95, 53, 46, 1, 89))
+        self.weapons.append(sprites.Weapon(self.game, "Priest Staff", "weapon", "staff",
+                                           180, False, 7, 750, "big",
+                                           0, 0, 0, 0, 0, 0, 95, 52, 43, 9, 90))
         self.weapons.append(sprites.Weapon(self.game, "Broad Sword", "weapon", "sword",
                                            185, False, 8, 700, "medium",
                                            0, 0, 0, 0, 0, 0,80, 30, 46, 28, 88))
@@ -132,12 +149,18 @@ class ItemGenerator:
         self.weapons.append(sprites.Weapon(self.game, "Golden Flail", "weapon", "blunt",
                                            200, False, 10, 1000, "big",
                                            0, 0, 0, 0, 0, 0, 90,39,47, 2, 88))
+        self.weapons.append(sprites.Weapon(self.game, "Royal Crossbow","weapon","bow",
+                                           210,True,8,1400,False,
+                                           0,0,0,0,0,0,50,23,49,36,87))
         self.weapons.append(sprites.Weapon(self.game, "Golden Dwarf Axe", "weapon", "axe",
                                            220, False, 10, 750, "medium",
                                            0, 0, 0, 0, 0, 0,95, 43, 44, 23, 88))
         self.weapons.append(sprites.Weapon(self.game, "Oriental Mace", "weapon", "blunt",
                                            220, False, 7, 875, "medium",
                                            0, 0, 0, 2, 0, 0, 70,49,46,54,87))
+        self.weapons.append(sprites.Weapon(self.game, "Katana", "weapon", "sword",
+                                           240,False,8,600,"medium",
+                                           0,0,0,0,0,0,85,55,48,48,88))
         self.weapons.append(sprites.Weapon(self.game, "Sapphire Sword", "weapon", "sword",
                                            250, False, 9, 700, "medium",
                                            0, 1, 0, 0, 0, 0,80, 33,46,17,91))
@@ -147,6 +170,9 @@ class ItemGenerator:
         self.weapons.append(sprites.Weapon(self.game, "Obsidian Dagger", "weapon", "dagger",
                                            300, False, 5, 500, "small",
                                            0, 0, 0, 0, 1, 0,90, 21,47,49,89))
+        self.weapons.append(sprites.Weapon(self.game, "Obsidian Katana", "weapon", "sword",
+                                           325,False, 10,600,"medium",
+                                           0,0,0,0,2,0,90,25,46,48,88))
         self.weapons.append(sprites.Weapon(self.game, "Sapphire Spear", "weapon", "spear",
                                            350, False, 12, 900, "big",
                                            0, 1, 0, 0, 0, 0,80, 38,48,52,90))
@@ -195,7 +221,7 @@ class ItemGenerator:
         self.armors.append(sprites.Armor(self.game, "Heavy Plate Armor", "armor","plate",
                                          65, 24, 1.6, 0, 0, 0, 0, 0, 0,90, 15, 38, 53, 82))
         self.armors.append(sprites.Armor(self.game,"Dryad`s Armor", "armor","robe",
-                                         70,12,1,0,0,2,0,0,0,70,53,38,44,83))
+                                         70,7,1,0,0,2,0,0,0,70,53,38,44,83))
         self.armors.append(sprites.Armor(self.game, "Steel Plate Armor", "armor","plate",
                                          75, 25, 1.4, 0, 0, 0, 0, 0, 0,125, 16, 38, 53, 82))
         self.armors.append(sprites.Armor(self.game, "Spiked Plate Armor", "armor","plate",
@@ -204,6 +230,8 @@ class ItemGenerator:
                                          100,20,1.25,0,0,0,0,0,0,75,21,38,28,82))
         self.armors.append(sprites.Armor(self.game,"Mithril Armor", "armor","chain",
                                          150,25,1,0,0,0,0,0,2,50,33,38,27,83))
+        self.armors.append(sprites.Armor(self.game,"Pearl Armor","armor","plate",
+                                         200,22,1.2,0,0,0,0,0,5,65,12,38,52,81))
         self.armors.append(sprites.Armor(self.game,"Royal Armor", "armor","chain",
                                          225,28,1.1,0,0,0,1,0,0,90,35,38,53,81))
         self.armors.append(sprites.Armor(self.game,"Wizard`s Robe", "armor","robe",
@@ -220,12 +248,16 @@ class ItemGenerator:
                                          12, 8, 1.05, 0, 0, 0, 0, 0, 0, 60,11, 37, 16, 86))
         self.armors.append(sprites.Armor(self.game, "Round Shield", "shield","wood",
                                          15, 6, 1 ,0,0,0,0,0,0,50,29,37,21,86))
+        self.armors.append(sprites.Armor(self.game,"Big Wooden Shield","shield","wood",
+                                         20, 8, 1, 0,0,0,0,0,0,30,56,35,8,86))
         self.armors.append(sprites.Armor(self.game, "Cavalry Shield","shield","iron",
-                                         20, 9,1.05,0,0,0,0,0,0,60,33,37,57,85))
+                                         35, 9,1.05,0,0,0,0,0,0,60,33,37,57,85))
+        self.armors.append(sprites.Armor(self.game, "Legion Shield","shield", "iron",
+                                         50,10,1.1,0,0,0,0,0,0,80,28,37,61,85))
+        self.armors.append(sprites.Armor(self.game, "Tower Shield", "shield", "iron",
+                                         60, 16, 1.2, 0, 0, 0, 0, 0, 0, 85, 17, 37, 53, 85))
         self.armors.append(sprites.Armor(self.game, "Scull Round Shield", "shield","iron",
-                                         55, 10, 1, 0, 0, 0, 0, 0, 0,75, 31,37,26,86))
-        self.armors.append(sprites.Armor(self.game, "Tower Shield", "shield","iron",
-                                         60, 16, 1.2, 0, 0, 0, 0, 0, 0,85, 17, 37, 53, 85))
+                                         75, 10, 1, 0, 0, 0, 0, 0, 0,75, 31,37,26,86))
         self.armors.append(sprites.Armor(self.game, "Hoplite Shiled", "shield", "iron",
                                          80, 12, 1, 0, 0, 0, 0, 0, 0,65, 7, 37, 46, 85))
         self.armors.append(sprites.Armor(self.game, "Phalanx Shield", "shield", "iron",
@@ -265,6 +297,8 @@ class ItemGenerator:
                                          15, 4, 1, 0, 0, 0, 0, 0, 0,20, 40,36,4,92))
         self.armors.append(sprites.Armor(self.game, "Red Hood", "helmet", "leather",
                                          12, 3, 1, 0, 0, 0, 0, 0, 0,35, 41,36,61,92))
+        self.armors.append(sprites.Armor(self.game, "Iron Helmet", "helmet", "plate",
+                                         20, 5, 1.1, 0, 0, 0, 0, 0, 0, 45, 39,94,53,92))
         self.armors.append(sprites.Armor(self.game, "Gladiator Helm", "helmet", "plate",
                                          25, 8, 1.15, 0, 0, 0, 0, 0, 0,90, 50,36,59,92))
         self.armors.append(sprites.Armor(self.game, "Mameluk Helm", "helmet", "chain",
@@ -277,14 +311,22 @@ class ItemGenerator:
                                          80, 12, 1.2, 0, 0, 0, 0, 0, 0,90, 58,36,39,92))
         self.armors.append(sprites.Armor(self.game, "Templar Helmet", "helmet", "plate",
                                          125, 14, 1.1, 0, 0, 0, 0, 0, 0,100, 56, 36, 57, 92))
+        self.armors.append(sprites.Armor(self.game, "Green Wizard Hat","helmet","robe",
+                                         175,2,1,0,2,1,0,1,1,40,55,35,19,93))
         self.armors.append(sprites.Armor(self.game, "Devil`s Helmet", "helmet", "plate",
                                          205, 20, 1.05, 1, 0, 0, 0, 0, 0, 125,59, 36, 52, 92))
+        self.armors.append(sprites.Armor(self.game, "Arcmage Hat", "helmet", "robe",
+                                         225,2,1,0,0,3,5,0,0,50,49,36,16,93))
+        self.armors.append(sprites.Armor(self.game, "Leonidas Hemlet", "helmet", "plate",
+                                         250, 24, 1.1,1,1,0,0,0,0,90,38,34,63,92))
+
 
         #### POTIONS ###########
         self.potions.append(sprites.Potion(self.game, "Red Potion", "Cure",15,30,26,42))
         self.potions.append(sprites.Potion(self.game, "Small Red Potion", "Cure",5,15,24,42))
         self.potions.append(sprites.Potion(self.game, "Blue Potion", "Mana",15,30,58,41))
         self.potions.append(sprites.Potion(self.game, "Small Blue Potion", "Mana", 5, 15, 23, 42))
+        self.potions.append(sprites.Potion(self.game, "Purple Potion", "All",30,35,9,42))
 
         #### ARROWS
         self.arrows.append(sprites.Arrow_Item(self.game,"Arrows",5))
@@ -337,14 +379,15 @@ class ItemGenerator:
 
         #### NECKLACE
         self.rings.append(sprites.Necklace(self.game, "Troll`s Finger", 125, 4, 0, 0, 0, 0, 0, 1, 0, 0, 1.1, 31, 35))
-        self.rings.append(sprites.Necklace(self.game,"Red Necklace",160,1, 0, 0, 0, 0, 0, 1, 0, 0, 1,62,34))
-        self.rings.append(sprites.Necklace(self.game, "Blue Necklace", 200, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1, 61, 34))
-        self.rings.append(sprites.Necklace(self.game, "Yellow Necklace", 200, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 63, 34))
-        self.rings.append(sprites.Necklace(self.game, "Green Necklace", 210, 0, 2, 0, 0, 0, 0, 1, 0, 0, 1, 0, 35))
-        self.rings.append(sprites.Necklace(self.game, "Red Necklace", 220, 0, 0, 2, 0, 0, 0, 1, 0, 0, 1, 1, 35))
-        self.rings.append(sprites.Necklace(self.game, "Rabbit Foot", 325, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0.96, 3, 35))
-        self.rings.append(sprites.Necklace(self.game, "Solar Pedant", 425, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.82, 7, 35))
-        self.rings.append(sprites.Necklace(self.game, "Amethyst Bat`s Wings", 225, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0.96, 31, 35))
+        self.rings.append(sprites.Necklace(self.game,"Red Necklace",140,1, 0, 0, 0, 0, 0, 1, 0, 0, 1,62,34))
+        self.rings.append(sprites.Necklace(self.game, "Blue Necklace", 150, 0, 0, 0, 2, 0, 0, 0, 0, 0, 1, 61, 34))
+        self.rings.append(sprites.Necklace(self.game, "Yellow Necklace", 150, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 63, 34))
+        self.rings.append(sprites.Necklace(self.game, "Green Necklace", 180, 0, 2, 0, 0, 0, 0, 1, 0, 0, 1, 0, 35))
+        self.rings.append(sprites.Necklace(self.game, "Red Necklace", 200, 0, 0, 2, 0, 0, 0, 1, 0, 0, 1, 1, 35))
+        self.rings.append(sprites.Necklace(self.game, "Rabbit Foot", 225, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0.96, 3, 35))
+        self.rings.append(sprites.Necklace(self.game, "Solar Pedant", 325, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.82, 7, 35))
+        self.rings.append(sprites.Necklace(self.game, "Amethyst Bat`s Wings", 200, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0.96, 31, 35))
+        self.rings.append(sprites.Necklace(self.game, "Tilas Necklace",250,0,3,0,0,0,0,0,0,0,1,12,35))
 
         #### SMITH ITEMS
         self.smith_items = self.weapons + self.armors
@@ -370,6 +413,8 @@ class ItemGenerator:
             return sprites.Key(self.game, "Key", key, 55, 40)
         elif name == "Miraflorida Magic Key":
             return sprites.Key(self.game, "Miraflorida Key", 41, 55, 40)
+        elif name == "Goblin Chest Key":
+            return sprites.Key(self.game, "Goblin Chest Key", 71, 55, 40)
         else:
             print ("ERROR in KEY CREATING")
 
@@ -410,10 +455,14 @@ class ItemGenerator:
         if name == "random":
             item = self.generate_random_item("all")
             return copy.copy(item)
+        if name[-3:] == "Key":
+            print("szukam klucza po nazwie (tylko specjalne klucze")
+            item = self.g_key(name,False)
+            return copy.copy(item)
         for i in self.all_item_and_quest_items:
             if i.name == name:
                 return copy.copy(i)
-        print ("ERROR - NO ITEM of NAME: "+ name)
+        print ("ERROR - NO ITEM of NAME: " + name)
         return False
 
     def generate_weapon_by_name(self, name):

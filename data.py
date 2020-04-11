@@ -149,6 +149,7 @@ e_ironskin_ico = pygame.image.load(path.join(img_folder, 'e_ironskin.png')).conv
 e_heroism_ico = pygame.image.load(path.join(img_folder, 'e_heroism.png')).convert_alpha()
 e_slow_ico = pygame.image.load(path.join(img_folder, 'e_slow.png')).convert_alpha()
 e_fire_ico = pygame.image.load(path.join(img_folder, 'e_fire_ico.png')).convert_alpha()
+e_dam_ico = pygame.image.load(path.join(img_folder, 'e_dam_ico.png')).convert_alpha()
 ### SPELL ICONS
 sb_firebolt_image = pygame.image.load(path.join(img_folder, 'sb_firebolt.png')).convert_alpha()
 sb_fireball_image = pygame.image.load(path.join(img_folder, 'sb_fireball.png')).convert_alpha()
@@ -170,6 +171,7 @@ bullet_poison_image = pygame.image.load(path.join(img_folder, 'bull_poisoncloud.
 bullet_magic_image = pygame.image.load(path.join(img_folder, 'bull_magic.png')).convert_alpha()
 bullet_dart_image = pygame.image.load(path.join(img_folder, 'bull_dart.png')).convert_alpha()
 bullet_rock_image = pygame.image.load(path.join(img_folder, 'bull_rock.png')).convert_alpha()
+bullet_stone_image = pygame.image.load(path.join(img_folder, 'bull_stone.png')).convert_alpha()
 ### ANIMS
 torch1_img = pygame.image.load(path.join(anim_folder, 'torch1.png')).convert_alpha()
 torch2_img = pygame.image.load(path.join(anim_folder, 'torch2.png')).convert_alpha()
@@ -224,3 +226,4 @@ crunch_snd = pygame.mixer.Sound(path.join(snd_folder, 'crunch.wav'))
 levelup_snd = pygame.mixer.Sound(path.join(snd_folder, 'level_up.wav'))
 item_dig_snd = pygame.mixer.Sound(path.join(snd_folder, 'item_dig.wav'))
 item_found_snd = pygame.mixer.Sound(path.join(snd_folder, 'item_found.wav'))
+whoaf_snd = pygame.mixer.Sound(path.join(snd_folder, 'whoaf.wav'))
