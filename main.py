@@ -161,10 +161,12 @@ class Game:
                     if self.quit_game_button.check_if_clicked(mouse_pos):
                         self.quit()
                     if self.load_game_button.check_if_clicked(mouse_pos):
-                        #try:
-                        self.load_game()
-                        #except:
-                        print ("Load Not Succesfull")
+                        try:
+                            self.load_game()
+                        except:
+                            print ("Load Not Succesfull")
+                        else:
+                            self.quit()
                     if self.incr_diff_button.check_if_clicked(mouse_pos):
                         a = self.dif_list.index(self.difficulty)
                         if a < 4:
