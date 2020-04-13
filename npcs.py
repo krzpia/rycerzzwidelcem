@@ -41,7 +41,7 @@ class QuestGenerator:
         self.q_miraflorida.put_image_from_tileset(0,60,full_tileset_image)
         ###############################################################################################
         self.q_open_the_gates = ui.Quest(self.game,"Open the Gates","Find and bring: Sunset Flower,Mad Bat Wing, Gremlin Tooth",
-                                         1,[],["Sunset Flower","Mad Bat Wing", "Gremlin Tooth"],False,[],[],20,0,"Miraflorida Magic Key")
+                                         1,[],["Sunset Flower","Mad Bat Wing", "Gremlin Tooth"],False,[],[],20,0,"Miraflorida Key")
         self.q_open_the_gates.put_image_from_tileset(32,94,full_tileset_image)
         ###############################################################################################
         self.q_karol_the_alchemist = ui.Quest(self.game,"Karol the Alchemist","Find Karol and bring          him the ingriedients",

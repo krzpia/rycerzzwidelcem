@@ -1062,7 +1062,7 @@ class Key:
                 self.game.item_picked = False
             if isinstance(self.lock_is_close,Treasure_Chest):
                 #print("OPEN CHEST")
-                if self.lock_is_close.unlock_with_key(self):
+                if self.lock_is_close.unlock_with_key():
                     self.lock_is_close.open()
         else:
             if not pygame.mixer.Channel(1).get_busy():

@@ -161,12 +161,12 @@ class Game:
                     if self.quit_game_button.check_if_clicked(mouse_pos):
                         self.quit()
                     if self.load_game_button.check_if_clicked(mouse_pos):
-                        try:
-                            self.load_game()
-                        except:
-                            print ("Load Not Succesfull")
-                        else:
-                            self.quit()
+                        #try:
+                        self.load_game()
+                        #except:
+                        #    print ("Load Not Succesfull")
+                        #else:
+                        #    self.quit()
                     if self.incr_diff_button.check_if_clicked(mouse_pos):
                         a = self.dif_list.index(self.difficulty)
                         if a < 4:
@@ -1548,6 +1548,20 @@ class Game:
                          (0, 0, 80 * self.player.hit_load_percentage / 100, 5))
 
     def draw_stats(self):
+        ######### PASEK XP
+        min_xp_c = 10 * (self.player.level - 1) + ((self.player.level - 2) * 2 * (self.player.level - 1))
+        # print ("min_xp_c")
+        # print (min_xp_c)
+        max_xp_c = 10 * self.player.level + ((self.player.level - 1) * 2 * self.player.level)
+        # print("max_xp_c")
+        # print (max_xp_c)
+        xp_dif_c = self.player.xp - min_xp_c
+        # print("xp_dif_c")
+        # print (xp_dif_c)
+        xp_ratio_c = xp_dif_c / (max_xp_c - min_xp_c)
+        # print("xp_ratio_c")
+        # print (xp_ratio_c)
+        # print ("--------")
         self.write("Name :" + self.player.name, (ST_POS[0] + ST_WIDTH / 2 - 40, ST_POS[1] + 10))
         self.write("Skills:", (ST_POS[0] + 10, ST_POS[1] + 10))
         self.write(str(self.player.strength), (ST_POS[0] + 50, ST_POS[1] + 40))
@@ -1564,7 +1578,7 @@ class Game:
         self.screen.blit(i_ste_ico, (ST_POS[0] + 30, ST_POS[1] + 140))
         self.write("CLASS :" + str(self.player.char_class.name), (ST_POS[0] + ST_WIDTH - 250, ST_POS[1] + 40))
         self.write("LEVEL " + str(self.player.level), (ST_POS[0] + ST_WIDTH - 250, ST_POS[1] + 60))
-        self.write("XP: " + str(self.player.xp), (ST_POS[0] + ST_WIDTH - 100, ST_POS[1] + 60))
+        self.write(f'XP: {self.player.xp}/{max_xp_c}', (ST_POS[0] + ST_WIDTH - 100, ST_POS[1] + 60))
         if self.player.attribute_points > 0:
             self.write("Points to spend :" + str(self.player.attribute_points), (ST_POS[0] + 10, ST_POS[1] + 10))
             self.str_ad_button.show_button(self.screen)
@@ -1573,20 +1587,6 @@ class Game:
             self.wis_ad_button.show_button(self.screen)
             self.spe_ad_button.show_button(self.screen)
             self.ste_ad_button.show_button(self.screen)
-        ######### PASEK XP
-        min_xp_c = 10 * (self.player.level - 1) + ((self.player.level - 2) * 2 * (self.player.level - 1))
-        # print ("min_xp_c")
-        # print (min_xp_c)
-        max_xp_c = 10 * self.player.level + ((self.player.level - 1) * 2 * self.player.level)
-        # print("max_xp_c")
-        # print (max_xp_c)
-        xp_dif_c = self.player.xp - min_xp_c
-        # print("xp_dif_c")
-        # print (xp_dif_c)
-        xp_ratio_c = xp_dif_c / (max_xp_c - min_xp_c)
-        # print("xp_ratio_c")
-        # print (xp_ratio_c)
-        # print ("--------")
         self.screen.blit(small_bar, (ST_POS[0] + ST_WIDTH - 100, ST_POS[1] + 45))
         self.screen.blit(silver_line, (ST_POS[0] + ST_WIDTH - 100, ST_POS[1] + 45),
                          (0, 0, 80 * xp_ratio_c, 5))

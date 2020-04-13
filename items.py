@@ -411,7 +411,7 @@ class ItemGenerator:
         ####################################
         if name == "Key":
             return sprites.Key(self.game, "Key", key, 55, 40)
-        elif name == "Miraflorida Magic Key":
+        elif name == "Miraflorida Key":
             return sprites.Key(self.game, "Miraflorida Key", 41, 55, 40)
         elif name == "Goblin Chest Key":
             return sprites.Key(self.game, "Goblin Chest Key", 71, 55, 40)
@@ -494,7 +494,7 @@ class ItemGenerator:
         return False
 
     def load_item_by_name(self, name, condition = False):
-        if name[:3] == "Key":
+        if name[-3:] == "Key":
             print("found a key")
             ## KLUCz condition to bedzie zmienna key... (wiem, ze zle nie powinienem podstawiac zmiennych)
             new_item = self.g_key(name, condition)
