@@ -225,6 +225,18 @@ class EnemyGenerator:
             return sprites.Mob(self.game, name, x, y, image, False, ("fire",round(self.dif*12),280,2000),
                                40,20,1.0,hp,round(self.dif*1),200,7, item)
 
+        if name == "Red Mutant":
+            if not hp:
+                hp = round(self.dif * 100)
+            return sprites.Mob(self.game, name, x, y, image, False, ("fire",round(self.dif*20),280,1800),
+                               50,25,1.0,hp,round(self.dif*10),280,50, item)
+
+        if name == "Coronavirus":
+            if not hp:
+                hp = round(self.dif * 250)
+            return sprites.Mob(self.game, name, x, y, image, False, ("virus",round(self.dif*50),250,1500),
+                               100,25,1.0,hp,round(self.dif*25),285,100, item)
+
 
 
 

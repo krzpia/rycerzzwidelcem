@@ -9,7 +9,7 @@ False;quest Golden Mask;0;3;Need some protection? What do you mean?;False;False;
 True;quest Golden Mask;0;4;An ancient artifact called Golden Mask.           Wish you help us to find it?;Yes>quest Golden Mask>0,5;No, I`m quite busy right now>False>0,6;False;False;False;False;False;False
 True;quest Golden Mask;0;5;Ok. Go then and speak with Eveandro, he will tell you where you can start your task;False;False;False;False;Next;False;False;False
 True;quest Golden Mask;0;6;Ok.. We will look after someone brave to complete this task..;False;False;False;False;Next;False;False;False
-True;quest Golden Mask;1;0;Go and find Golden Mask. Look after it in the north lands!;False;False;False;False;Next;False;False;False
+True;quest Golden Mask;1;0;Go and find Golden Mask. Look after it in         the North Lands!;False;False;False;False;Next;False;False;False
 True;quest Golden Mask;2;0;Holy Crap! You`ve made it! Original Golden Mask.  Look it has original engraved inscription         'HEPA MASK FPP3  Made in China'                   It`s very powerfull stuff. Go to Dori. She will   know how to use it!;False;False;False;False;False;False;False;quest Golden Mask has been completed
 True;quest Golden Mask;2;1;She will reward you also quite well!;False;False;False;False;Next;False;False;False
 True;quest Golden Mask;3;0;Did you speak with Dori? She will know how to pay you well for it!;False;False;False;False;Next;False;False;False

@@ -1921,6 +1921,8 @@ class Mob(pygame.sprite.Sprite):
                 self.bullet_image = bullet_rock_image
             elif self.bullet_type == "dart":
                 self.bullet_image = bullet_dart_image
+            elif self.bullet_type == "virus":
+                self.bullet_image = bullet_virus_image
             else:
                 self.bullet_image = bullet_magic_image
             self.bullet_damage = ranged_parameters[1]

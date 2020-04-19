@@ -1674,6 +1674,10 @@ class DialogBox:
             ### jezeli next level, pauzuje gre po dialogu
             if self.game.player.check_next_level():
                 self.game.paused = True
+            ### jezeli koniec gry:
+            if self.game.events_manager.check_game_accomplished():
+                self.game.game_accomplished = True
+                self.game.playing = False
 
     def write_actual_text(self):
         if self.actual_text.ifnpc:

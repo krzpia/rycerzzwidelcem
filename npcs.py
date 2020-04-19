@@ -62,7 +62,7 @@ class QuestGenerator:
         ###############################################################################################
         self.q_magic_rose = ui.Quest(self.game,"Magic Rose", "Bring to the Enano the magic  rose flower",
                                      1,[],["Magic Rose"],True,[],[],20,20,"Enanos Cap")
-        self.q_magic_rose.put_image_from_tileset(39,94,full_tileset_image)
+        self.q_magic_rose.put_image_from_tileset(40,94,full_tileset_image)
         ###############################################################################################
         self.q_coronavirus = ui.Quest(self.game,"Coronavirus","Kill the Coronavirus",1,["Coronavirus"],
                                       [],False,[],[],100,10000,"Corona Crown")
@@ -182,6 +182,7 @@ class NpcGenerator:
             king_sancho.dialog_data.thread_unblock_with_event("quest Speak with the King",['got quest Speak with the King'])
             king_sancho.dialog_data.thread_block_with_event("ill",['quest Karol the Alchemist has been completed'])
             king_sancho.dialog_data.thread_unblock_with_event("quest Coronavirus",['quest Golden Mask has been rewarded'])
+            king_sancho.dialog_data.thread_block_with_event("quest Speak with the King",['Coronavirus has been killed'])
             return king_sancho
 
         if name == "King`s Guard":

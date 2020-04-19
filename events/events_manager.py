@@ -78,6 +78,11 @@ class EventManager:
             if game_event.id == f'thread {thread_name} has been read':
                 return True
 
+    def check_game_accomplished(self):
+        for game_event in self.events:
+            if game_event.id == f'game accomplished':
+                return True
+
 
 
 

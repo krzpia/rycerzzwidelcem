@@ -295,9 +295,6 @@ class Game:
         #### FLIP
         pygame.display.flip()
 
-    #def load(self, file):
-    #   pass
-
     def save_game(self):
         print ("saving...")
         saveGame = open('savegame.txt', 'wb')
@@ -403,7 +400,6 @@ class Game:
         if self.player_data['char_name'] == "Thief":
             self.new(self.thief_class,difficulty,True)
 
-
     def load_inventory_from_namecond_list(self, nc_list):
         ## TO UNPACK ITEMS FOR PLAYER INVENTORY
         self.itemgen = ItemGenerator(self, tileset_image,full_tileset_image)
@@ -470,6 +466,7 @@ class Game:
         self.update_game_enviroment()
 
     def new(self, class_selected, difficulty, loaded = False):
+        self.game_accomplished = False
         #### LOADING LEVELS ####
         self.difficulty = difficulty
         print("LOADING LEVELS...")
@@ -492,6 +489,8 @@ class Game:
         self.map_level_07 = tilemap.TiledMap(path.join(map_folder, 'mapa7.tmx'))
         self.level_08 = Level()
         self.map_level_08 = tilemap.TiledMap(path.join(map_folder, 'mapa8.tmx'))
+        self.level_09 = Level()
+        self.map_level_09 = tilemap.TiledMap(path.join(map_folder, 'mapa9.tmx'))
         #####
         self.levels['level01'] = self.level_01
         self.levels['level02'] = self.level_02
@@ -501,6 +500,7 @@ class Game:
         self.levels['level06'] = self.level_06
         self.levels['level07'] = self.level_07
         self.levels['level08'] = self.level_08
+        self.levels['level09'] = self.level_09
         #####
         self.map_levels['level01'] = self.map_level_01
         self.map_levels['level02'] = self.map_level_02
@@ -510,6 +510,7 @@ class Game:
         self.map_levels['level06'] = self.map_level_06
         self.map_levels['level07'] = self.map_level_07
         self.map_levels['level08'] = self.map_level_08
+        self.map_levels['level09'] = self.map_level_09
         #### CREATE ##########################################
         ### SPRITE GROUPS NALEZACE DO GAME a nie DO LEVEL! ###
         ######################################################
@@ -527,7 +528,7 @@ class Game:
         ### CREATE PLAYER ###
         #####################
         if not loaded:
-            self.new_player("Kris", class_selected)
+            self.new_player("Adventurer", class_selected)
         else:
             self.load_player(self.player_data, class_selected)
         ### CREATE EVENTS MANAGER
@@ -584,6 +585,7 @@ class Game:
             self.levelgen.load_level_06(False)
             self.levelgen.load_level_07(False)
             self.levelgen.load_level_08(False)
+            self.levelgen.load_level_09(False)
         else:
             self.levelgen.load_level_01(self.saved_levels_data['level01'])
             self.levelgen.load_level_02(self.saved_levels_data['level02'])
@@ -593,6 +595,7 @@ class Game:
             self.levelgen.load_level_06(self.saved_levels_data['level06'])
             self.levelgen.load_level_07(self.saved_levels_data['level07'])
             self.levelgen.load_level_08(self.saved_levels_data['level08'])
+            self.levelgen.load_level_09(self.saved_levels_data['level09'])
             self.levelgen.shop_gen.load_shops_data(self.shops_data)
         if not loaded:
             self.levelgen.go_to_level("level01", 2, 2)
@@ -695,8 +698,13 @@ class Game:
         y_pos = 140
         x_pos = 100
         self.screen.fill(BGCOLOR)
-        self.screen.blit(game_over_img, (0, 0))
-        self.big_write("GAME OVER", (SCREEN_WIDTH / 2 - 120, 60))
+        if self.game_accomplished:
+            self.screen.blit(winner_img, (0, 0))
+            self.big_write("CONGRATULATIONS!", (SCREEN_WIDTH / 2 - 120, 60))
+            self.big_write("YOU HAVE ACCOMPLISHED THE GAME!", (SCREEN_WIDTH / 2 - 120, 100))
+        else:
+            self.screen.blit(game_over_img, (0, 0))
+            self.big_write("GAME OVER", (SCREEN_WIDTH / 2 - 120, 60))
         self.big_write("Press Enter to go to Main Menu", (SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT - 100))
         self.big_write("Game time: " + str(self.time_played) + " sec.", (x_pos + 60, y_pos + 50))
         self.big_write("Gold: " + str(self.player.gold), (x_pos + 60, y_pos + 70))
@@ -1646,7 +1654,6 @@ class Game:
                 if anim_counter >= len(self.player.char_death_animation_images):
                     animation = False
             pygame.display.flip()
-
         self.playing = False
 
     def draw(self):
@@ -1759,7 +1766,6 @@ class Game:
 
         #### FLIP
         pygame.display.flip()
-
 
 game = Game()
 game.intro()

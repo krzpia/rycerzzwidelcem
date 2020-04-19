@@ -39,8 +39,10 @@ class LevelGen:
             self.load_level_07()
         elif name == "level08":
             self.load_level_08()
+        elif name == "level09":
+            self.load_level_09()
         else:
-            print ("ERROR DECODIN LEVELGEN LOAD LEVEL by NAME")
+            print ("ERROR DECODING LEVELGEN LOAD LEVEL by NAME")
 
     def go_to_level(self,level,pos_x, pos_y):
         self.game.act_lvl = self.game.levels[level]
@@ -49,6 +51,52 @@ class LevelGen:
         self.game.map_image = self.game.map.make_map()
         self.game.map_rect = self.game.map_image.get_rect()
         self.game.player.put_in_pos(pos_x, pos_y)
+
+    def load_level_09(self, saved_data):
+        self.game.act_lvl = self.game.level_09
+        ### ALL SPRITES (BEZ GRACZA!)
+        self.game.level_09.all_sprites = pygame.sprite.LayeredUpdates()
+        ## MURY / tylko odbijanie od obiektu Rect z TMX MAPS
+        self.game.level_09.walls = pygame.sprite.LayeredUpdates()
+        ## PRZESZKODY / odbijaja sie za pomoca hit_rect.
+        self.game.level_09.hr_obstacles = pygame.sprite.LayeredUpdates()
+        ## NIEWIDZIALNE POLE ZABIERAJACE HP
+        self.game.level_09.lavas = pygame.sprite.LayeredUpdates()
+        ## NPCS
+        self.game.level_09.npcs = pygame.sprite.LayeredUpdates()
+        ## PRZECIWNICY
+        self.game.level_09.mobs = pygame.sprite.LayeredUpdates()
+        ## STRZALY PRZECIWNIKOW
+        self.game.level_09.mob_arrows = pygame.sprite.LayeredUpdates()
+        ## STRZALY ranged
+        self.game.level_09.arrows = pygame.sprite.LayeredUpdates()
+        ## Sprite ataku wręcz
+        self.game.level_09.melle_swing = pygame.sprite.LayeredUpdates()
+        ## PRZEDMIOTY NA MAPIE DO PODNIESIENIA
+        self.game.level_09.items_to_pick = pygame.sprite.LayeredUpdates()
+        ## OBIEKTY DO INTERAKCJI (PODNIESIENIA, WYLECZENIA ITP)
+        self.game.level_09.collecting_sprites = pygame.sprite.LayeredUpdates()
+        ## ZLOTE MONETY DO PODNIESIENIA
+        self.game.level_09.gold_to_pick = pygame.sprite.LayeredUpdates()
+        ## STRZALY DO PODNIESIENIA
+        self.game.level_09.arrows_to_pick = pygame.sprite.LayeredUpdates()
+        ## DRZWI
+        self.game.level_09.doors = pygame.sprite.LayeredUpdates()
+        ## SKRZYNIE
+        self.game.level_09.chest_to_open = pygame.sprite.LayeredUpdates()
+        ## TELEPORTS
+        self.game.level_09.teleports = pygame.sprite.LayeredUpdates()
+        ## SHOPS
+        self.game.level_09.shops = pygame.sprite.LayeredUpdates()
+        if not saved_data:
+            ### 1 URUCHOMIENIE:
+            self.load_objects(self.game.map_level_09.tmxdata.objects)
+        else:
+            ### 2. z LOAD GAME
+            print ("MAM DANE, uruchamiam load level from saved data...")
+            self.load_enemy_images(self.game.map_level_09.tmxdata.objects)
+            self.load_object_images(self.game.map_level_09.tmxdata.objects)
+            self.load_objects_from_save_data(self.game.map_level_09.tmxdata.objects, saved_data)
 
     def load_level_08(self, saved_data):
         self.game.act_lvl = self.game.level_08

@@ -12,9 +12,11 @@ True;quest Speak with the King;2;4;Okhh. Ok.. (cough). Let me see. I will speak 
 True;quest Speak with the King;2;5;Take this as my gratefullness;False;False;False;False;Next;False;False;quest Speak with the King has been rewarded
 True;quest Speak with the King;3;0;Lord Ivan is working on the cure. We think we`ll  spread de Arechinix by the giant ballon over the  empire or something else;False;False;False;False;Next;False;False;False
 True;quest Coronavirus;0;0;Ok. Are you ready to face the danger? ;Yes!>quest Coronavirus>0,1;False;False;False;False;False;False;False
-True;quest Coronavirus;0;1;Use the teleport in library to get to the Virudungeon! Kill the beast!;False;False;False;False;Next;False;False;False
-True;quest Coronavirus;0;2;Ok. We are waiting for you!;False;False;False;False;Next;False;False;False
-True;quest Coronavirus;1;0;We are waiting for your victory!;False;False;False;False;Next;False;False;False
-True;quest Coronavirus;2;0;Our Hero!!! CONGRATULATIONS!;False;False;False;False;Next;False;False;quest Coronavirus has been completed
-True;quest Coronavirus;3;0;Our Hero!!! CONGRATULATIONS!;False;False;False;False;Next;False;False;False
+True;quest Coronavirus;0;1;Go to Bravendell and then head east to Teneguerra Volcano. Our spies are reporting that in that areawas seen a giant monster, looking like fosfolipid sphere, with rybonucleic acid inside with proteinson the surface like crown looking style. It might be the cause of the curse! Kill the beast!;False;False;False;False;Next;False;False;False
+True;quest Coronavirus;0;2;We are waiting for you! Go to Bravendell and then head east!;False;False;False;False;Next;False;False;False
+True;quest Coronavirus;1;0;We are waiting for you! Go to Bravendell and then head east!;False;False;False;False;Next;False;False;False
+True;quest Coronavirus;2;0;Our Hero!!! CONGRATULATIONS!;False;False;False;False;False;False;False;quest Coronavirus has been completed
+True;quest Coronavirus;2;1;Well, YOU HAVE ACCOMPLISHED the Game! With the    honour I give you old Wuhan Artifact: Corona CrownWear it with proud. Now we will see if we can end lock down of Lapalmix!. The economy must be turned on! Farewell!!;False;False;False;False;False;False;False;quest Coronavirus has been rewarded
+False;quest Coronavirus;2;2;I`m glad to see Lapalmix without this nasty virus!;False;False;False;False;False;False;False;game accomplished
+True;quest Coronavirus;3;0;Our Hero! Everything is going good so far. Next   week we will open the barber shop.;False;False;False;False;Next;False;False;False
 True;bye;0;0;You may go!;False;False;False;False;False;False;False;False

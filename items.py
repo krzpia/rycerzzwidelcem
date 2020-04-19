@@ -36,8 +36,8 @@ class ItemGenerator:
                                           175,9,1,0,0,0,5,0,0,70,59,37,49,81))
         self.q_items.append(sprites.Quest_Item(self.game,"Spider`s Leg",0,41,94))
         self.q_items.append(sprites.Armor(self.game,"HEPA Helmet","helmet","textile",
-                                          10000,50,1,0,25,0,0,0,0,15,42,94,43,94))
-        self.q_items.append(sprites.Armor(self.game, "Corna Crown", "helmet", "crown",
+                                          10000,25,1,0,10,0,0,0,0,15,42,94,43,94))
+        self.q_items.append(sprites.Armor(self.game, "Corona Crown", "helmet", "crown",
                                           10000, 0, 1, 10, 10, 10, 10, 10, 10, 100, 47, 35, 17, 92))
 
         ######## WEAPONS ###########
